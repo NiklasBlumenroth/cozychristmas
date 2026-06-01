@@ -1,0 +1,16 @@
+{
+    "name": "CozySanta.Runtime",
+    "rootNamespace": "CozySanta.Runtime",
+    "references": [
+        "CozySanta.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

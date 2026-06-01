@@ -65,6 +65,27 @@ Vor Code-Aenderungen die Constitution lesen. Die wichtigsten Pflichten:
 - `.csproj`/`.sln` werden von Unity generiert und sind nicht versioniert
   (siehe `.gitignore`).
 
+## Code-Architektur & Konvention (ab F1)
+
+Quellcode liegt additiv unter `Assets/_Project/`, getrennt über Assembly Definitions
+(setzt Constitution-Prinzip IX technisch durch):
+
+```
+Assets/_Project/
+├── Core/      → CozySanta.Core      (reines C#, noEngineReferences: true – keine UnityEngine-Typen!)
+├── Runtime/   → CozySanta.Runtime   (MonoBehaviours, Provider-Impl., referenziert Core)
+└── Tests/
+    ├── EditMode/ → CozySanta.Tests.EditMode (refs Core; schnelle Regel-/Unit-Tests, kein Szenenstart)
+    └── PlayMode/ → CozySanta.Tests.PlayMode (refs Core + Runtime; gezielte E2E-Flows)
+```
+
+- **Namespaces folgen dem Ordner**: `CozySanta.Core.<Bereich>`, `CozySanta.Runtime.<Bereich>`.
+- **Decide/Apply**: Entscheidungslogik als reine Methode in Core (`Decide`), Seiteneffekt in der
+  Runtime (`Apply`). Zeit-/Welt-/Eingabezugriffe nur über Provider-Interfaces (in Tests gemockt).
+- **Abhängigkeit strikt einseitig**: Runtime → Core, niemals umgekehrt.
+- Schritt-für-Schritt-Anleitung zum Anlegen eines neuen Features:
+  `specs/001-core-architektur-fundament/quickstart.md`.
+
 ## Status / MVP-Fokus
 
 Erster Sektor (Eingangsbereich + Poststelle, optional Dekorationsfabrik) als

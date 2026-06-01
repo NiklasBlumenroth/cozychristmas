@@ -1,0 +1,37 @@
+@startuml decide-apply-flow
+title F1 – Decide/Apply-Beispielflow (Interaktions-Zielauswahl)
+
+start
+:Runtime: Kandidaten über IInteractionProbe abfragen (Provider);
+note right: Seiteneffektfreie Eingabe für Core
+
+partition "Core: InteractionSelector.Decide (pure)" {
+  :Kandidaten nach MaxRange filtern;
+  if (mind. ein Kandidat in Reichweite?) then (ja)
+    :Kandidaten nach MaxAngle filtern;
+    if (mind. ein Kandidat im Blickwinkel?) then (ja)
+      :besten wählen\n(kleinste Distanz; Tie-Break kleinster Winkel);
+      :InteractionSelection { HasTarget = true, TargetId };
+    else (nein)
+      :InteractionSelection.None;
+    endif
+  else (nein)
+    :InteractionSelection.None;
+  endif
+}
+
+partition "Runtime: Apply (einziger Seiteneffekt)" {
+  if (HasTarget?) then (ja)
+    :FocusedTargetId = selection.TargetId;
+  else (nein)
+    :FocusedTargetId = none / kein Fokus;
+  endif
+}
+stop
+
+note bottom
+  Testkandidaten: T1 (leer), T2 (1 gültig), T3 (Distanz-Sortierung),
+  T4 (Tie-Break Winkel), T5 (Winkel-Filter), T6 (Reichweiten-Filter),
+  T7 (E2E Apply). Siehe data-model.md.
+end note
+@enduml

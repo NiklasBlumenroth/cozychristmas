@@ -1,0 +1,60 @@
+@startuml architektur-schichten
+title F1 – Architekturschichten & Abhängigkeitsrichtung
+
+package "CozySanta.Core\n(noEngineReferences: true)" #LightCyan {
+  interface ITimeProvider {
+    +DeltaTime : float
+    +Now : double
+  }
+  interface IInteractionProbe {
+    +QueryCandidates() : IReadOnlyList<InteractionCandidate>
+  }
+  class InteractionCandidate <<readonly struct>> {
+    +TargetId : int
+    +Distance : float
+    +AngleToView : float
+  }
+  class SelectionSettings <<readonly struct>> {
+    +MaxRange : float
+    +MaxAngle : float
+  }
+  class InteractionSelection <<readonly struct>> {
+    +HasTarget : bool
+    +TargetId : int
+    {static} +None
+  }
+  class InteractionSelector {
+    +Decide(candidates, settings) : InteractionSelection
+  }
+  InteractionSelector ..> InteractionCandidate
+  InteractionSelector ..> SelectionSettings
+  InteractionSelector ..> InteractionSelection
+}
+
+package "CozySanta.Runtime\n(referenziert Core)" #LightYellow {
+  class UnityTimeProvider
+  class PhysicsInteractionProbe <<MonoBehaviour>>
+  class PlayerInteractionController <<MonoBehaviour>> {
+    -settings : SelectionSettings
+    +FocusedTargetId : int
+  }
+  UnityTimeProvider ..|> ITimeProvider
+  PhysicsInteractionProbe ..|> IInteractionProbe
+  PlayerInteractionController ..> IInteractionProbe : Provider
+  PlayerInteractionController ..> InteractionSelector : Decide
+}
+
+package "Tests" #LightGreen {
+  class "CozySanta.Tests.EditMode" as EM
+  class "CozySanta.Tests.PlayMode" as PM
+}
+
+PlayerInteractionController -down-> InteractionSelector
+EM -up-> InteractionSelector : prüft Decide
+PM -up-> PlayerInteractionController : prüft Apply (E2E)
+
+note right of InteractionSelector
+  Abhängigkeit strikt einseitig:
+  Runtime --> Core, niemals umgekehrt (FR-005)
+end note
+@enduml
