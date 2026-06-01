@@ -1,0 +1,23 @@
+@startuml trag-stapel-zustand
+title F3 – Lebenszyklus eines Objekts (Tragen)
+
+[*] --> InWelt
+InWelt --> Getragen : Interact (aufnehmbar)\n[CarryStack.TryPush == true]
+InWelt --> InWelt : Interact\n[Überlast -> TryPush == false]
+
+state Getragen {
+  [*] --> LinkeHand
+  LinkeHand --> RechterStapel : weiteres Objekt aufgenommen\n(neues links, dieses nach rechts)
+  RechterStapel --> LinkeHand : linkes abgelegt -> oberstes\nrechts rückt nach links
+}
+
+Getragen --> InWelt : Drop (LIFO: nur das linke/aktuelle)\n[reparent in Welt, Physik aktiv]
+
+note right of Getragen
+  Apply: RelayoutHands() – zuletzt
+  aufgenommenes an leftHandAnchor,
+  Rest an rightHandAnchor; Collider aus,
+  Rigidbody kinematic. Core (CarryStack)
+  bleibt Autorität über Reihenfolge & Gewicht.
+end note
+@enduml

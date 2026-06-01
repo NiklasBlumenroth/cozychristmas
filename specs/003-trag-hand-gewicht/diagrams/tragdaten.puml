@@ -1,0 +1,46 @@
+@startuml tragdaten
+title F3 – Tragdaten & Komponenten
+
+package "CozySanta.Core.Carry (pure)" #LightCyan {
+  class CarryItem <<readonly struct>> {
+    +Id : int
+    +Weight : float
+  }
+  class CarryStack {
+    +Capacity : float
+    +TotalWeight : float
+    +Count : int
+    +CanPickUp(weight) : bool
+    +TryPush(item) : bool
+    +TryPop(out item) : bool
+    +TryPeek(out item) : bool
+  }
+  CarryStack o-- "0..*" CarryItem : LIFO
+}
+
+package "CozySanta.Runtime.Carry" #LightYellow {
+  interface IPickup {
+    +Weight : float
+  }
+  class PickupInteractable <<MonoBehaviour>> {
+    +PromptText : string
+  }
+  class PlayerCarry <<MonoBehaviour>> {
+    -leftHandAnchor : Transform
+    -rightHandAnchor : Transform
+    +TryPickup(IPickup) : bool
+    +Drop()
+    -RelayoutHands()
+  }
+  PickupInteractable ..|> IPickup
+  PickupInteractable ..|> "IInteractable (F2)"
+  PlayerCarry --> CarryStack : Autorität (Decide)
+  PlayerCarry ..> IPickup : Id->Objekt (Dictionary)
+}
+
+note bottom of PlayerCarry
+  Apply: Reparent/Physik/Weltplatzierung.
+  Routing: PlayerInteractionController (F2)
+  gibt fokussierte IPickup an TryPickup.
+end note
+@enduml

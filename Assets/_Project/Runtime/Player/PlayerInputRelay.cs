@@ -1,3 +1,4 @@
+using CozySanta.Runtime.Carry;
 using CozySanta.Runtime.Interaction;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,12 +9,14 @@ namespace CozySanta.Runtime.Player
     /// Input-Adapter: bindet die Input-System-Actions der Map „Player" an die entkoppelten Setter
     /// des Controllers. Auf dasselbe GameObject wie eine <c>PlayerInput</c>-Komponente (Behavior
     /// „Send Messages") setzen; die Action-Namen Move/Look/Interact werden per Konvention
-    /// (OnMove/OnLook/OnInteract) aufgerufen.
+    /// (OnMove/OnLook/OnInteract) aufgerufen. Ablegen wird im Prototyp direkt über Taste „Q" gelesen
+    /// (formale Drop-Action folgt mit der finalen Tastenbelegung).
     /// </summary>
     public sealed class PlayerInputRelay : MonoBehaviour
     {
         [SerializeField] private FirstPersonController controller;
         [SerializeField] private PlayerInteractionController interaction;
+        [SerializeField] private PlayerCarry carry;
 
         private void Awake()
         {
@@ -25,6 +28,20 @@ namespace CozySanta.Runtime.Player
             if (interaction == null)
             {
                 interaction = GetComponent<PlayerInteractionController>();
+            }
+
+            if (carry == null)
+            {
+                carry = GetComponent<PlayerCarry>();
+            }
+        }
+
+        private void Update()
+        {
+            var keyboard = Keyboard.current;
+            if (keyboard != null && keyboard.qKey.wasPressedThisFrame && carry != null)
+            {
+                carry.Drop();
             }
         }
 

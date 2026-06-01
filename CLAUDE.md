@@ -89,9 +89,12 @@ Assets/_Project/
 ## Fortschritt
 
 - **F1 (abgeschlossen)**: Testbares Architekturfundament (Core/Runtime/Tests, Decide/Apply, Provider).
-- **F2 (in Arbeit/abgeschlossen)**: First-Person-Controller (WASD + Maus-Blick, CharacterController)
+- **F2 (abgeschlossen)**: First-Person-Controller (WASD + Maus-Blick, CharacterController)
   und Interaktionssystem (blick-/reichweitenbasierte Erkennung über F1-`InteractionSelector`,
   editor-authored Hinweis, `Interact`-Auslösung auf das fokussierte `IInteractable`).
+- **F3 (in Arbeit)**: Trag-, Hand- & Gewichtssystem — Core-`CarryStack` (LIFO + Traglast),
+  `IPickup`/`PickupInteractable`, `PlayerCarry` (Links/Rechts-Anker: links an der Kamera = aktuelles
+  Objekt, rechts am Körper = Stapel mit fester Basis), Ablegen via „Q", Test-Spawner („O") + Prefab.
 
 ## Status / MVP-Fokus
 

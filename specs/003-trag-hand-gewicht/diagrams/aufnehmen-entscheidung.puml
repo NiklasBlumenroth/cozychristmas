@@ -1,0 +1,37 @@
+@startuml aufnehmen-entscheidung
+title F3 – Aufnehmen-Entscheidung (mit Gewichtsprüfung)
+
+start
+:Spieler drückt Interact;
+if (Fokus auf interagierbarem Objekt?) then (nein)
+  :keine Aktion;
+  stop
+else (ja)
+  if (Objekt ist IPickup?) then (nein)
+    :Interact() (generisch, z. B. DebugInteractable);
+    stop
+  else (ja)
+    partition "Core: CarryStack (Decide)" {
+      if (TotalWeight + Weight <= Capacity?) then (ja)
+        :TryPush(item) -> true;
+      else (nein)
+        :TryPush -> false (Ablehnung);
+      endif
+    }
+    if (aufgenommen?) then (ja)
+      partition "Runtime: Apply" {
+        :Id->IPickup merken;
+        :Objekt an HandAnchor reparenten\n(Index-Offset), Physik ruht;
+      }
+    else (nein)
+      :Objekt bleibt in der Welt;
+    endif
+  endif
+endif
+stop
+
+note right
+  Testkandidaten: C1 (unter), C2 (==Grenze),
+  C3 (über/Ablehnung), C6 (Capacity erhöht).
+end note
+@enduml

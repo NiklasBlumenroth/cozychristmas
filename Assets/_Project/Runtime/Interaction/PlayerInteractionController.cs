@@ -1,4 +1,5 @@
 using CozySanta.Core.Interaction;
+using CozySanta.Runtime.Carry;
 using UnityEngine;
 
 namespace CozySanta.Runtime.Interaction
@@ -14,6 +15,7 @@ namespace CozySanta.Runtime.Interaction
         [SerializeField] private float maxRange = 3f;
         [SerializeField] private float maxAngle = 30f;
         [SerializeField] private InteractionPromptPresenter prompt;
+        [SerializeField] private PlayerCarry carry;
 
         private IInteractionProbe _probe;
         private IInteractableResolver _resolver;
@@ -96,13 +98,23 @@ namespace CozySanta.Runtime.Interaction
             }
         }
 
-        /// <summary>Vom Interact-Input aufzurufen. Löst nur bei aufgelöstem Fokus aus (Gate in Core).</summary>
+        /// <summary>Vom Interact-Input aufzurufen. Löst nur bei aufgelöstem Fokus aus (Gate in Core).
+        /// Ist das fokussierte Objekt aufnehmbar (<see cref="IPickup"/>), wird es an <c>PlayerCarry</c>
+        /// geroutet; sonst die generische <c>Interact()</c>-Aktion ausgelöst.</summary>
         public void TryInteract()
         {
-            if (InteractionTrigger.ShouldInteract(HasInteractableFocus, true) && _focused != null)
+            if (!InteractionTrigger.ShouldInteract(HasInteractableFocus, true) || _focused == null)
             {
-                _focused.Interact();
+                return;
             }
+
+            if (carry != null && _focused is IPickup pickup)
+            {
+                carry.TryPickup(pickup);
+                return;
+            }
+
+            _focused.Interact();
         }
     }
 }
