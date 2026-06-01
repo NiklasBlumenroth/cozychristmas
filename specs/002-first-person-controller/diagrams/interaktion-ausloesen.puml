@@ -1,0 +1,45 @@
+@startuml interaktion-ausloesen
+title F2 – Interaktions-Auslösung (systemübergreifender Fluss)
+
+actor Spieler
+participant "Input System\n(Map: Player)" as Input
+participant "FirstPersonController\n(Runtime)" as FPC
+participant "PlayerInteractionController\n(Runtime)" as PIC
+participant "PhysicsInteractionProbe\n(Runtime, IInteractionProbe + Resolver)" as Probe
+participant "InteractionSelector\n(Core, pure Decide)" as Selector
+participant "InteractionPromptPresenter\n(Runtime, editor-authored UI)" as Prompt
+participant "IInteractable\n(Weltobjekt)" as Target
+
+== Pro Frame: Fokus ermitteln ==
+Spieler -> Input : Move / Look
+Input -> FPC : Move/Look-Werte
+FPC -> FPC : MovementCalculator / LookMath (Core)\nApply: CharacterController + Kamera
+
+PIC -> Probe : QueryCandidates()
+Probe --> PIC : Kandidaten (nur IInteractable)
+PIC -> Selector : Decide(kandidaten, settings)
+Selector --> PIC : InteractionSelection (TargetId | None)
+
+alt HasTarget
+  PIC -> Probe : TryResolve(TargetId)
+  Probe --> PIC : IInteractable
+  PIC -> Prompt : Show(PromptText)
+else kein Ziel
+  PIC -> Prompt : Hide()
+end
+
+== Auslösen ==
+Spieler -> Input : Interact
+Input -> PIC : interactPressed
+PIC -> PIC : InteractionTrigger.ShouldInteract(HasFocus, pressed) (Core)
+alt ShouldInteract == true
+  PIC -> Target : Interact()
+else
+  note right of PIC : keine Auslösung
+end
+
+note over Selector
+  Auswahlregel unverändert aus F1.
+  Core kennt weder UnityEngine noch IInteractable.
+end note
+@enduml

@@ -1,0 +1,50 @@
+@startuml interaktion-komponenten
+title F2 – Komponenten & Bezug zu F1
+
+package "CozySanta.Core (pure)" #LightCyan {
+  class "LookMath\n+ClampPitch()" as LookMath <<static>>
+  class "MovementCalculator\n+ComputeLocalVelocity()" as Move <<static>>
+  class "InteractionTrigger\n+ShouldInteract()" as Trigger <<static>>
+  class "InteractionSelector\n+Decide()  (F1)" as Selector <<static>>
+  interface "IInteractionProbe (F1)" as IProbe
+}
+
+package "CozySanta.Runtime" #LightYellow {
+  class FirstPersonController <<MonoBehaviour>> {
+    -speed : float
+    -minPitch/maxPitch : float
+  }
+  class PlayerInteractionController <<MonoBehaviour>> {
+    +HasFocus : bool
+    +FocusedTargetId : int
+  }
+  class PhysicsInteractionProbe <<MonoBehaviour>>
+  interface IInteractable {
+    +Interact()
+    +PromptText : string
+  }
+  interface IInteractableResolver {
+    +TryResolve(targetId, out IInteractable) : bool
+  }
+  class InteractionPromptPresenter <<MonoBehaviour>> {
+    -promptRoot : GameObject  (editor-authored)
+    +Show(text) / Hide()
+  }
+}
+
+FirstPersonController ..> Move
+FirstPersonController ..> LookMath
+PlayerInteractionController ..> Selector : Decide
+PlayerInteractionController ..> Trigger : Gate
+PlayerInteractionController ..> IProbe : Kandidaten
+PlayerInteractionController ..> IInteractableResolver : Auflösung
+PlayerInteractionController ..> IInteractable : Interact()
+PlayerInteractionController ..> InteractionPromptPresenter : Fokuszustand
+PhysicsInteractionProbe ..|> IProbe
+PhysicsInteractionProbe ..|> IInteractableResolver
+
+note bottom of IInteractable
+  Liegt in Runtime (Unity-nah, Seiteneffekt).
+  Core bleibt frei davon -> Abhängigkeit nur Runtime->Core.
+end note
+@enduml

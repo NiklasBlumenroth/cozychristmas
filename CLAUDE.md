@@ -86,6 +86,13 @@ Assets/_Project/
 - Schritt-für-Schritt-Anleitung zum Anlegen eines neuen Features:
   `specs/001-core-architektur-fundament/quickstart.md`.
 
+## Fortschritt
+
+- **F1 (abgeschlossen)**: Testbares Architekturfundament (Core/Runtime/Tests, Decide/Apply, Provider).
+- **F2 (in Arbeit/abgeschlossen)**: First-Person-Controller (WASD + Maus-Blick, CharacterController)
+  und Interaktionssystem (blick-/reichweitenbasierte Erkennung über F1-`InteractionSelector`,
+  editor-authored Hinweis, `Interact`-Auslösung auf das fokussierte `IInteractable`).
+
 ## Status / MVP-Fokus
 
 Erster Sektor (Eingangsbereich + Poststelle, optional Dekorationsfabrik) als
