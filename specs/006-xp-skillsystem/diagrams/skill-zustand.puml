@@ -1,0 +1,30 @@
+@startuml skill-zustand
+title F6 – Skill-Stufe & Level-Fortschritt (Lebenszyklus)
+
+state "Standard-Skill" as Std {
+  [*] --> Stufe0
+  Stufe0 --> Stufe_n : Invest\n[AvailablePoints > 0]
+  Stufe_n --> Stufe_n : Invest\n[Level < MaxLevel]
+  Stufe_n --> Max : Invest\n[Level == MaxLevel]
+  Max --> Max : Invest\n[keine Aktion]
+}
+
+state "Freischalt-Skill (SortVision/ObjectPull)" as Unlock {
+  [*] --> Gesperrt
+  Gesperrt --> Freigeschaltet : erste Investition\n[Unlocked = true]
+  Freigeschaltet --> Freigeschaltet : Invest\n[Level < MaxLevel]
+  Freigeschaltet --> MaxU : Invest\n[Level == MaxLevel]
+}
+
+state "Level-Fortschritt" as Lvl {
+  [*] --> L1
+  L1 --> L1 : AwardXp\n[unter Schwelle]
+  L1 --> L2 : AwardXp\n[Schwelle erreicht -> +Skillpunkte]
+  L2 --> Lk : AwardXp\n[viel XP -> mehrere Level]
+}
+
+note bottom of Unlock
+  In F6 nur Status/Stufe. Die Fähigkeit (Sortierblick-Anzeige,
+  Objektanziehung) wirkt erst mit F9/F10.
+end note
+@enduml
