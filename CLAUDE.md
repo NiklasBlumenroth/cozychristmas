@@ -95,7 +95,7 @@ Assets/_Project/
 - **F3 (abgeschlossen)**: Trag-, Hand- & Gewichtssystem — Core-`CarryStack` (LIFO + Traglast),
   `IPickup`/`PickupInteractable`, `PlayerCarry` (Links/Rechts-Anker: links an der Kamera = aktuelles
   Objekt, rechts am Körper = Stapel mit fester Basis), Ablegen via „Q", Test-Spawner + Prefab.
-- **F4 (in Arbeit)**: Sortiersystem & Sortierfeedback — Core-`SortKey`/`SortTarget` (Klassifizierung
+- **F4 (abgeschlossen)**: Sortiersystem & Sortierfeedback — Core-`SortKey`/`SortTarget` (Klassifizierung
   korrekt/falsch, konfigurierbare Soll-Menge, LIFO-Entnahme, Abschluss/Sperre, `JustCompleted`),
   Runtime `ISortable`/`Sortable` + `SortTargetInteractable` (Fach: Einsortieren/Entnehmen kontextabhängig
   über das fokussierte Fach, Reparenting an Slot, eingelegte Objekte ohne aktive Interaktions-Collider,
@@ -103,6 +103,13 @@ Assets/_Project/
   `CanCarry`/`TryHandOverTop` erweitert; `PlayerInteractionController` routet fokussierte Fächer.
   Dev-Tool `DevSpawnMenu` (IMGUI): „G" öffnet Auswahlliste, „R" spawnt das selektierte Prefab
   (ersetzt den festen „O"-Spawner). Editor-Setup „CozySanta/Setup F4 …" verdrahtet Prefabs.
+- **F5 (abgeschlossen)**: Schnee-Schmelzsystem — Core `LampBattery` (Akku) + `MeltField` (Zell-Höhenfeld,
+  Coverage %); Runtime `SnowPatch` (Grid-Mesh spiegelt das Höhenfeld via Vertex-Displacement, Höhe im
+  Vertex-Color) + `MeltController` (Raycast auf die Patch-Ebene, „F" schmelzen mit Akku-Verbrauch, „V"
+  Schnee auftragen als Dev-Helfer). URP-Shader `CozySanta/SnowMelt` clippt freigelegte Stellen mit
+  weicher Noise-Kante (Boden erscheint), Textur/Fake-Lighting/Glitzer. Editor-Setup
+  „CozySanta/Setup F5 …" (Material + Patch + Verdrahtung). Core unit-getestet; Shader/Look = Editor-
+  Iteration (dokumentierte Nicht-Unit-Ausnahme). Boden = Szenen-Plane, Schnee-Textur `Holiday_Snow_02`.
 
 ## Status / MVP-Fokus
 

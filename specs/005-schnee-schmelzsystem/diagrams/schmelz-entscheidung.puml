@@ -1,0 +1,38 @@
+@startuml schmelz-entscheidung
+title F5 – Schmelz-/Auftrag-Entscheidung (pro Tick)
+
+start
+:Blick-Raycast schneidet Patch-Ebene;
+if (Treffer auf Patch (enter <= maxRange)?) then (nein)
+  if (F nicht gehalten?) then (ja)
+    :Akku langsam nachladen (Recharge);
+  endif
+  stop
+endif
+
+if (F gehalten?) then (ja – schmelzen)
+  if (Akku > 0 (CanMelt)?) then (ja)
+    :MeltField.Melt(u, v, radius, strength*dt)\n(Höhe senken, clamp 0, Coverage aktualisieren);
+    :SnowPatch.SyncMesh (Vertex-Höhe + Color);
+    :LampBattery.Drain(rate*dt);
+  else (leer)
+    :kein Abtrag (gesperrt);
+  endif
+else (nein)
+  if (V gehalten?) then (ja – Dev-Auftrag)
+    :MeltField.Add(u, v, radius, strength*dt)\n(Höhe heben, clamp 1);
+    :SnowPatch.SyncMesh;
+  else (nichts)
+    :Akku langsam nachladen (Recharge);
+  endif
+endif
+
+stop
+
+note right
+  Decide (Core): LampBattery (CanMelt/Drain/Recharge),
+  MeltField (Melt/Add/Coverage).
+  Apply (Runtime): Raycast, Mesh-Sync, Shader-Clip (Reveal),
+  dt-Skalierung. Coverage ist Autorität für XP/Aufgaben (F6/F7).
+end note
+@enduml

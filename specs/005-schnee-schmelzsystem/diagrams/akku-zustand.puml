@@ -1,0 +1,27 @@
+@startuml akku-zustand
+title F5 – Akku & Area-Fortschritt (Lebenszyklus)
+
+state "Akku" as Battery {
+  [*] --> Geladen
+  Geladen --> Geladen : Drain (schmelzen)\n[Level > 0]
+  Geladen --> Leer : Drain\n[Level == 0]
+  Leer --> Geladen : Recharge\n[Level > 0]
+  Leer --> Leer : F gehalten\n[kein Abtrag]
+  Geladen --> Geladen : Recharge (nicht schmelzen)\n[clamp Capacity]
+}
+
+state "Area-Fortschritt (Coverage)" as Area {
+  [*] --> VollSchnee
+  VollSchnee --> Teilweise : Melt\n[Coverage > 0]
+  Teilweise --> Teilweise : Melt / Add
+  Teilweise --> VollSchnee : Add\n[Coverage == 0]
+  Teilweise --> Frei : Melt\n[Coverage == 1 (100%)]
+  Frei --> Teilweise : Add (Dev)\n[Coverage < 1]
+}
+
+note bottom of Area
+  Coverage = Anteil freigelegter Zellen (MeltField).
+  "Frei" (100%) ist das Abschluss-Signal der Area
+  fuer XP/Aufgaben (F6/F7).
+end note
+@enduml

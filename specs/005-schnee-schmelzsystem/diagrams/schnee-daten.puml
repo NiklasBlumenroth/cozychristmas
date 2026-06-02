@@ -1,0 +1,61 @@
+@startuml schnee-daten
+title F5 – Schnee-/Akku-Daten (Core) und Runtime-Anbindung
+
+package "CozySanta.Core.Snow" {
+  class LampBattery {
+    + Capacity : float
+    + Level : float
+    + CanMelt : bool
+    + Fraction : float
+    + Drain(amount)
+    + Recharge(amount)
+    + Refill()
+  }
+  class MeltField {
+    + Resolution : int
+    + CellCount : int
+    + Coverage : float        ' 0..1, Autorität
+    + CoveragePercent : float
+    + HeightAt(x,y) : float
+    + Melt(u,v,radius,strength)
+    + Add(u,v,radius,strength)
+    .. Invarianten ..
+    ' Höhe je Zelle in [0,1]
+    ' Coverage = Anteil Zellen mit Höhe ~ 0
+  }
+}
+
+package "CozySanta.Runtime.Snow" {
+  class SnowPatch <<MonoBehaviour>> {
+    - resolution : int
+    - size : float
+    - maxHeight : float
+    + Coverage : float
+    + Melt(world,radius,strength) : bool
+    + AddSnow(world,radius,strength) : bool
+    - SyncMesh()  ' Vertex-Höhe + Color.r = Höhe
+  }
+  class MeltController <<MonoBehaviour>> {
+    - viewOrigin : Transform
+    - patch : SnowPatch
+    + BatteryFraction : float
+    + Coverage : float
+    + Update()  ' F=schmelzen, V=auftragen
+  }
+  note bottom of SnowPatch
+    Shader "CozySanta/SnowMelt" (URP):
+    clip(height - noisySchwelle) -> Reveal Boden,
+    weicher Rand; Textur + Fake-Lighting + Glitzer.
+  end note
+}
+
+MeltController "1" *-- "1" LampBattery : hält
+MeltController --> SnowPatch : steuert
+SnowPatch "1" *-- "1" MeltField : spiegelt (Decide)
+
+note as N1
+  Abhängigkeit strikt Runtime --> Core.
+  Core kennt weder UnityEngine noch SnowPatch/Shader.
+  GPU spiegelt nur; Core bleibt Autorität über Akku & Coverage.
+end note
+@enduml
