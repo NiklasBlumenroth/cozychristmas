@@ -1,0 +1,78 @@
+@startuml sortierdaten
+title F4 – Sortierdaten (Core) und Runtime-Anbindung
+
+package "CozySanta.Core.Sorting" {
+  struct SortKey <<readonly struct>> {
+    + facets : string[]  ' geordnete Facettenwerte
+    + Matches(other : SortKey) : bool
+    + Equals/GetHashCode  ' wertbasiert, positionsbezogen
+  }
+
+  enum SortTargetState {
+    Leer
+    Teilweise
+    FalschEnthalten
+    Vollstaendig
+  }
+
+  class SortTarget {
+    + Accepted : SortKey
+    + RequiredCount : int
+    + CorrectCount : int
+    + WrongCount : int
+    + Count : int
+    + IsClosed : bool
+    + Classify(itemKey : SortKey) : bool
+    + TryPlace(id : int, itemKey : SortKey) : bool
+    + TryRemoveTop(out id : int) : bool
+    + Evaluate() : SortTargetState
+    + JustCompleted : bool
+    .. Invarianten ..
+    ' CorrectCount + WrongCount == Count
+    ' Vollstaendig <=> CorrectCount == RequiredCount && WrongCount == 0
+    ' nach IsClosed keine Mutation; Einlagen LIFO
+  }
+
+  class "Eintrag" as Eintrag <<value>> {
+    + Id : int
+    + Key : SortKey
+    + Correct : bool
+  }
+
+  SortTarget "1" o-- "0..*" Eintrag : Einlagen (LIFO)
+  SortTarget --> SortKey : Accepted
+  SortTarget ..> SortTargetState : Evaluate()
+  Eintrag --> SortKey
+}
+
+package "CozySanta.Runtime.Sorting" {
+  interface ISortable {
+    + Key : SortKey
+  }
+  class Sortable <<MonoBehaviour>> {
+    - facets : string[]
+    + Key : SortKey
+  }
+  class SortTargetInteractable <<MonoBehaviour>> {
+    - acceptedFacets : string[]
+    - requiredCount : int
+    - slotAnchor : Transform
+    - lamp : (Light / GameObject)
+    - onCompleted : UnityEvent
+    + PromptText : string
+    + Interact()  ' Apply: Hand<->Fach, Reparent, Collider/Lampe/Schließen
+  }
+
+  Sortable ..|> ISortable
+  SortTargetInteractable ..|> "CozySanta.Runtime.Interaction.IInteractable"
+  SortTargetInteractable "1" *-- "1" SortTarget : hält (Decide)
+  SortTargetInteractable ..> ISortable : übernimmt/gibt zurück
+  SortTargetInteractable ..> "CozySanta.Runtime.Carry.PlayerCarry" : Hand<->Fach
+}
+
+note bottom
+  Abhängigkeit strikt Runtime --> Core.
+  Core kennt weder UnityEngine noch ISortable/IInteractable/PlayerCarry.
+  Sortable ergänzt das F3-PickupInteractable desselben Objekts (Objekt bleibt aufnehmbar).
+end note
+@enduml

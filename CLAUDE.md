@@ -92,9 +92,17 @@ Assets/_Project/
 - **F2 (abgeschlossen)**: First-Person-Controller (WASD + Maus-Blick, CharacterController)
   und Interaktionssystem (blick-/reichweitenbasierte Erkennung über F1-`InteractionSelector`,
   editor-authored Hinweis, `Interact`-Auslösung auf das fokussierte `IInteractable`).
-- **F3 (in Arbeit)**: Trag-, Hand- & Gewichtssystem — Core-`CarryStack` (LIFO + Traglast),
+- **F3 (abgeschlossen)**: Trag-, Hand- & Gewichtssystem — Core-`CarryStack` (LIFO + Traglast),
   `IPickup`/`PickupInteractable`, `PlayerCarry` (Links/Rechts-Anker: links an der Kamera = aktuelles
-  Objekt, rechts am Körper = Stapel mit fester Basis), Ablegen via „Q", Test-Spawner („O") + Prefab.
+  Objekt, rechts am Körper = Stapel mit fester Basis), Ablegen via „Q", Test-Spawner + Prefab.
+- **F4 (in Arbeit)**: Sortiersystem & Sortierfeedback — Core-`SortKey`/`SortTarget` (Klassifizierung
+  korrekt/falsch, konfigurierbare Soll-Menge, LIFO-Entnahme, Abschluss/Sperre, `JustCompleted`),
+  Runtime `ISortable`/`Sortable` + `SortTargetInteractable` (Fach: Einsortieren/Entnehmen kontextabhängig
+  über das fokussierte Fach, Reparenting an Slot, eingelegte Objekte ohne aktive Interaktions-Collider,
+  Lampe + Schließen bei Vollständigkeit, `onCompleted` als XP-Andockpunkt/F6). `PlayerCarry` additiv um
+  `CanCarry`/`TryHandOverTop` erweitert; `PlayerInteractionController` routet fokussierte Fächer.
+  Dev-Tool `DevSpawnMenu` (IMGUI): „G" öffnet Auswahlliste, „R" spawnt das selektierte Prefab
+  (ersetzt den festen „O"-Spawner). Editor-Setup „CozySanta/Setup F4 …" verdrahtet Prefabs.
 
 ## Status / MVP-Fokus
 

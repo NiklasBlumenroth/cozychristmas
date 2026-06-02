@@ -1,5 +1,6 @@
 using CozySanta.Core.Interaction;
 using CozySanta.Runtime.Carry;
+using CozySanta.Runtime.Sorting;
 using UnityEngine;
 
 namespace CozySanta.Runtime.Interaction
@@ -111,6 +112,13 @@ namespace CozySanta.Runtime.Interaction
             if (carry != null && _focused is IPickup pickup)
             {
                 carry.TryPickup(pickup);
+                return;
+            }
+
+            // F4: fokussiertes Sortier-Fach erhält die Interaktion mit Trag-Kontext (Einsortieren/Entnehmen).
+            if (carry != null && _focused is SortTargetInteractable sortTarget)
+            {
+                sortTarget.HandleInteract(carry);
                 return;
             }
 

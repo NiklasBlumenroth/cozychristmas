@@ -1,0 +1,48 @@
+@startuml sortier-entscheidung
+title F4 – Einsortier-/Entnahme-Entscheidung (Fach-Interact)
+
+start
+:Spieler löst Interact auf fokussiertes Fach aus;
+
+if (Fach IsClosed?) then (ja)
+  :keine Aktion;
+  stop
+endif
+
+if (Spieler trägt ein Objekt?) then (ja – Einsortieren)
+  :oberstes getragenes ISortable\naus PlayerCarry ermitteln (id, key);
+  :SortTarget.TryPlace(id, key);
+  if (key passt zu Accepted?) then (korrekt)
+    :CorrectCount + 1;
+  else (falsch)
+    :WrongCount + 1\n(bleibt liegen, kein Auswurf);
+  endif
+  :Objekt an SlotAnchor reparenten,\nInteraktions-Collider deaktivieren,\nsichtbar lassen;
+  if (CorrectCount == RequiredCount\n&& WrongCount == 0?) then (Abschluss)
+    :Lampe AN;
+    :onCompleted auslösen\n(Andockpunkt XP/F6);
+    :Fach schließen:\neingelegte Visuals/Collider entfernen,\nIsClosed = true;
+  else (noch offen)
+    :Lampe bleibt AUS;
+  endif
+else (nein – Entnahme)
+  if (Fach enthält Objekte?) then (ja)
+    if (Hand hat freie Tragkapazität?\n(CarryStack.CanPickUp)) then (ja)
+      :SortTarget.TryRemoveTop(out id) (LIFO);
+      :zugehöriges Objekt zurück in die Hand,\nInteraktions-Collider reaktivieren;
+    else (Überlast)
+      :Entnahme abgelehnt,\nObjekt bleibt im Fach;
+    endif
+  else (leer)
+    :keine Aktion;
+  endif
+endif
+
+stop
+
+note right
+  Decide (Core): Classify, TryPlace, TryRemoveTop, Evaluate, IsClosed.
+  Apply (Runtime): Reparenting, Collider-/Visual-Toggle, Lampe, Schließen,
+  Hand<->Fach-Übergabe, Kapazitätsprüfung über F3-CarryStack.
+end note
+@enduml

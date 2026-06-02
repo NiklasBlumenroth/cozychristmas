@@ -1,0 +1,36 @@
+@startuml fach-zustand
+title F4 – Lebenszyklus eines Fachs (SortTarget)
+
+[*] --> Leer
+
+Leer --> Teilweise : TryPlace (korrekt)\n[CorrectCount < RequiredCount, WrongCount == 0]
+Leer --> FalschEnthalten : TryPlace (falsch)\n[WrongCount > 0]
+
+Teilweise --> Teilweise : TryPlace (korrekt)\n[CorrectCount < RequiredCount]
+Teilweise --> FalschEnthalten : TryPlace (falsch)\n[WrongCount > 0]
+Teilweise --> Leer : TryRemoveTop (LIFO)\n[Count == 0]
+Teilweise --> Vollstaendig : TryPlace (korrekt)\n[CorrectCount == RequiredCount && WrongCount == 0]\n=> JustCompleted
+
+FalschEnthalten --> FalschEnthalten : TryPlace / TryRemoveTop\n[WrongCount > 0]
+FalschEnthalten --> Teilweise : TryRemoveTop (falsches entfernt)\n[WrongCount == 0, CorrectCount < RequiredCount]
+FalschEnthalten --> Vollstaendig : TryRemoveTop (letztes falsche)\n[CorrectCount == RequiredCount && WrongCount == 0]\n=> JustCompleted
+FalschEnthalten --> Leer : TryRemoveTop (LIFO)\n[Count == 0]
+
+Vollstaendig --> [*] : IsClosed (gesperrt)
+
+note right of Vollstaendig
+  Abschlussregel:
+  CorrectCount == RequiredCount && WrongCount == 0.
+  JustCompleted nur im Abschluss-Schritt.
+  Danach IsClosed: TryPlace/TryRemoveTop == false.
+  Apply: Lampe an, onCompleted, Fach schließen
+  (eingelegte Visuals/Collider entfernen),
+  Core hält Zählstand.
+end note
+
+note bottom of FalschEnthalten
+  Sanftes Feedback (kein harter Auswurf, ≠ F12):
+  falsches Objekt bleibt liegen, Lampe bleibt aus,
+  korrigierbar via TryRemoveTop (LIFO).
+end note
+@enduml

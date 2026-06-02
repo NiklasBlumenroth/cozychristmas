@@ -37,6 +37,28 @@ namespace CozySanta.Runtime.Carry
         /// <summary>Anzahl aktuell getragener Objekte.</summary>
         public int CarriedCount => _stack != null ? _stack.Count : 0;
 
+        /// <summary>True, wenn ein Objekt mit <paramref name="weight"/> noch in die Traglast passt.</summary>
+        public bool CanCarry(float weight) => _stack != null && _stack.CanPickUp(weight);
+
+        /// <summary>
+        /// Übergibt das oberste getragene Objekt an einen Aufrufer (z. B. ein Fach beim Einsortieren):
+        /// entnimmt es aus dem Tragstapel, OHNE es in der Welt abzulegen oder seine Physik zu verändern –
+        /// der Aufrufer übernimmt Reparenting/Physik. False bei leerem Stapel.
+        /// </summary>
+        public bool TryHandOverTop(out IPickup pickup)
+        {
+            pickup = null;
+            if (_stack == null || !_stack.TryPeek(out var item) || !_objects.TryGetValue(item.Id, out pickup))
+            {
+                return false;
+            }
+
+            _stack.TryPop(out _);
+            _objects.Remove(item.Id);
+            RelayoutHands();
+            return true;
+        }
+
         private void Awake()
         {
             _stack = new CarryStack(capacity);
