@@ -18,6 +18,12 @@ namespace CozySanta.Runtime.Progression
             ? "Lampe bereits voll"
             : "Rechtsklick halten: Lampe aufladen";
 
+        private void Start()
+        {
+            if (melt == null)
+                melt = Object.FindFirstObjectByType<MeltController>();
+        }
+
         /// <summary>Aktueller Akku-Ladestand 0..1 (für HUD-Ladebalken).</summary>
         public float ChargeFraction => melt != null ? melt.BatteryFraction : 0f;
 

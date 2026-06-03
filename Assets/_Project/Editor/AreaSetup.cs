@@ -110,20 +110,6 @@ namespace CozySanta.Editor
                 new Color(1f, 0.75f, 0.1f, 1f));
             ObjProp(so, "batteryBar", batteryBar);
 
-            var chargeSection = UI("ChargeSection", panel.transform);
-            LE(chargeSection, height: 18);
-            chargeSection.SetActive(false);
-            var chargeSectionVl = chargeSection.AddComponent<VerticalLayoutGroup>();
-            chargeSectionVl.childControlWidth = chargeSectionVl.childControlHeight = true;
-            chargeSectionVl.childForceExpandWidth = true; chargeSectionVl.childForceExpandHeight = false;
-            var chargeLabel = AddTMP(UI("ChargeLabel", chargeSection.transform), "Laden...");
-            LE(chargeLabel.gameObject, height: 16);
-            // Ladebalken: grün
-            var chargeBar = MakeSlider("ChargeBar", chargeSection.transform, 10,
-                new Color(0.2f, 0.9f, 0.3f, 1f));
-            ObjProp(so, "chargeSection", chargeSection);
-            ObjProp(so, "chargeBar",     chargeBar);
-
             MakeSeparator(panel.transform);
 
             var levelText = AddTMP(UI("LevelText", panel.transform), "Level 0");

@@ -17,18 +17,9 @@ namespace CozySanta.Runtime.Progression
         [Header("Akku")]
         [SerializeField] private Slider batteryBar;
 
-        [Header("Ladestation")]
-        [SerializeField] private GameObject chargeSection;
-        [SerializeField] private Slider chargeBar;
-
         [Header("XP / Level")]
         [SerializeField] private TMP_Text levelText;
         [SerializeField] private Slider xpBar;
-
-        private void Awake()
-        {
-            if (chargeSection != null) chargeSection.SetActive(false);
-        }
 
         public void SetAreaName(string name)
         {
@@ -38,16 +29,6 @@ namespace CozySanta.Runtime.Progression
         public void SetBattery(float fraction)
         {
             if (batteryBar != null) batteryBar.value = fraction;
-        }
-
-        public void SetChargeBarVisible(bool visible)
-        {
-            if (chargeSection != null) chargeSection.SetActive(visible);
-        }
-
-        public void SetChargeProgress(float fraction)
-        {
-            if (chargeBar != null) chargeBar.value = fraction;
         }
 
         public void SetLevel(int level)

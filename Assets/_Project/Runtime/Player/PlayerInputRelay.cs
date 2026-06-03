@@ -51,9 +51,6 @@ namespace CozySanta.Runtime.Player
             var station  = interaction?.FocusedInteractable as LadeStation;
             var charging = station != null && Mouse.current?.rightButton.isPressed == true;
             if (charging) station.ChargeTick(UnityEngine.Time.deltaTime);
-            if (areaHud == null) return;
-            areaHud.SetChargeBarVisible(charging);
-            if (charging) areaHud.SetChargeProgress(station.ChargeFraction);
         }
 
         private void ToggleSkillMenu()

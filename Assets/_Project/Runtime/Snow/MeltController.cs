@@ -73,14 +73,12 @@ namespace CozySanta.Runtime.Snow
             var origin = viewOrigin != null ? viewOrigin : (Camera.main != null ? Camera.main.transform : transform);
             var hasHit = TryAimAtSnow(origin, out var world);
 
-            var didMelt = false;
-            if (melting && _battery.CanMelt && hasHit)
+            // Akku läuft immer wenn F gedrückt, unabhängig ob Schnee getroffen wird
+            if (melting && _battery.CanMelt)
             {
-                if (patch.Melt(world, meltRadius, meltStrength * dt))
-                {
-                    _battery.Drain(drainPerSecond * dt);
-                    didMelt = true;
-                }
+                _battery.Drain(drainPerSecond * dt);
+                if (hasHit)
+                    patch.Melt(world, meltRadius, meltStrength * dt);
             }
             else if (adding && hasHit)
             {
