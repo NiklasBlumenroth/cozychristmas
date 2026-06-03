@@ -22,6 +22,9 @@ namespace CozySanta.Runtime.Player
         [Header("Skill-Menü (optional)")]
         [SerializeField] private SkillMenuView skillMenu;
 
+        [Header("Area-HUD (optional)")]
+        [SerializeField] private AreaHudView areaHud;
+
         private void Awake()
         {
             if (controller == null) controller = GetComponent<FirstPersonController>();
@@ -39,6 +42,15 @@ namespace CozySanta.Runtime.Player
 
             if (keyboard.xKey.wasPressedThisFrame && skillMenu != null)
                 ToggleSkillMenu();
+
+            HandleCharging();
+        }
+
+        private void HandleCharging()
+        {
+            var station  = interaction?.FocusedInteractable as LadeStation;
+            var charging = station != null && Mouse.current?.rightButton.isPressed == true;
+            if (charging) station.ChargeTick(UnityEngine.Time.deltaTime);
         }
 
         private void ToggleSkillMenu()

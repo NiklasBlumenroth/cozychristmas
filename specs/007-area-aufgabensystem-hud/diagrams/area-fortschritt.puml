@@ -1,0 +1,47 @@
+@startuml area-fortschritt
+skinparam activityBorderColor DarkGoldenRod
+skinparam activityBackgroundColor LightYellow
+
+|AreaTracker|
+start
+
+fork
+    :F4 onCompleted Event;
+    :BookSort(taskId, 1);
+fork again
+    :F5 Coverage-Delta > 0;
+    :BookMelt(taskId, delta);
+end fork
+
+|AreaProgress|
+:Passenden AreaTask finden;
+
+if (Task bereits IsComplete?) then (ja)
+    :ignorieren;
+    stop
+else (nein)
+    :Current += delta (clamp bei Required);
+    if (Current >= Required?) then (ja)
+        :IsComplete = true;
+        if (alle Tasks IsComplete?) then (ja)
+            if (Completed = false?) then (ja)
+                :Completed = true;
+                :OnCompleted auslösen;
+                |AreaTracker|
+                :PlayerProgression.AwardXp(AreaXp);
+                :AreaHudView aktualisieren;
+            else (nein)
+                :ignorieren (kein zweites Event);
+            endif
+        else (nein)
+            |AreaTracker|
+            :AreaHudView aktualisieren;
+        endif
+    else (nein)
+        |AreaTracker|
+        :AreaHudView aktualisieren;
+    endif
+endif
+
+stop
+@enduml

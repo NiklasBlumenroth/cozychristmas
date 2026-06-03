@@ -47,6 +47,12 @@ namespace CozySanta.Runtime.Snow
         /// <summary>Schmelzradius (m). Andockpunkt für LampCone-Upgrade (F6).</summary>
         public float MeltRadius { get => meltRadius; set => meltRadius = value; }
 
+        /// <summary>Lädt den Akku von einer externen Quelle auf (Ladestation, F7).</summary>
+        public void ChargeFromStation(float amount)
+        {
+            if (_battery != null) _battery.Recharge(amount);
+        }
+
         private void Awake()
         {
             _battery = new LampBattery(batteryCapacity);
@@ -67,26 +73,19 @@ namespace CozySanta.Runtime.Snow
             var origin = viewOrigin != null ? viewOrigin : (Camera.main != null ? Camera.main.transform : transform);
             var hasHit = TryAimAtSnow(origin, out var world);
 
-            var didMelt = false;
-            if (melting && _battery.CanMelt && hasHit)
+            // Akku läuft immer wenn F gedrückt, unabhängig ob Schnee getroffen wird
+            if (melting && _battery.CanMelt)
             {
-                if (patch.Melt(world, meltRadius, meltStrength * dt))
-                {
-                    _battery.Drain(drainPerSecond * dt);
-                    didMelt = true;
-                }
+                _battery.Drain(drainPerSecond * dt);
+                if (hasHit)
+                    patch.Melt(world, meltRadius, meltStrength * dt);
             }
             else if (adding && hasHit)
             {
                 patch.AddSnow(world, meltRadius, addStrength * dt);
             }
 
-            // Nachladen immer, wenn in diesem Frame nicht aktiv geschmolzen wird – auch bei gehaltenem F
-            // (sonst Deadlock: leerer Akku bei gehaltenem F würde nie wieder laden).
-            if (!didMelt)
-            {
-                _battery.Recharge(rechargePerSecond * dt);
-            }
+            // Passives Nachladen entfernt (F7): Akku lädt nur noch über die Ladestation auf.
         }
 
         private bool TryAimAtSnow(Transform origin, out Vector3 world)

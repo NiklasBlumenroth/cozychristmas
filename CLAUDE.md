@@ -120,6 +120,14 @@ Assets/_Project/
   IMGUI-Dev-Tool `SkillMenuDevTool` (F2). Editor-Setup „CozySanta/Setup F6 …" erstellt Panel+Prefab
   und verdrahtet alle Referenzen. EditMode-Tests X1–X4, S1–S5, V1 grün.
 
+- **F7 (abgeschlossen)**: Area- & Aufgabensystem + HUD — Core `TaskType`/`AreaTask`/`AreaDefinition`/`AreaProgress`
+  (BookSort/BookMelt, IsComplete, OnCompleted einmalig); Runtime `AreaTracker` (Inspector-Konfiguration: Area-Name,
+  Tasks[], SortBindings, MeltTaskId; verdrahtet F4-onCompleted + F5-Coverage-Delta; XP bei Abschluss über F6-Andockpunkt),
+  `AreaHudView` (editor-authored HUD oben rechts: Area-Name, Task-Zeilen, Akku-Balken, XP/Level), `TaskEntryUI`-Prefab,
+  `LadeStation` (IInteractable, Rechtsklick+LoS, 10s-Ladedauer, auto-wire MeltController).
+  `MeltController`: Akku läuft immer bei gedrücktem F (nicht nur bei Schnee-Treffer); passives Nachladen entfernt.
+  Editor-Setup „CozySanta/Setup F7 …". EditMode-Tests A1–A3, B1–B2, C1–C2 grün.
+
 ## Status / MVP-Fokus
 
 Erster Sektor (Eingangsbereich + Poststelle, optional Dekorationsfabrik) als

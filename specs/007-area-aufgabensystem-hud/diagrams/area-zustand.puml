@@ -1,0 +1,23 @@
+@startuml area-zustand
+skinparam state {
+    BackgroundColor LightYellow
+    BorderColor DarkGoldenRod
+}
+
+[*] --> Aktiv : AreaProgress erstellt
+
+state Aktiv {
+    [*] --> LaufenderFortschritt
+    LaufenderFortschritt --> LaufenderFortschritt : BookSort / BookMelt\n[noch nicht alle Tasks erledigt]
+    LaufenderFortschritt --> AlleTasksErledigt : BookSort / BookMelt\n[IsComplete = true]
+}
+
+Aktiv --> Abgeschlossen : OnCompleted ausgelöst\n(einmalig, nicht rückgängig)
+
+state Abgeschlossen {
+    note: Completed = true\nWeitere Book-Aufrufe ignoriert
+}
+
+Abgeschlossen --> [*]
+
+@enduml
