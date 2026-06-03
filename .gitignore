@@ -34,6 +34,10 @@ ExportedObj/
 
 # Unity3D generierte Crash-Reports
 sysinfo.txt
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta
+/[Aa]ssets/TextMesh Pro/
+/[Aa]ssets/TextMesh Pro.meta
 
 # Builds
 *.apk
