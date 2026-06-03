@@ -87,12 +87,7 @@ namespace CozySanta.Runtime.Snow
                 patch.AddSnow(world, meltRadius, addStrength * dt);
             }
 
-            // Nachladen immer, wenn in diesem Frame nicht aktiv geschmolzen wird – auch bei gehaltenem F
-            // (sonst Deadlock: leerer Akku bei gehaltenem F würde nie wieder laden).
-            if (!didMelt)
-            {
-                _battery.Recharge(rechargePerSecond * dt);
-            }
+            // Passives Nachladen entfernt (F7): Akku lädt nur noch über die Ladestation auf.
         }
 
         private bool TryAimAtSnow(Transform origin, out Vector3 world)
