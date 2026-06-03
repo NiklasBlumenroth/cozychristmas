@@ -1,0 +1,43 @@
+@startuml xp-skill-entscheidung
+title F6 – XP-Gutschrift & Skill-Investition
+
+|XP-Gutschrift|
+start
+:AwardXp(amount);
+if (amount > 0?) then (nein)
+  stop
+endif
+:TotalXp += amount;
+while (TotalXp >= XpForNextLevel?) is (ja)
+  :Level += 1;
+  :EarnedSkillPoints += pointsPerLevel;
+endwhile (nein)
+:fertig (verfügbare Punkte = verdient - ausgegeben);
+stop
+
+|Investition|
+start
+:Invest(skillId);
+if (AvailablePoints > 0?) then (nein)
+  :keine Aktion;
+  stop
+endif
+if (Skill.Level < MaxLevel?) then (nein)
+  :keine Aktion (Maximalstufe);
+  stop
+endif
+:Skill.Raise() (Level+1);
+if (Freischalt-Skill und war Stufe 0?) then (ja)
+  :Unlocked = true;
+endif
+:SpentPoints += 1;
+:ApplySkills() -> Wert auf Komponente\n(PlayerCarry / MeltController / Bewegung);
+stop
+
+note right
+  Decide (Core): XpLedger (Level/Punkte),
+  SkillSet (CanInvest/TryInvest), Skill (Value).
+  Apply (Runtime): Werte auf bestehende Komponenten,
+  XP aus F4-onCompleted / F5-Coverage-Delta.
+end note
+@enduml

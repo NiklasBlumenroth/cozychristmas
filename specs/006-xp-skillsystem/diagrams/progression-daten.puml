@@ -1,0 +1,77 @@
+@startuml progression-daten
+title F6 – Progression-Daten (Core) und Runtime-Anbindung
+
+package "CozySanta.Core.Progression" {
+  enum SkillId {
+    LampPower
+    LampCone
+    LampBattery
+    CarryCapacity
+    MoveSpeed
+    SortVision
+    ObjectPull
+  }
+  class XpLedger {
+    + TotalXp : int
+    + Level : int
+    + XpIntoLevel : int
+    + XpForNextLevel : int
+    + EarnedSkillPoints : int
+    + Add(xp)
+    + XpForLevel(n) : int
+  }
+  class Skill {
+    + Id : SkillId
+    + Level : int   ' 0..MaxLevel
+    + MaxLevel : int
+    + Unlockable : bool
+    + Unlocked : bool
+    + Value : float ' base + step*Level (gedeckelt)
+    + CanRaise : bool
+    + Raise()
+  }
+  class SkillSet {
+    + SpentPoints : int
+    + Get(id) : Skill
+    + ValueOf(id) : float
+    + CanInvest(id, avail) : bool
+    + TryInvest(id, avail) : bool
+  }
+  class ProgressionState {
+    + AvailablePoints : int  ' verdient - ausgegeben
+    + AwardXp(amount)
+    + Invest(id) : bool
+  }
+
+  ProgressionState *-- XpLedger
+  ProgressionState *-- SkillSet
+  SkillSet "1" o-- "*" Skill
+  Skill --> SkillId
+}
+
+package "CozySanta.Runtime.Progression" {
+  class PlayerProgression <<MonoBehaviour>> {
+    - carry : PlayerCarry
+    - melt : MeltController
+    - move : FirstPersonController
+    + AwardSortXp()
+    + AwardMeltXp(coverageDelta)
+    + Invest(id) : bool
+    - ApplySkills()
+  }
+  class SkillMenuDevTool <<MonoBehaviour>> {
+    ' IMGUI-Dev-Tool: XP/Invest testen
+  }
+}
+
+PlayerProgression *-- ProgressionState
+PlayerProgression ..> "F3 PlayerCarry.Capacity" : setzt
+PlayerProgression ..> "F5 MeltController" : setzt (Akku/Power/Kegel)
+PlayerProgression ..> "F2 Bewegung" : setzt (Speed)
+PlayerProgression ..> "F4 onCompleted / F5 Coverage" : XP-Quelle
+
+note bottom
+  Abhängigkeit strikt Runtime --> Core. Core kennt kein UnityEngine.
+  Freischalt-Skills SortVision/ObjectPull: in F6 nur Status; Fähigkeit F9/F10.
+end note
+@enduml

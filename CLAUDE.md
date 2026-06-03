@@ -110,6 +110,15 @@ Assets/_Project/
   weicher Noise-Kante (Boden erscheint), Textur/Fake-Lighting/Glitzer. Editor-Setup
   „CozySanta/Setup F5 …" (Material + Patch + Verdrahtung). Core unit-getestet; Shader/Look = Editor-
   Iteration (dokumentierte Nicht-Unit-Ausnahme). Boden = Szenen-Plane, Schnee-Textur `Holiday_Snow_02`.
+- **F6 (abgeschlossen)**: XP- & Skillsystem — Core `XpLedger` (gemeinsamer XP-Pool, Level-Kurve n×100,
+  1 Skillpunkt/Level), `Skill`/`SkillConfig` (Basis+Schritt×Stufe, Deckelung, Freischalt-Flag),
+  `SkillSet` (7 Optionen: LampPower/LampCone/LampBattery/CarryCapacity/MoveSpeed/SortVision/ObjectPull,
+  freie Investition ohne Tree), `ProgressionState` (bündelt Ledger+Skills, AvailablePoints). Runtime
+  `PlayerProgression` (Apply: schreibt XP aus F4-`onCompleted` + F5-Coverage-Delta gut, überträgt
+  Skillwerte auf `PlayerCarry.Capacity`, `MeltController`-Felder, `FirstPersonController.MoveSpeed`);
+  editor-authored Skillmenü (`SkillMenuView`/`SkillEntryUI`-Prefab, „X" öffnen/schließen, Invest-Buttons).
+  IMGUI-Dev-Tool `SkillMenuDevTool` (F2). Editor-Setup „CozySanta/Setup F6 …" erstellt Panel+Prefab
+  und verdrahtet alle Referenzen. EditMode-Tests X1–X4, S1–S5, V1 grün.
 
 ## Status / MVP-Fokus
 

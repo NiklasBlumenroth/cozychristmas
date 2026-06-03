@@ -30,6 +30,9 @@ namespace CozySanta.Runtime.Player
         public void SetMoveInput(Vector2 value) => _moveInput = value;
         public void SetLookInput(Vector2 value) => _lookInput = value;
 
+        /// <summary>Laufgeschwindigkeit (m/s). Andockpunkt für MoveSpeed-Upgrade (F6).</summary>
+        public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
+
         private void Awake()
         {
             _controller = GetComponent<CharacterController>();

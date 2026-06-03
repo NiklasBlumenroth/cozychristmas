@@ -1,5 +1,6 @@
 using CozySanta.Runtime.Carry;
 using CozySanta.Runtime.Interaction;
+using CozySanta.Runtime.Progression;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,55 +19,52 @@ namespace CozySanta.Runtime.Player
         [SerializeField] private PlayerInteractionController interaction;
         [SerializeField] private PlayerCarry carry;
 
+        [Header("Skill-Menü (optional)")]
+        [SerializeField] private SkillMenuView skillMenu;
+
         private void Awake()
         {
-            if (controller == null)
-            {
-                controller = GetComponent<FirstPersonController>();
-            }
-
-            if (interaction == null)
-            {
-                interaction = GetComponent<PlayerInteractionController>();
-            }
-
-            if (carry == null)
-            {
-                carry = GetComponent<PlayerCarry>();
-            }
+            if (controller == null) controller = GetComponent<FirstPersonController>();
+            if (interaction == null) interaction = GetComponent<PlayerInteractionController>();
+            if (carry == null) carry = GetComponent<PlayerCarry>();
         }
 
         private void Update()
         {
             var keyboard = Keyboard.current;
-            if (keyboard != null && keyboard.qKey.wasPressedThisFrame && carry != null)
-            {
+            if (keyboard == null) return;
+
+            if (keyboard.qKey.wasPressedThisFrame && carry != null)
                 carry.Drop();
-            }
+
+            if (keyboard.xKey.wasPressedThisFrame && skillMenu != null)
+                ToggleSkillMenu();
+        }
+
+        private void ToggleSkillMenu()
+        {
+            if (skillMenu.IsVisible) skillMenu.Hide();
+            else                     skillMenu.Show();
         }
 
         public void OnMove(InputValue value)
         {
             if (controller != null)
-            {
                 controller.SetMoveInput(value.Get<Vector2>());
-            }
         }
 
         public void OnLook(InputValue value)
         {
+            // Kein Look wenn Menü offen – sonst dreht sich die Kamera hinter dem Menü weiter.
+            if (skillMenu != null && skillMenu.IsVisible) return;
             if (controller != null)
-            {
                 controller.SetLookInput(value.Get<Vector2>());
-            }
         }
 
         public void OnInteract(InputValue value)
         {
             if (value.isPressed && interaction != null)
-            {
                 interaction.TryInteract();
-            }
         }
     }
 }
