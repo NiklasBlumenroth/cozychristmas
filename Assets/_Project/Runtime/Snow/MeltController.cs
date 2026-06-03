@@ -47,6 +47,12 @@ namespace CozySanta.Runtime.Snow
         /// <summary>Schmelzradius (m). Andockpunkt für LampCone-Upgrade (F6).</summary>
         public float MeltRadius { get => meltRadius; set => meltRadius = value; }
 
+        /// <summary>Lädt den Akku von einer externen Quelle auf (Ladestation, F7).</summary>
+        public void ChargeFromStation(float amount)
+        {
+            if (_battery != null) _battery.Recharge(amount);
+        }
+
         private void Awake()
         {
             _battery = new LampBattery(batteryCapacity);

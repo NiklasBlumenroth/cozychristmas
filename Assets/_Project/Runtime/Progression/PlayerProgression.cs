@@ -73,6 +73,13 @@ namespace CozySanta.Runtime.Progression
             _lastCoverage = current;
         }
 
+        /// <summary>Bucht einen beliebigen XP-Betrag (Andockpunkt für Area-Abschluss, F7).</summary>
+        public void AwardXp(int amount)
+        {
+            _state.AwardXp(amount);
+            RefreshView();
+        }
+
         public void AwardSortXp()
         {
             _state.AwardXp(sortXp);
