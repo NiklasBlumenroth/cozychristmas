@@ -3,7 +3,9 @@
     "rootNamespace": "CozySanta.Runtime",
     "references": [
         "CozySanta.Core",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

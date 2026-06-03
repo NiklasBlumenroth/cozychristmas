@@ -4,7 +4,11 @@
     "references": [
         "CozySanta.Core",
         "CozySanta.Runtime",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "Unity.TextMeshPro.Editor",
+        "UnityEngine.UI",
+        "UnityEditor.UI"
     ],
     "includePlatforms": [
         "Editor"

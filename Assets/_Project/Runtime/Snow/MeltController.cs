@@ -34,6 +34,19 @@ namespace CozySanta.Runtime.Snow
         /// <summary>Flächen-Fortschritt 0..1 des angesteuerten Patches.</summary>
         public float Coverage => patch != null ? patch.Coverage : 0f;
 
+        /// <summary>Maximale Akku-Kapazität. Andockpunkt für LampBattery-Upgrade (F6).</summary>
+        public float BatteryCapacity
+        {
+            get => batteryCapacity;
+            set { batteryCapacity = value; if (_battery != null) _battery.Capacity = value; }
+        }
+
+        /// <summary>Schmelzstärke (Höhe/s im Zentrum). Andockpunkt für LampPower-Upgrade (F6).</summary>
+        public float MeltStrength { get => meltStrength; set => meltStrength = value; }
+
+        /// <summary>Schmelzradius (m). Andockpunkt für LampCone-Upgrade (F6).</summary>
+        public float MeltRadius { get => meltRadius; set => meltRadius = value; }
+
         private void Awake()
         {
             _battery = new LampBattery(batteryCapacity);

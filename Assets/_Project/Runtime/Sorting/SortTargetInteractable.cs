@@ -42,6 +42,10 @@ namespace CozySanta.Runtime.Sorting
         /// <summary>Reiner Fach-Zustand (für Tests/Diagnose).</summary>
         public SortTarget Target => _target;
 
+        /// <summary>Registriert einen Listener für das einmalige Abschluss-Ereignis (Andockpunkt F6-XP).</summary>
+        public void AddCompletionListener(UnityEngine.Events.UnityAction listener)
+            => onCompleted.AddListener(listener);
+
         public string PromptText => _target != null && _target.IsClosed ? string.Empty : promptText;
 
         private void Awake()
