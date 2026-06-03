@@ -87,7 +87,24 @@ Der Spieler sieht im HUD jederzeit den aktuellen Ladestand des Lampen-Akkus, dam
 
 ---
 
-### User Story 4 – HUD zeigt Level und XP-Fortschritt an (Priority: P2)
+### User Story 4 – Ladestation lädt die Lampe auf (Priority: P2)
+
+Der Spieler läuft zu einer Ladestation in der Welt, schaut sie an und hält Rechtsklick gedrückt. Solange Blickkontakt und Rechtsklick gleichzeitig gehalten werden, lädt der Lampen-Akku innerhalb von 10 Sekunden vollständig auf. Ein Ladebalken zeigt den Fortschritt. Bricht eine der beiden Bedingungen ab (Rechtsklick losgelassen oder Blickkontakt unterbrochen), stoppt der Ladevorgang – der bereits erreichte Ladestand bleibt erhalten.
+
+**Why this priority**: Gibt dem Spieler eine aktive Strategie für den Akku-Management-Loop; die passive Nachladung aus F5 reicht bei großen Schneeflächen nicht aus.
+
+**Independent Test**: Play-Mode: Akku leer machen (langes Schmelzen), zur Ladestation gehen, Rechtsklick 10 s halten → Akku voll; Rechtsklick vorzeitig loslassen → Zwischenstand bleibt.
+
+**Acceptance Scenarios**:
+
+1. **Given** Spieler steht vor der Ladestation und schaut sie an, **When** Rechtsklick gehalten wird, **Then** steigt der Akku-Ladestand kontinuierlich und der Ladebalken im HUD ist sichtbar.
+2. **Given** Ladevorgang läuft, **When** Spieler wegschaut oder Rechtsklick loslässt, **Then** stoppt das Laden sofort; Ladestand bleibt auf dem aktuellen Wert.
+3. **Given** Ladevorgang läuft, **When** 10 Sekunden gehalten (von 0 %), **Then** ist der Akku vollständig aufgeladen; Ladebalken verschwindet.
+4. **Given** Spieler schaut eine Ladestation an, **When** Rechtsklick noch nicht gedrückt, **Then** wird ein Interaktionshinweis angezeigt („Rechtsklick: Lampe aufladen").
+
+---
+
+### User Story 5 – HUD zeigt Level und XP-Fortschritt an (Priority: P2)
 
 Der Spieler sieht im HUD sein aktuelles Level sowie den Fortschrittsbalken zum nächsten Level, damit er den Effekt seiner Aktionen direkt wahrnimmt.
 
@@ -104,6 +121,9 @@ Der Spieler sieht im HUD sein aktuelles Level sowie den Fortschrittsbalken zum n
 
 ### Edge Cases
 
+- Ladestation: Spieler unterbricht mehrfach → Ladestand akkumuliert sich korrekt über mehrere Ladevorgänge.
+- Ladestation: Akku bereits voll → Ladebalken erscheint nicht / Vorgang wird sofort beendet.
+- Ladestation: Spieler steht sehr nah (LoS-Raycast trifft nicht) → kein Laden.
 - Area ohne Tasks → `IsComplete` sofort true (oder Konfigurationsfehler loggen).
 - Task mit `required = 0` → sofort erfüllt (Sonderfall: optionaler Task).
 - Sehr schneller Fortschritt (mehrere Events im selben Frame) → kein doppelter Area-Abschluss.
@@ -129,7 +149,12 @@ Der Spieler sieht im HUD sein aktuelles Level sowie den Fortschrittsbalken zum n
 - **FR-013**: Compilation MUST succeed after code changes before merge (Zero-Compile-Error).
 - **FR-014**: Documentation and project communication artifacts for this feature MUST be in German.
 - **FR-015**: Keine Produktions-/Test-Klassenimplementierungsdatei DARF 300 Zeilen überschreiten.
-- **FR-016**: PlantUML-Diagramme (Activity Fortschritt/Abschluss, Class Area-Datenmodell, State Area-Zustand) MÜSSEN erstellt und mit Tests verknüpft werden.
+- **FR-016**: PlantUML-Diagramme (Activity Fortschritt/Abschluss + Ladevorgang, Class Area-Datenmodell, State Area-Zustand + Ladezustand) MÜSSEN erstellt und mit Tests verknüpft werden.
+- **FR-017**: Der Ladevorgang MUSS sowohl gehaltenen Rechtsklick als auch ununterbrochenen Blickkontakt (Raycast-Treffer auf die Ladestation) erfordern; Unterbrechung einer der beiden Bedingungen stoppt das Laden sofort.
+- **FR-018**: Der Ladestand MUSS bei Unterbrechung erhalten bleiben und beim nächsten Ladevorgang fortgesetzt werden können.
+- **FR-019**: Ein Ladebalken im HUD MUSS den aktuellen Ladefortschritt (0–100 %) während des Ladevorgangs anzeigen; er MUSS editor-authored sein.
+- **FR-020**: Die Ladestation MUSS als Placeholder-Prefab unter `Assets/_Project/Prefabs/LadeStation.prefab` vorliegen und in die `DevSpawnMenu`-Spawn-Liste aufgenommen sein.
+- **FR-021**: Die Ladedauer für einen vollständigen Ladevorgang (0 → 100 %) MUSS konfigurierbar sein (Platzhalterwert: 10 Sekunden).
 
 ### Key Entities
 
@@ -137,8 +162,9 @@ Der Spieler sieht im HUD sein aktuelles Level sowie den Fortschrittsbalken zum n
 - **AreaDefinition (Core)**: Unveränderliche Konfiguration einer Area: `Name`, `Tasks[]`, `AreaXp` (XP bei Abschluss).
 - **AreaProgress (Core)**: Laufzeitstatus einer Area: hält `AreaDefinition` + aktuelle Task-Stände; `IsComplete` = alle Tasks erledigt; `BookSort(count)`, `BookMelt(coveragePercent)`; `onCompleted`-Event (einmalig).
 - **AreaTracker (Runtime)**: MonoBehaviour; hält `AreaProgress`, abonniert F4-Events + tracked F5-Coverage-Delta in Update; ruft bei Abschluss `PlayerProgression.AwardXp` auf.
-- **AreaHudView (Runtime)**: MonoBehaviour; editor-authored Panel; zeigt Area-Name, Task-Liste, Akku-Balken, XP/Level. Wird von `AreaTracker` + `PlayerProgression` aktualisiert.
+- **AreaHudView (Runtime)**: MonoBehaviour; editor-authored Panel; zeigt Area-Name, Task-Liste, Akku-Balken, Ladebalken, XP/Level. Wird von `AreaTracker`, `LadeStation` + `PlayerProgression` aktualisiert.
 - **TaskEntryUI (Runtime/Prefab)**: Wiederholte UI-Zeile pro Task (Name + Fortschrittstext); analoges Prefab-Muster wie `SkillEntryUI` (F6).
+- **LadeStation (Runtime)**: MonoBehaviour + Placeholder-Prefab; implementiert `IInteractable` für Hinweis-Text; `ChargeTick(float dt)` lädt den Akku wenn Rechtsklick + LoS aktiv; konfigurierbare Ladedauer (10 s Standard). Wird in `DevSpawnMenu` aufgenommen.
 
 ## Success Criteria *(mandatory)*
 
@@ -147,7 +173,8 @@ Der Spieler sieht im HUD sein aktuelles Level sowie den Fortschrittsbalken zum n
 - **SC-001**: Sortier- und Schmelzfortschritt schlägt sich in Echtzeit in den HUD-Task-Anzeigen nieder.
 - **SC-002**: Area-Abschluss wird korrekt erkannt; XP wird einmalig und korrekt vergeben.
 - **SC-003**: HUD zeigt Akku-Ladestand und XP/Level-Fortschritt ohne Fehler an.
-- **SC-004**: EditMode-Tests für Task-Fortschritt (A1–A3) und Area-Abschluss (B1–B2) laufen grün.
+- **SC-004**: EditMode-Tests für Task-Fortschritt (A1–A3), Area-Abschluss (B1–B2) und Ladelogik (C1–C2) laufen grün.
+- **SC-004b**: Ladestation-Prefab existiert unter `Assets/_Project/Prefabs/LadeStation.prefab` und ist in DevSpawnMenu eingetragen.
 - **SC-005**: 100 % Doku-Coverage-Check besteht beim Merge.
 - **SC-006**: Compile-Check: 0 Fehler nach der Implementierung.
 - **SC-007**: Die geforderten PlantUML-Diagramme (Activity + Class + State) sind vorhanden, aktuell und mit Tests verknüpft.

@@ -50,6 +50,18 @@
 - `[SerializeField] TMP_Text progressText`
 - `void SetTask(string name, float current, float required, TaskType type)`
 
+### `LadeStation : MonoBehaviour` (Runtime, Prefab)
+- `[SerializeField] float chargeDuration = 10f` – Sekunden für vollen Ladevorgang (0 → 100 %)
+- `[SerializeField] MeltController melt` – Ziel-Akku
+- `[SerializeField] AreaHudView hudView` – für Ladebalken-Anzeige
+- Implementiert `IInteractable` → `PromptText = "Rechtsklick: Lampe aufladen"`
+- `void ChargeTick(float dt)` – ruft `melt.BatteryCapacity`/Kapazität ab, berechnet `chargePerSecond = capacity / chargeDuration`, ruft intern `LampBattery.Recharge(chargePerSecond * dt)` via neuem `MeltController.ChargeFromStation(float amount)` auf
+- Ladebalken-Update: `hudView.SetChargeProgress(fraction)` pro Tick
+- Placeholder-Prefab: Cube (grau) + `LadeStation`-Skript; wird in `DevSpawnMenu` eingetragen
+
+### Additiver Setter `MeltController`
+- `public void ChargeFromStation(float amount)` – ruft `_battery.Recharge(amount)` auf (Andockpunkt für externe Aufladung)
+
 ## Abgeleitete Testkandidaten
 
 | ID | Testfall | Art | Quelle |
@@ -59,3 +71,5 @@
 | A3 | Task nach Abschluss: weitere Buchungen ignoriert | EditMode | State-Grenze |
 | B1 | Area: alle Tasks erledigt → IsComplete true, OnCompleted einmalig | EditMode | State-Übergang |
 | B2 | Area bereits abgeschlossen: weiterer Fortschritt ohne zweites Event | EditMode | State-Invariante |
+| C1 | `ChargeTick`: Akku steigt proportional zur dt; stoppt bei voller Kapazität | EditMode | Ladelogik |
+| C2 | Unterbrochener Ladevorgang: Ladestand bleibt erhalten; nächster Tick setzt fort | EditMode | Ladelogik |

@@ -32,7 +32,27 @@
 
 **Begründung**: Direkteste Verbindung; kein neues Event-System nötig. Andockpunkt war in F6 explizit vorgesehen.
 
-## Entscheidung 5 – AreaDefinition als serialisierbares C#-Objekt
+## Entscheidung 5 – Area-Abgrenzung im MVP: immer aktiv, kein Trigger
+
+**Entscheidung**: In F7 gibt es genau eine Area, die immer aktiv ist. Kein Trigger-Collider nötig. F8 bringt Trigger-Collider wenn mehrere Areas sequenziell freigeschaltet werden.
+
+**Begründung**: MVP hat einen Sektor. Spatial-Trigger-Logik ist overhead der erst relevant wird wenn es mehrere Areas gibt. Einfachste korrekte Lösung für jetzt.
+
+## Entscheidung 6 – Ladestation: Rechtsklick + LoS-Raycast im PlayerInputRelay
+
+**Entscheidung**: `PlayerInputRelay.Update()` prüft `Mouse.current.rightButton.isPressed` + ob der Interaktions-Raycast die fokussierte `LadeStation` trifft. Wenn beides zutrifft, wird `focusedStation.ChargeTick(dt)` aufgerufen.
+
+**Begründung**: Konsistent mit dem bestehenden Interaktionsmuster (Raycast läuft bereits für F2); kein neues Input-System nötig. LoS-Prüfung ist bereits im `PhysicsInteractionProbe` vorhanden.
+
+**Verworfene Alternative**: Eigener `ChargingController` MonoBehaviour – unnötige Trennung für eine einfache Held-Interaction.
+
+## Entscheidung 7 – Ladebalken im HUD (editor-authored), nicht World-Space
+
+**Entscheidung**: Der Ladebalken ist ein Slider im `AreaHudView`-Panel (HUD, Screen-Space). Er ist standardmäßig inaktiv und wird nur während des Ladevorgangs eingeblendet.
+
+**Begründung**: Konsistent mit dem restlichen HUD-Ansatz; einfacher zu implementieren als World-Space Canvas am Prefab. World-Space wäre ansprechender aber Mehraufwand für den Prototyp.
+
+## Entscheidung 8 – AreaDefinition als serialisierbares C#-Objekt
 
 **Entscheidung**: `AreaDefinition` ist ein reines C#-Objekt (kein ScriptableObject) mit `[Serializable]`-Unterobjekten. `AreaTracker` hält die Konfiguration direkt via `[SerializeField]`.
 

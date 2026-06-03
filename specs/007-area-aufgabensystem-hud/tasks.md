@@ -57,19 +57,31 @@ Compile-Check + 300-Zeilen-DoD verbindlich.
 - [ ] T025 [US3] `AreaTracker.Update`: `MeltController.BatteryFraction` → `hudView.SetBattery(...)` pro Frame
 - [ ] T026 [US3] ⏳ Manueller Test: F-Taste halten → Akku-Balken sinkt; loslassen → steigt
 
-## Phase 6: US4 – HUD XP/Level (P2)
+## Phase 6: US4 – Ladestation (P2)
 
-- [ ] T027 [US4] `AreaHudView`: `levelText`, `xpBar` + `SetLevel/SetXp`-Methoden
-- [ ] T028 [US4] `AreaTracker`: `PlayerProgression.State` auslesen → HUD nach XP-Änderung aktualisieren (via Callback oder `Update`)
-- [ ] T029 [US4] ⏳ Manueller Test: Fach abschließen → XP-Balken im HUD wächst
+- [ ] T027 [P] [US4] EditMode C1–C2 (Ladelogik) in `AreaProgressTests.cs`
+- [ ] T028 [US4] Additiver Setter `MeltController.ChargeFromStation(float amount)` in `MeltController.cs`
+- [ ] T029 [US4] `LadeStation` (IInteractable, ChargeTick, chargeDuration, HudView-Ref) in `Assets/_Project/Runtime/Progression/LadeStation.cs`
+- [ ] T030 [US4] Placeholder-Prefab `LadeStation` (Cube + Skript) in `Assets/_Project/Prefabs/LadeStation.prefab` (via AreaSetup oder manuell)
+- [ ] T031 [US4] `DevSpawnMenu`-Eintrag: LadeStation-Prefab zur Spawn-Liste hinzufügen (via AreaSetup)
+- [ ] T032 [US4] `AreaHudView`: `chargeBar` (Slider, initial inaktiv) + `SetChargeProgress(float fraction)` + `SetChargeBarVisible(bool)`
+- [ ] T033 [US4] `PlayerInputRelay.Update`: Rechtsklick (`Mouse.current.rightButton.isPressed`) + fokussierte `LadeStation` → `ChargeTick(dt)` + `hudView.SetChargeProgress`; bei Abbruch `SetChargeBarVisible(false)`
+- [ ] T034 [US4] ⏳ EditMode C1–C2 grün — Test Runner
+- [ ] T035 [US4] ⏳ Manueller Test: zur Ladestation gehen, Rechtsklick halten → Ladebalken erscheint, Akku steigt; loslassen/wegschauen → stoppt, Stand bleibt
 
-## Phase 7: Documentation Sync & Merge Readiness
+## Phase 7: US5 – HUD XP/Level (P2)
 
-- [ ] T030 Doku-Coverage-Matrix: geänderte Code-Areas ⇄ Doku/Diagramme (ohne `Notizen.md`)
-- [ ] T031 `CLAUDE.md` „Fortschritt" um F7 ergänzen
-- [ ] T032 [P] Deutsch-Nachweis; PlantUML ohne Platzhalter
-- [ ] T033 Bestätigen: keine Laufzeit-UI (HUD editor-authored)
-- [ ] T034 ⏳ Finaler Compile-Check (0 Fehler) + 300-Zeilen-DoD + EditMode A1–A3/B1–B2 grün — Test Runner
+- [ ] T036 [US5] `AreaHudView`: `levelText`, `xpBar` + `SetLevel/SetXp`-Methoden
+- [ ] T037 [US5] `AreaTracker`: `PlayerProgression.State` auslesen → HUD nach XP-Änderung aktualisieren (via Callback oder `Update`)
+- [ ] T038 [US5] ⏳ Manueller Test: Fach abschließen → XP-Balken im HUD wächst
+
+## Phase 8: Documentation Sync & Merge Readiness
+
+- [ ] T039 Doku-Coverage-Matrix: geänderte Code-Areas ⇄ Doku/Diagramme (ohne `Notizen.md`)
+- [ ] T040 `CLAUDE.md` „Fortschritt" um F7 ergänzen
+- [ ] T041 [P] Deutsch-Nachweis; PlantUML ohne Platzhalter
+- [ ] T042 Bestätigen: keine Laufzeit-UI (HUD + Ladebalken editor-authored)
+- [ ] T043 ⏳ Finaler Compile-Check (0 Fehler) + 300-Zeilen-DoD + EditMode A1–A3/B1–B2/C1–C2 grün — Test Runner
 
 ---
 
