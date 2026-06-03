@@ -105,7 +105,9 @@ namespace CozySanta.Editor
 
             MakeSeparator(panel.transform);
 
-            var batteryBar = MakeSlider("BatteryBar", panel.transform, 14);
+            // Akku: gelb-orange
+            var batteryBar = MakeSlider("BatteryBar", panel.transform, 14,
+                new Color(1f, 0.75f, 0.1f, 1f));
             ObjProp(so, "batteryBar", batteryBar);
 
             var chargeSection = UI("ChargeSection", panel.transform);
@@ -116,7 +118,9 @@ namespace CozySanta.Editor
             chargeSectionVl.childForceExpandWidth = true; chargeSectionVl.childForceExpandHeight = false;
             var chargeLabel = AddTMP(UI("ChargeLabel", chargeSection.transform), "Laden...");
             LE(chargeLabel.gameObject, height: 16);
-            var chargeBar = MakeSlider("ChargeBar", chargeSection.transform, 10);
+            // Ladebalken: grün
+            var chargeBar = MakeSlider("ChargeBar", chargeSection.transform, 10,
+                new Color(0.2f, 0.9f, 0.3f, 1f));
             ObjProp(so, "chargeSection", chargeSection);
             ObjProp(so, "chargeBar",     chargeBar);
 
@@ -124,7 +128,9 @@ namespace CozySanta.Editor
 
             var levelText = AddTMP(UI("LevelText", panel.transform), "Level 0");
             LE(levelText.gameObject, height: 20);
-            var xpBar = MakeSlider("XpBar", panel.transform, 10);
+            // XP-Balken: lila
+            var xpBar = MakeSlider("XpBar", panel.transform, 10,
+                new Color(0.7f, 0.3f, 1f, 1f));
             ObjProp(so, "levelText", levelText);
             ObjProp(so, "xpBar",     xpBar);
 
@@ -206,13 +212,33 @@ namespace CozySanta.Editor
             return t;
         }
 
-        private static Slider MakeSlider(string name, Transform parent, float height)
+        private static Slider MakeSlider(string name, Transform parent, float height,
+            Color? fillColor = null)
         {
             var go = UI(name, parent);
             LE(go, height: height);
+
+            // Hintergrund
+            go.AddComponent<Image>().color = new Color(0.18f, 0.18f, 0.18f, 1f);
+
+            // Fill Area (gestreckt, kleiner Rand rechts)
+            var fillArea = UI("Fill Area", go.transform);
+            var faRT = fillArea.GetComponent<RectTransform>();
+            faRT.anchorMin = Vector2.zero; faRT.anchorMax = Vector2.one;
+            faRT.offsetMin = Vector2.zero; faRT.offsetMax = new Vector2(-4f, 0f);
+
+            // Fill
+            var fill = UI("Fill", fillArea.transform);
+            var fillImg = fill.AddComponent<Image>();
+            fillImg.color = fillColor ?? new Color(0.25f, 0.6f, 1f, 1f);
+            var fillRT = fill.GetComponent<RectTransform>();
+            fillRT.anchorMin = Vector2.zero; fillRT.anchorMax = Vector2.one;
+            fillRT.offsetMin = fillRT.offsetMax = Vector2.zero;
+
             var s = go.AddComponent<Slider>();
             s.interactable = false;
-            s.value = 0f;
+            s.value        = 1f;
+            s.fillRect     = fillRT;
             return s;
         }
 
