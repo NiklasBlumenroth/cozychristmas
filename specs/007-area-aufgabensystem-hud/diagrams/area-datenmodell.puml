@@ -1,0 +1,70 @@
+@startuml area-datenmodell
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "CozySanta.Core.Progression" {
+    enum TaskType {
+        Sort
+        Melt
+        Custom
+    }
+
+    class AreaTask {
+        +TaskId : string
+        +Type : TaskType
+        +Description : string
+        +Required : float
+        +Current : float
+        +IsComplete : bool
+        +Book(delta : float) : void
+    }
+
+    class AreaDefinition {
+        +AreaName : string
+        +Tasks : AreaTask[]
+        +AreaXp : int
+    }
+
+    class AreaProgress {
+        +IsComplete : bool
+        +Completed : bool
+        +OnCompleted : event Action
+        +BookSort(taskId, count) : void
+        +BookMelt(taskId, delta) : void
+    }
+
+    AreaDefinition "1" *-- "n" AreaTask
+    AreaProgress "1" --> "1" AreaDefinition
+    AreaTask --> TaskType
+}
+
+package "CozySanta.Runtime.Progression" {
+    class AreaTracker {
+        -config : AreaTrackerConfig
+        -progression : PlayerProgression
+        -melt : MeltController
+        +Progress : AreaProgress
+    }
+
+    class AreaHudView {
+        +SetAreaName(name) : void
+        +SetBattery(fraction) : void
+        +SetLevel(level) : void
+        +SetXp(into, forNext) : void
+        +GetEntry(index) : TaskEntryUI
+    }
+
+    class TaskEntryUI {
+        +SetTask(name, current, required, type) : void
+    }
+
+    AreaTracker --> AreaProgress : hält
+    AreaTracker --> AreaHudView : aktualisiert
+    AreaHudView "1" *-- "n" TaskEntryUI
+}
+
+AreaTracker ..> "CozySanta.Runtime.Snow.MeltController" : Coverage-Delta
+AreaTracker ..> "CozySanta.Runtime.Sorting.SortTargetInteractable" : onCompleted
+AreaTracker ..> "CozySanta.Runtime.Progression.PlayerProgression" : AwardXp
+
+@enduml
