@@ -93,7 +93,7 @@ namespace CozySanta.Runtime.Progression
 
         private void RefreshHud()
         {
-            if (hudView == null) return;
+            if (hudView == null || _progress == null) return;
 
             var tasks = _progress.Tasks;
             for (var i = 0; i < hudView.EntryCount; i++)
@@ -121,9 +121,13 @@ namespace CozySanta.Runtime.Progression
             }
         }
 
+        /// <summary>Wird einmalig gefeuert wenn alle Area-Tasks abgeschlossen sind (z. B. für F8 KeySpawnBinding).</summary>
+        public event System.Action OnAreaCompleted;
+
         private void HandleCompletion()
         {
             if (progression != null) progression.AwardXp(_progress.AreaXp);
+            OnAreaCompleted?.Invoke();
         }
     }
 }
