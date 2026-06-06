@@ -60,7 +60,7 @@ namespace CozySanta.Runtime.Snow
         private void Update()
         {
             var keyboard = Keyboard.current;
-            if (keyboard == null || patch == null)
+            if (keyboard == null)
             {
                 return;
             }
@@ -70,46 +70,53 @@ namespace CozySanta.Runtime.Snow
             var dt = UnityEngine.Time.deltaTime;
 
             var origin = viewOrigin != null ? viewOrigin : (Camera.main != null ? Camera.main.transform : transform);
-            var hasHit = TryAimAtSnow(origin, out var world);
+            var hasHit = TryAimAtSnow(origin, out var world, out var aimed);
 
             // Akku läuft immer wenn F gedrückt, unabhängig ob Schnee getroffen wird
             if (melting && _battery.CanMelt)
             {
                 _battery.Drain(drainPerSecond * dt);
                 if (hasHit)
-                    patch.Melt(world, meltRadius, meltStrength * dt);
+                    aimed.Melt(world, meltRadius, meltStrength * dt);
             }
             else if (adding && hasHit)
             {
-                patch.AddSnow(world, meltRadius, addStrength * dt);
+                aimed.AddSnow(world, meltRadius, addStrength * dt);
             }
 
             // Passives Nachladen entfernt (F7): Akku lädt nur noch über die Ladestation auf.
         }
 
-        private bool TryAimAtSnow(Transform origin, out Vector3 world)
+        private bool TryAimAtSnow(Transform origin, out Vector3 world, out SnowPatch aimed)
         {
             world = Vector3.zero;
+            aimed = null;
             var ray = new Ray(origin.position, origin.forward);
 
-            // Primär: Strahl gegen das tatsächliche Schnee-Volumen (Trigger-Collider am Patch).
+            // Primär: nächstgelegenes Schnee-Volumen (Trigger-Collider eines beliebigen SnowPatch).
             var hits = Physics.RaycastAll(ray, maxRange, ~0, QueryTriggerInteraction.Collide);
-            for (var i = 0; i < hits.Length; i++)
+            var bestDist = float.MaxValue;
+            foreach (var hit in hits)
             {
-                if (hits[i].collider.GetComponentInParent<SnowPatch>() == patch)
+                var sp = hit.collider.GetComponentInParent<SnowPatch>();
+                if (sp == null || hit.distance >= bestDist) continue;
+                bestDist = hit.distance;
+                aimed = sp;
+                world = hit.point;
+            }
+            if (aimed != null) return true;
+
+            // Fallback: Schnitt mit der Ebene des primären Patches (falls gesetzt).
+            if (patch != null)
+            {
+                var planePoint = patch.transform.position + (patch.transform.up * (patch.AimHeight * 0.5f));
+                var plane = new Plane(patch.transform.up, planePoint);
+                if (plane.Raycast(ray, out var enter) && enter <= maxRange)
                 {
-                    world = hits[i].point;
+                    world = ray.GetPoint(enter);
+                    aimed = patch;
                     return true;
                 }
-            }
-
-            // Fallback: Schnitt mit der Patch-Ebene auf halber Schneehöhe.
-            var planePoint = patch.transform.position + (patch.transform.up * (patch.AimHeight * 0.5f));
-            var plane = new Plane(patch.transform.up, planePoint);
-            if (plane.Raycast(ray, out var enter) && enter <= maxRange)
-            {
-                world = ray.GetPoint(enter);
-                return true;
             }
 
             return false;

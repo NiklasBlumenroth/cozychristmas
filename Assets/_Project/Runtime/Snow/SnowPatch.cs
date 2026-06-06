@@ -10,7 +10,7 @@ namespace CozySanta.Runtime.Snow
     /// Auftragen läuft über das Core-Feld (Decide), das Mesh wird danach synchronisiert (Apply).
     /// </summary>
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-    public sealed class SnowPatch : MonoBehaviour
+    public sealed partial class SnowPatch : MonoBehaviour
     {
         [Tooltip("Zellen pro Achse (Grid ist Resolution × Resolution Vertices).")]
         [SerializeField] private int resolution = 64;
@@ -18,11 +18,20 @@ namespace CozySanta.Runtime.Snow
         [SerializeField] private float size = 8f;
         [Tooltip("Volle Schneehöhe in Metern (Dicke der Decke).")]
         [SerializeField] private float maxHeight = 0.5f;
+        [Tooltip("Breite des abgeschrägten Randauslaufs in Metern: über diese Strecke fällt die " +
+                 "Schneehöhe sanft auf 0 (natürlicher Übergang zum Boden statt senkrechter Kante).")]
+        [SerializeField] private float edgeFalloff = 0.5f;
 
         private MeltField _field;
         private Mesh _mesh;
         private Vector3[] _verts;
         private Color[] _colors;
+
+        // Geometrischer Rand-Blend je Vertex (0 am äußeren Rand … 1 ab edgeFalloff nach innen).
+        private float[] _edgeBlend = System.Array.Empty<float>();
+        // Höhen-Deckel je Vertex (0..1 × maxHeight): kombiniert Rand-Blend mit der erkannten
+        // Nachbarhöhe. Die angezeigte Höhe ist min(Schmelzhöhe, Deckel). In ShapeEdges gesetzt.
+        private float[] _cap = System.Array.Empty<float>();
 
         /// <summary>Flächen-Fortschritt 0..1 (Anteil freigelegt) aus der Core-Logik.</summary>
         public float Coverage => _field != null ? _field.Coverage : 0f;
@@ -30,10 +39,20 @@ namespace CozySanta.Runtime.Snow
         /// <summary>Volle Schneehöhe (für das Zielen auf das Schnee-Volumen).</summary>
         public float AimHeight => maxHeight;
 
+        /// <summary>Zählt bei jeder Schmelz-/Auftrag-Änderung hoch; Nachbar-Patches pollen das,
+        /// um ihren Randübergang an die geänderte Oberfläche anzupassen.</summary>
+        public int Version { get; private set; }
+
         private void Awake()
         {
             BuildMesh();
             EnsureAimCollider();
+        }
+
+        private void Start()
+        {
+            // Erst hier: alle Nachbar-Collider (auch SnowPatch-Trigger aus deren Awake) existieren.
+            ShapeEdges();
         }
 
         // Zeigt die Schnee-Ausdehnung (Fläche + Höhe) schon im Edit-Modus an, da das Mesh erst zur
@@ -75,9 +94,12 @@ namespace CozySanta.Runtime.Snow
         {
             var r = Mathf.Max(2, resolution);
             _field = new MeltField(r);
-            _verts = new Vector3[r * r];
+
+            _verts  = new Vector3[r * r];
             _colors = new Color[r * r];
-            var uvs = new Vector2[r * r];
+            _edgeBlend = new float[r * r];
+            _cap = new float[r * r];
+            var uvs  = new Vector2[r * r];
             var tris = new int[(r - 1) * (r - 1) * 6];
 
             for (var y = 0; y < r; y++)
@@ -87,7 +109,10 @@ namespace CozySanta.Runtime.Snow
                     var i = (y * r) + x;
                     var fx = ((float)x / (r - 1)) - 0.5f;
                     var fz = ((float)y / (r - 1)) - 0.5f;
-                    _verts[i] = new Vector3(fx * size, maxHeight, fz * size);
+                    var blend = EdgeBlend(fx, fz);
+                    _edgeBlend[i] = blend;
+                    _cap[i] = blend; // bis zur Nachbarerkennung (ShapeEdges): Auslauf auf 0
+                    _verts[i] = new Vector3(fx * size, maxHeight * blend, fz * size);
                     uvs[i] = new Vector2((float)x / (r - 1), (float)y / (r - 1));
                     _colors[i] = new Color(1f, 1f, 1f, 1f); // height in r-channel
                 }
@@ -99,12 +124,8 @@ namespace CozySanta.Runtime.Snow
                 for (var x = 0; x < r - 1; x++)
                 {
                     var i = (y * r) + x;
-                    tris[t++] = i;
-                    tris[t++] = i + r;
-                    tris[t++] = i + 1;
-                    tris[t++] = i + 1;
-                    tris[t++] = i + r;
-                    tris[t++] = i + r + 1;
+                    tris[t++] = i; tris[t++] = i + r; tris[t++] = i + 1;
+                    tris[t++] = i + 1; tris[t++] = i + r; tris[t++] = i + r + 1;
                 }
             }
 
@@ -122,6 +143,17 @@ namespace CozySanta.Runtime.Snow
             GetComponent<MeshFilter>().sharedMesh = _mesh;
         }
 
+        // Sanfter Geometrie-Blend am Rand: 0 an der äußeren Kante, 1 ab edgeFalloff Metern nach innen.
+        // fx/fz liegen in [-0.5, 0.5]; Abstand zur nächsten Kante in Metern bestimmt den Wert.
+        private float EdgeBlend(float fx, float fz)
+        {
+            if (edgeFalloff <= 0f) return 1f;
+            var distX = (0.5f - Mathf.Abs(fx)) * size;
+            var distZ = (0.5f - Mathf.Abs(fz)) * size;
+            var edgeDist = Mathf.Min(distX, distZ);
+            return Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(edgeDist / edgeFalloff));
+        }
+
         /// <summary>Senkt die Schneehöhe am Weltpunkt; false, wenn der Punkt außerhalb des Patches liegt.</summary>
         public bool Melt(Vector3 world, float radiusMeters, float strength)
         {
@@ -131,6 +163,7 @@ namespace CozySanta.Runtime.Snow
             }
 
             _field.Melt(u, v, radiusMeters / size, strength);
+            Version++;
             SyncMesh();
             return true;
         }
@@ -144,6 +177,7 @@ namespace CozySanta.Runtime.Snow
             }
 
             _field.Add(u, v, radiusMeters / size, strength);
+            Version++;
             SyncMesh();
             return true;
         }
@@ -165,7 +199,7 @@ namespace CozySanta.Runtime.Snow
                 {
                     var i = (y * r) + x;
                     var h = _field.HeightAt(x, y);
-                    _verts[i].y = h * maxHeight;
+                    _verts[i].y = Mathf.Min(h, _cap[i]) * maxHeight; // Schmelzhöhe, gedeckelt durch Rand/Nachbar
                     _colors[i].r = h;
                 }
             }
