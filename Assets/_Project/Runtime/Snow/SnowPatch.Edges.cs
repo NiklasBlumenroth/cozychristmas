@@ -59,7 +59,61 @@ namespace CozySanta.Runtime.Snow
             _neighborVersions = new int[_neighborPatches.Length];
 
             RecomputeCaps();
+            BuildCarveMask();
             SyncMesh();
+        }
+
+        // Spart Schnee dort aus, wo ein Objekt in der Fläche steht: pro Zelle ein Raycast nach unten;
+        // ragt dort ein solider (Nicht-Boden-)Collider über den Boden, wird die Zelle als belegt
+        // markiert. Ein 1-Ring-Dilation gibt etwas Freiraum ums Objekt. Einmalig beim Start.
+        private void BuildCarveMask()
+        {
+            var r = _field.Resolution;
+            var occupied = new bool[r * r];
+            for (var y = 0; y < r; y++)
+                for (var x = 0; x < r; x++)
+                    if (CellOccupied(x, y)) occupied[(y * r) + x] = true;
+
+            // Weicher Übergang: carve = SmoothStep über carveFalloff Meter Abstand zur nächsten
+            // belegten Zelle. Objektzellen = 0, ab carveFalloff = 1, dazwischen sanfter Auslauf.
+            var fall = Mathf.Max(0.0001f, carveFalloff);
+            var cell = size / (r - 1);
+            var rad = Mathf.Max(1, Mathf.CeilToInt(fall / cell));
+            for (var y = 0; y < r; y++)
+                for (var x = 0; x < r; x++)
+                {
+                    var i = (y * r) + x;
+                    if (occupied[i]) { _carve[i] = 0f; continue; }
+                    var best = float.MaxValue;
+                    for (var dy = -rad; dy <= rad; dy++)
+                        for (var dx = -rad; dx <= rad; dx++)
+                        {
+                            int nx = x + dx, ny = y + dy;
+                            if (nx < 0 || ny < 0 || nx >= r || ny >= r || !occupied[(ny * r) + nx]) continue;
+                            var d = Mathf.Sqrt((dx * dx) + (dy * dy)) * cell;
+                            if (d < best) best = d;
+                        }
+                    _carve[i] = best >= fall ? 1f : Mathf.SmoothStep(0f, 1f, best / fall);
+                }
+        }
+
+        // True, wenn an der Zelle ein solides Objekt über dem Boden steht (Boden/Schnee/fremde Trigger zählen nicht).
+        private bool CellOccupied(int x, int y)
+        {
+            var r = _field.Resolution;
+            var fx = ((float)x / (r - 1)) - 0.5f;
+            var fz = ((float)y / (r - 1)) - 0.5f;
+            // Start weit oben, damit der Strahl auch hohe Objekte (z. B. Capsule) von außen/oben trifft
+            // statt im Collider zu beginnen (ein Raycast aus dem Inneren meldet keinen Treffer).
+            var origin = transform.TransformPoint(new Vector3(fx * size, maxHeight + 100f, fz * size));
+            var hits = Physics.RaycastAll(origin, -transform.up, 300f, ~0, QueryTriggerInteraction.Collide);
+            foreach (var hit in hits)
+            {
+                if (hit.collider.GetComponentInParent<SnowPatch>() != null) continue; // eigene/fremde Schneefläche
+                if (hit.collider.isTrigger) continue;                                  // AreaZone/Gate u. Ä.
+                if (transform.InverseTransformPoint(hit.point).y > 0.05f) return true;  // ragt über den Boden
+            }
+            return false;
         }
 
         // Pollt die Nachbar-Patches: ändert einer seine Schmelzhöhe, wird der Randübergang neu berechnet.

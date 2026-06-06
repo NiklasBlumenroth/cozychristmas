@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CozySanta.Core.Snow;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -77,7 +78,7 @@ namespace CozySanta.Runtime.Snow
             {
                 _battery.Drain(drainPerSecond * dt);
                 if (hasHit)
-                    aimed.Melt(world, meltRadius, meltStrength * dt);
+                    MeltCone(world, meltStrength * dt);
             }
             else if (adding && hasHit)
             {
@@ -85,6 +86,23 @@ namespace CozySanta.Runtime.Snow
             }
 
             // Passives Nachladen entfernt (F7): Akku lädt nur noch über die Ladestation auf.
+        }
+
+        private readonly Collider[] _coneHits = new Collider[16];
+        private readonly HashSet<SnowPatch> _coneSeen = new();
+
+        // Schmilzt den ganzen Pinselkegel: alle SnowPatches im Radius um den Zielpunkt, nicht nur den
+        // anvisierten. Jeder Patch senkt den überlappenden Teil – so wirkt der Kegel über Patch-Grenzen.
+        private void MeltCone(Vector3 world, float strength)
+        {
+            _coneSeen.Clear();
+            var n = Physics.OverlapSphereNonAlloc(world, meltRadius, _coneHits, ~0, QueryTriggerInteraction.Collide);
+            for (var i = 0; i < n; i++)
+            {
+                var sp = _coneHits[i].GetComponentInParent<SnowPatch>();
+                if (sp != null && _coneSeen.Add(sp))
+                    sp.Melt(world, meltRadius, strength);
+            }
         }
 
         private bool TryAimAtSnow(Transform origin, out Vector3 world, out SnowPatch aimed)
