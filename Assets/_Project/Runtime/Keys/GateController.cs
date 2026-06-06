@@ -16,6 +16,10 @@ namespace CozySanta.Runtime.Keys
         [SerializeField] private float openDuration = 0.8f;
         [SerializeField] private float openAngle = 90f;
 
+        [Header("Diagnose")]
+        [Tooltip("Verbose Per-Trigger-Logs (standardmäßig aus). Warnungen bei Fehlkonfiguration erscheinen immer.")]
+        [SerializeField] private bool verboseLog;
+
         private GateLockData          _lock;
         private GateState             _state = GateState.Closed;
         private KeyInventoryManager   _inventoryManager;
@@ -32,30 +36,37 @@ namespace CozySanta.Runtime.Keys
 
         private void OnTriggerEnter(Collider other)
         {
-            Debug.Log($"[Gate] OnTriggerEnter: {other.gameObject.name}");
-
-            if (_state != GateState.Closed)
-            { Debug.Log($"[Gate] Abbruch: State = {_state}"); return; }
+            if (_state != GateState.Closed) { Log($"Abbruch: State = {_state}"); return; }
 
             if (_inventoryManager == null)
-            { Debug.LogWarning("[Gate] Kein KeyInventoryManager gefunden."); return; }
+            { Debug.LogWarning("[Gate] Kein KeyInventoryManager gefunden.", this); return; }
 
             if (other.GetComponentInParent<CozySanta.Runtime.Player.FirstPersonController>() == null)
-            { Debug.Log($"[Gate] '{other.gameObject.name}' ist kein Spieler – ignoriert."); return; }
-
-            var keys = string.Join(", ", _inventoryManager.Inventory.GetAllKeys());
-            var needed = string.Join(", ", requiredKeyIds);
-            Debug.Log($"[Gate] Spieler erkannt. Inventar: [{keys}]  Benötigt: [{needed}]");
+            { Log($"'{other.gameObject.name}' ist kein Spieler – ignoriert."); return; }
 
             if (requiredKeyIds.Length == 0)
             { Debug.LogWarning("[Gate] requiredKeyIds ist leer – bitte ID im Inspector eintragen. Tor öffnet nicht.", this); return; }
 
             if (!_lock.CanOpen(_inventoryManager.Inventory))
-            { Debug.Log("[Gate] Schlüssel fehlen – Tor bleibt zu."); return; }
+            {
+                if (verboseLog)
+                {
+                    var keys = string.Join(", ", _inventoryManager.Inventory.GetAllKeys());
+                    Log($"Schlüssel fehlen – Inventar [{keys}], benötigt [{string.Join(", ", requiredKeyIds)}].");
+                }
+                return;
+            }
 
             _state = GateState.Opening;
             _inventoryManager.ConsumeKeys(requiredKeyIds);
+            Log($"Tor geöffnet (verbraucht: {string.Join(", ", requiredKeyIds)}).");
             StartCoroutine(OpenRoutine());
+        }
+
+        // Verbose-Diagnose, standardmäßig aus; pro Tor im Inspector aktivierbar.
+        private void Log(string msg)
+        {
+            if (verboseLog) Debug.Log($"[Gate] {msg}", this);
         }
 
         private IEnumerator OpenRoutine()

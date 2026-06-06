@@ -24,7 +24,6 @@ namespace CozySanta.Runtime.Snow
         [Header("Akku")]
         [SerializeField] private float batteryCapacity = 12f;
         [SerializeField] private float drainPerSecond = 1f;
-        [SerializeField] private float rechargePerSecond = 0.6f;
 
         private LampBattery _battery;
 
