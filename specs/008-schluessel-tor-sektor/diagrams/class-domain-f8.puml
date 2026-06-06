@@ -1,0 +1,99 @@
+@startuml class-domain-f8
+' F8-Entitäten-Überblick (Core + Runtime). Abhängigkeit strikt Runtime → Core.
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "CozySanta.Core.Keys" {
+    enum GateState {
+        Closed
+        Opening
+        Open
+    }
+
+    class KeyInventory {
+        +AddKey(id : string) : void
+        +RemoveKeys(ids) : void
+        +HasKeys(ids) : bool
+        +GetAllKeys() : IReadOnlyCollection<string>
+    }
+    note bottom of KeyInventory
+        Testkandidaten:
+        K1 AddKey, K2/K3 HasKeys, K4 RemoveKeys
+    end note
+
+    class GateLockData {
+        +RequiredKeyIds : string[]
+        +CanOpen(inventory : KeyInventory) : bool
+    }
+    note bottom of GateLockData
+        Testkandidaten: G1 (Schlüssel fehlt),
+        G2 (alle vorhanden)
+    end note
+
+    GateLockData --> KeyInventory : prüft
+}
+
+package "CozySanta.Runtime.Keys" {
+    class KeyInventoryManager {
+        +Inventory : KeyInventory
+        +OnInventoryChanged : event Action
+        +CollectKey(id, icon) : void
+        +ConsumeKeys(ids) : void
+        +HasKeys(ids) : bool
+    }
+
+    class KeyPickup {
+        -keyId : string
+        -keyIcon : Sprite
+        +Interact() : void
+    }
+
+    class KeyHudView {
+        +Refresh(heldKeys, icons) : void
+    }
+
+    class GateController {
+        -requiredKeyIds : string[]
+        -openDuration : float
+        -openAngle : float
+    }
+
+    class KeySpawnBinding {
+        -targetArea : AreaTracker
+        -keyPrefab : GameObject
+        -spawnTransform : Transform
+    }
+
+    KeyInventoryManager *-- KeyInventory : hält
+    KeyInventoryManager --> KeyHudView : aktualisiert
+    KeyPickup ..> KeyInventoryManager : CollectKey
+    GateController *-- GateLockData : hält
+    GateController --> GateState : Zustand
+    GateController ..> KeyInventoryManager : CanOpen / ConsumeKeys
+}
+
+package "CozySanta.Runtime.Areas" {
+    class AreaManager {
+        +ActiveZones : IReadOnlyCollection<AreaZone>
+        +RegisterZone(zone) : void
+        +UnregisterZone(zone) : void
+    }
+    note bottom of AreaManager
+        Testkandidaten: Z1 (Overlap),
+        Z2 (Verlassen ohne Fallback)
+    end note
+
+    class AreaZone {
+        +Tracker : AreaTracker
+        +HudSection : GameObject
+    }
+
+    AreaManager o-- AreaZone : aktive Zones
+    AreaZone ..> AreaManager : Register/Unregister
+}
+
+' Cross-System-Anbindungen an F7
+KeySpawnBinding ..> "CozySanta.Runtime.Progression.AreaTracker" : OnAreaCompleted
+AreaZone --> "CozySanta.Runtime.Progression.AreaTracker" : referenziert
+
+@enduml

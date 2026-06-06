@@ -1,0 +1,32 @@
+@startuml state-gate
+' Tor-Lebenszyklus (GateController + Core-Enum GateState)
+' Testkandidaten: G1 CanOpen_ReturnsFalse_WhenKeyMissing, G2 CanOpen_ReturnsTrue_WhenAllKeysPresent
+skinparam state {
+    BackgroundColor LightYellow
+    BorderColor DarkGoldenRod
+}
+
+[*] --> Closed : Awake\n(GateLockData aus requiredKeyIds)
+
+Closed --> Closed : OnTriggerEnter\n[kein Spieler\nODER requiredKeyIds leer\nODER CanOpen = false]
+Closed --> Opening : OnTriggerEnter\n[Spieler & CanOpen = true]\n/ ConsumeKeys(requiredKeyIds)
+
+note on link
+    Verzweigung CanOpen prüft GateLockData.CanOpen(KeyInventory)
+    Testkandidaten: G1 (Schlüssel fehlt), G2 (alle vorhanden)
+end note
+
+state Opening {
+    note: OpenRoutine (Coroutine)\nSlerp doorPivot um openAngle\nüber openDuration
+}
+
+Opening --> Open : Rotation abgeschlossen
+
+state Open {
+    note: dauerhaft offen\nOnTriggerEnter ignoriert\n(State != Closed)
+}
+
+Open --> Open : OnTriggerEnter\n[State != Closed → Abbruch]
+Open --> [*]
+
+@enduml

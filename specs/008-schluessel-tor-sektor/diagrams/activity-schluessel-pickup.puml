@@ -1,0 +1,46 @@
+@startuml activity-schluessel-pickup
+' Schlüssel-Pickup-Flow: Area-Abschluss → Spawn → Aufheben → HUD
+' Testkandidaten: K1 AddKey_MakesKeyAvailable, K3 HasKeys_ReturnsTrue_WhenAllKeysPresent
+skinparam activity {
+    BackgroundColor LightYellow
+    BorderColor DarkGoldenRod
+}
+
+start
+
+:AreaTracker.OnAreaCompleted feuert;
+note right: einmalig bei IsComplete (F7 AreaProgress)
+
+if (KeySpawnBinding bereits gespawnt? (_spawned)) then (ja)
+  stop
+else (nein)
+endif
+
+if (keyPrefab gesetzt?) then (nein)
+  stop
+else (ja)
+  :Instantiate keyPrefab an spawnTransform\n(sonst eigene Position);
+endif
+
+:Schlüssel liegt in der Welt\n(KeyPickup, IInteractable);
+
+:Spieler fokussiert & interagiert\n(F2 Interaktions-Raycast);
+
+if (KeyInventoryManager vorhanden?) then (nein)
+  :LogWarning – kein Aufheben;
+  stop
+else (ja)
+  :CollectKey(keyId, keyIcon);
+  note right
+    KeyInventory.AddKey (HashSet → kein Duplikat)
+    Testkandidat K1
+  end note
+  :Icon-Zuordnung aktualisieren;
+  :OnInventoryChanged + KeyHudView.Refresh;
+  :Schlüssel-Objekt zerstören;
+endif
+
+:Icon erscheint im HUD\n(Carry-Stack unberührt);
+stop
+
+@enduml

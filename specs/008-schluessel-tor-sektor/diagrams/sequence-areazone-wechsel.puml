@@ -1,0 +1,40 @@
+@startuml sequence-areazone-wechsel
+' Area-Zone-Wechsel: Betreten/Verlassen → AreaManager → HUD-Sektion
+' Testkandidaten: Z1 RegisterZone_TwoZones_BothActive, Z2 UnregisterZone_RemovesZone_OtherRemains
+skinparam sequence {
+    LifeLineBackgroundColor LightYellow
+    LifeLineBorderColor DarkGoldenRod
+}
+
+actor Spieler
+participant "AreaZone A\n(BoxCollider Trigger)" as ZoneA
+participant "AreaZone B" as ZoneB
+participant AreaManager
+participant "HudSection A" as HudA
+participant "HudSection B" as HudB
+
+== Betreten Zone A ==
+Spieler -> ZoneA : OnTriggerEnter (FirstPersonController)
+ZoneA -> AreaManager : RegisterZone(A)
+AreaManager -> HudA : SetActive(true)
+note over AreaManager: _activeZones = {A}
+
+== Overlap: zusätzlich Zone B betreten ==
+Spieler -> ZoneB : OnTriggerEnter
+ZoneB -> AreaManager : RegisterZone(B)
+AreaManager -> HudB : SetActive(true)
+note over AreaManager: _activeZones = {A, B}\nbeide Listen sichtbar (Testkandidat Z1)
+
+== Zone A verlassen (B bleibt) ==
+Spieler -> ZoneA : OnTriggerExit
+ZoneA -> AreaManager : UnregisterZone(A)
+AreaManager -> HudA : SetActive(false)
+note over AreaManager: _activeZones = {B}\nkein Fallback auf A (Testkandidat Z2)
+
+== Letzte Zone verlassen ==
+Spieler -> ZoneB : OnTriggerExit
+ZoneB -> AreaManager : UnregisterZone(B)
+AreaManager -> HudB : SetActive(false)
+note over AreaManager: _activeZones = {}\nHUD zeigt keine Aufgaben
+
+@enduml
