@@ -24,16 +24,38 @@ namespace CozySanta.Runtime.Snow
         {
             worldY = 0f;
             if (_field == null || !TryWorldToUV(world, out var u, out var v)) return false;
-            var r = _field.Resolution;
-            var cx = Mathf.Clamp(Mathf.RoundToInt(u * (r - 1)), 0, r - 1);
-            var cy = Mathf.Clamp(Mathf.RoundToInt(v * (r - 1)), 0, r - 1);
-            var h = _field.HeightAt(cx, cy);
+            var h = SampleHeightBilinear(u, v);
             worldY = transform.TransformPoint(new Vector3((u - 0.5f) * size, h * maxHeight, (v - 0.5f) * size)).y;
             return true;
         }
 
-        // Initiale Randerkennung (in Start, wenn alle Nachbar-Collider existieren).
+        // Bilinear interpolierte Feld-Höhe an (u,v) – glatte Werte zwischen den Zellen, damit
+        // angrenzende Patches sich an der Naht ohne Quantisierungs-Stufen aufeinander abstimmen.
+        private float SampleHeightBilinear(float u, float v)
+        {
+            var r = _field.Resolution;
+            var fx = Mathf.Clamp(u * (r - 1), 0f, r - 1);
+            var fy = Mathf.Clamp(v * (r - 1), 0f, r - 1);
+            int x0 = Mathf.FloorToInt(fx), y0 = Mathf.FloorToInt(fy);
+            int x1 = Mathf.Min(x0 + 1, r - 1), y1 = Mathf.Min(y0 + 1, r - 1);
+            float tx = fx - x0, ty = fy - y0;
+            var top = Mathf.Lerp(_field.HeightAt(x0, y0), _field.HeightAt(x1, y0), tx);
+            var bot = Mathf.Lerp(_field.HeightAt(x0, y1), _field.HeightAt(x1, y1), tx);
+            return Mathf.Lerp(top, bot, ty);
+        }
+
+        // Initiale Randerkennung (in Start). SyncTransforms stellt sicher, dass neu in Awake angelegte
+        // Nachbar-Collider in der Physik-Szene aktuell sind, bevor wir sie antasten.
         private void ShapeEdges()
+        {
+            Physics.SyncTransforms();
+            DetectNeighborEdges();
+            BuildCarveMask();
+            SyncMesh();
+        }
+
+        // Tastet alle vier Ränder ab, bestimmt Nachbar-Patches und berechnet die Deckel neu.
+        private void DetectNeighborEdges()
         {
             var r = _field.Resolution;
             _boundaryTarget = new float[r * r];
@@ -59,8 +81,6 @@ namespace CozySanta.Runtime.Snow
             _neighborVersions = new int[_neighborPatches.Length];
 
             RecomputeCaps();
-            BuildCarveMask();
-            SyncMesh();
         }
 
         // Spart Schnee dort aus, wo ein Objekt in der Fläche steht: pro Zelle ein Raycast nach unten;
@@ -116,9 +136,22 @@ namespace CozySanta.Runtime.Snow
             return false;
         }
 
+        private bool _edgesSettled;
+
         // Pollt die Nachbar-Patches: ändert einer seine Schmelzhöhe, wird der Randübergang neu berechnet.
         private void LateUpdate()
         {
+            if (!_edgesSettled)
+            {
+                // Einmalige Re-Erkennung nach dem ersten Frame: jetzt ist die Physik (Nachbar-Collider)
+                // sicher synchronisiert → behebt Naht-Risse aus dem zu frühen Antasten in Start.
+                _edgesSettled = true;
+                Physics.SyncTransforms();
+                DetectNeighborEdges();
+                SyncMesh();
+                return;
+            }
+
             if (_neighborPatches.Length == 0) return;
             var changed = false;
             for (var k = 0; k < _neighborPatches.Length; k++)
