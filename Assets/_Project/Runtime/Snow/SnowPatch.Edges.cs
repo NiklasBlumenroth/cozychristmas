@@ -12,26 +12,41 @@ namespace CozySanta.Runtime.Snow
     public sealed partial class SnowPatch
     {
         private float[] _boundaryTarget = System.Array.Empty<float>();   // Nachbarhöhen-Anteil je Randvertex (0..1)
-        private int[] _dynBoundary = System.Array.Empty<int>();          // Rand-Vertizes mit SnowPatch-Nachbar
-        private SnowPatch[] _dynBoundaryPatch = System.Array.Empty<SnowPatch>();
+        private int[] _dynBoundary = System.Array.Empty<int>();          // Rand-Vertizes mit SnowPatch-Nachbar (unique)
         private SnowPatch[] _neighborPatches = System.Array.Empty<SnowPatch>();
         private int[] _neighborVersions = System.Array.Empty<int>();
 
-        /// <summary>Liefert die aktuelle Schmelzhöhe (Welt-Y) der Schneefläche am XZ-Weltpunkt;
-        /// false, wenn der Punkt außerhalb liegt. Liefert die reine Feld-Höhe (ohne Rand-Deckel),
-        /// damit Nachbarn der tatsächlichen Schneemenge folgen – nicht der Rand-Optik.</summary>
+        /// <summary>Liefert die aktuelle, sichtbare Oberkanten-Höhe (Welt-Y) der Schneefläche am
+        /// XZ-Weltpunkt; false, wenn der Punkt außerhalb liegt. Es ist die *gerenderte* Höhe
+        /// (Schmelzhöhe, gedeckelt + ausgespart), damit ein Nachbar auch eine an seiner Kante noch
+        /// nicht fertig ausgelaufene Rampe übernimmt und die Naht bündig bleibt.</summary>
         public bool TrySurfaceWorldY(Vector3 world, out float worldY)
         {
             worldY = 0f;
-            if (_field == null || !TryWorldToUV(world, out var u, out var v)) return false;
-            var h = SampleHeightBilinear(u, v);
+            if (_field == null) return false;
+            var local = transform.InverseTransformPoint(world);
+            var u = (local.x / size) + 0.5f;
+            var v = (local.z / size) + 0.5f;
+            var tol = 0.05f / size; // kleine Toleranz, damit an Ecken geteilte Randpunkte auf allen Patches aufgehen
+            if (u < -tol || u > 1f + tol || v < -tol || v > 1f + tol) return false;
+            u = Mathf.Clamp01(u);
+            v = Mathf.Clamp01(v);
+            var h = SampleRenderedBilinear(u, v);
             worldY = transform.TransformPoint(new Vector3((u - 0.5f) * size, h * maxHeight, (v - 0.5f) * size)).y;
             return true;
         }
 
-        // Bilinear interpolierte Feld-Höhe an (u,v) – glatte Werte zwischen den Zellen, damit
-        // angrenzende Patches sich an der Naht ohne Quantisierungs-Stufen aufeinander abstimmen.
-        private float SampleHeightBilinear(float u, float v)
+        // Sichtbare Oberkanten-Höhe (0..1) einer Zelle: Schmelzhöhe, gedeckelt durch Rand/Nachbar und
+        // ausgespart bei Objekten – also genau das, was gerendert wird.
+        private float Rendered(int x, int y)
+        {
+            var i = (y * _field.Resolution) + x;
+            return Mathf.Min(_field.HeightAt(x, y), _cap[i]) * _carve[i];
+        }
+
+        // Bilinear interpolierte gerenderte Höhe an (u,v) – glatt zwischen den Zellen, damit Nähte
+        // ohne Quantisierungs-Stufen aufeinander abgestimmt sind.
+        private float SampleRenderedBilinear(float u, float v)
         {
             var r = _field.Resolution;
             var fx = Mathf.Clamp(u * (r - 1), 0f, r - 1);
@@ -39,8 +54,8 @@ namespace CozySanta.Runtime.Snow
             int x0 = Mathf.FloorToInt(fx), y0 = Mathf.FloorToInt(fy);
             int x1 = Mathf.Min(x0 + 1, r - 1), y1 = Mathf.Min(y0 + 1, r - 1);
             float tx = fx - x0, ty = fy - y0;
-            var top = Mathf.Lerp(_field.HeightAt(x0, y0), _field.HeightAt(x1, y0), tx);
-            var bot = Mathf.Lerp(_field.HeightAt(x0, y1), _field.HeightAt(x1, y1), tx);
+            var top = Mathf.Lerp(Rendered(x0, y0), Rendered(x1, y0), tx);
+            var bot = Mathf.Lerp(Rendered(x0, y1), Rendered(x1, y1), tx);
             return Mathf.Lerp(top, bot, ty);
         }
 
@@ -59,8 +74,7 @@ namespace CozySanta.Runtime.Snow
         {
             var r = _field.Resolution;
             _boundaryTarget = new float[r * r];
-            var dyn = new List<int>();
-            var dynPatch = new List<SnowPatch>();
+            var dyn = new HashSet<int>();
             var neighbors = new HashSet<SnowPatch>();
 
             void Probe(int x, int y, float nx, float nz)
@@ -68,14 +82,17 @@ namespace CozySanta.Runtime.Snow
                 var gi = (y * r) + x;
                 _boundaryTarget[gi] = ProbeNeighbor(x, y, nx, nz, out var nb);
                 if (nb == null) return;
-                dyn.Add(gi); dynPatch.Add(nb); neighbors.Add(nb);
+                dyn.Add(gi); neighbors.Add(nb);
             }
 
             for (var x = 0; x < r; x++) { Probe(x, 0, 0f, -1f); Probe(x, r - 1, 0f, 1f); }
             for (var y = 0; y < r; y++) { Probe(0, y, -1f, 0f); Probe(r - 1, y, 1f, 0f); }
+            // Diagonale Eck-Antastung: erfasst den dritten (diagonalen) Nachbarn an 4-Patch-Ecken.
+            Probe(0, 0, -1f, -1f); Probe(r - 1, 0, 1f, -1f);
+            Probe(0, r - 1, -1f, 1f); Probe(r - 1, r - 1, 1f, 1f);
 
-            _dynBoundary = dyn.ToArray();
-            _dynBoundaryPatch = dynPatch.ToArray();
+            _dynBoundary = new int[dyn.Count];
+            dyn.CopyTo(_dynBoundary);
             _neighborPatches = new SnowPatch[neighbors.Count];
             neighbors.CopyTo(_neighborPatches);
             _neighborVersions = new int[_neighborPatches.Length];
@@ -136,19 +153,20 @@ namespace CozySanta.Runtime.Snow
             return false;
         }
 
-        private bool _edgesSettled;
+        private int _settleFrames = 4;
 
         // Pollt die Nachbar-Patches: ändert einer seine Schmelzhöhe, wird der Randübergang neu berechnet.
         private void LateUpdate()
         {
-            if (!_edgesSettled)
+            if (_settleFrames > 0)
             {
-                // Einmalige Re-Erkennung nach dem ersten Frame: jetzt ist die Physik (Nachbar-Collider)
-                // sicher synchronisiert → behebt Naht-Risse aus dem zu frühen Antasten in Start.
-                _edgesSettled = true;
-                Physics.SyncTransforms();
-                DetectNeighborEdges();
+                // Erster Frame: Physik ist gesetzt → volle Re-Erkennung der Ränder (behebt frühe
+                // Naht-Risse aus Start). Danach ein paar Iterationen, damit sich gegenseitig auf die
+                // gerenderte Höhe abgestimmte Nähte sauber einschwingen.
+                if (_settleFrames == 4) { Physics.SyncTransforms(); DetectNeighborEdges(); }
+                else RecomputeCaps();
                 SyncMesh();
+                _settleFrames--;
                 return;
             }
 
@@ -171,7 +189,7 @@ namespace CozySanta.Runtime.Snow
             for (var k = 0; k < _dynBoundary.Length; k++)
             {
                 var gi = _dynBoundary[k];
-                _boundaryTarget[gi] = SampleNeighborFrac(gi % r, gi / r, _dynBoundaryPatch[k]);
+                _boundaryTarget[gi] = SampleNeighborsMinFrac(gi % r, gi / r);
             }
             for (var y = 0; y < r; y++)
             {
@@ -225,22 +243,26 @@ namespace CozySanta.Runtime.Snow
             return best;
         }
 
-        // Aktuelle Oberkante eines SnowPatch-Nachbarn am Randpunkt, als Anteil von maxHeight (0..1).
-        private float SampleNeighborFrac(int x, int y, SnowPatch nb)
+        // Minimum der gerenderten Oberkanten ALLER an diesem Randpunkt anliegenden SnowPatch-Nachbarn
+        // (als Anteil von maxHeight, 0..1). So teilen sich an einer 4-Patch-Ecke alle denselben Wert →
+        // sauberer Übergang. 1, wenn kein Nachbar den Punkt abdeckt (kein Deckel).
+        private float SampleNeighborsMinFrac(int x, int y)
         {
-            if (nb == null) return 0f;
             var r = _field.Resolution;
             var fx = ((float)x / (r - 1)) - 0.5f;
             var fz = ((float)y / (r - 1)) - 0.5f;
-            var nx = x == 0 ? -1f : (x == r - 1 ? 1f : 0f);
-            var nz = y == 0 ? -1f : (y == r - 1 ? 1f : 0f);
-            const float outward = 0.1f;
+            var world = transform.TransformPoint(new Vector3(fx * size, 0f, fz * size));
 
-            var world = transform.TransformPoint(new Vector3(
-                (fx * size) + (nx * outward), 0f, (fz * size) + (nz * outward)));
-            if (!nb.TrySurfaceWorldY(world, out var worldY)) return 0f;
-            var localY = transform.InverseTransformPoint(new Vector3(world.x, worldY, world.z)).y;
-            return Mathf.Clamp01(localY / maxHeight);
+            var min = 1f;
+            var found = false;
+            foreach (var n in _neighborPatches)
+            {
+                if (n == null || !n.TrySurfaceWorldY(world, out var worldY)) continue;
+                var localY = transform.InverseTransformPoint(new Vector3(world.x, worldY, world.z)).y;
+                min = Mathf.Min(min, Mathf.Clamp01(localY / maxHeight));
+                found = true;
+            }
+            return found ? min : 1f;
         }
     }
 }

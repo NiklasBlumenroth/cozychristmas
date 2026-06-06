@@ -118,7 +118,8 @@ namespace CozySanta.Runtime.Snow
                     var fz = ((float)y / (r - 1)) - 0.5f;
                     var blend = EdgeBlend(fx, fz);
                     _edgeBlend[i] = blend;
-                    _cap[i] = blend; // bis zur Nachbarerkennung (ShapeEdges): Auslauf auf 0
+                    _cap[i] = 1f;    // sichere Voll-Basis, bis ShapeEdges den echten Deckel setzt
+                                     // (ein noch nicht abgetasteter Nachbar wird so nie als „leer" gelesen)
                     _carve[i] = 1f;  // bis BuildCarveMask: überall Schnee erlaubt
                     _verts[i] = new Vector3(fx * size, maxHeight * blend, fz * size);
                     uvs[i] = new Vector2((float)x / (r - 1), (float)y / (r - 1));
