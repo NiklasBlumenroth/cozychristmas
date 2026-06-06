@@ -40,6 +40,9 @@ namespace CozySanta.Runtime.Player
             if (keyboard.qKey.wasPressedThisFrame && carry != null)
                 carry.Drop();
 
+            if (keyboard.spaceKey.wasPressedThisFrame && controller != null)
+                controller.RequestJump();
+
             if (keyboard.xKey.wasPressedThisFrame && skillMenu != null)
                 ToggleSkillMenu();
 

@@ -128,6 +128,23 @@ Assets/_Project/
   `MeltController`: Akku läuft immer bei gedrücktem F (nicht nur bei Schnee-Treffer); passives Nachladen entfernt.
   Editor-Setup „CozySanta/Setup F7 …". EditMode-Tests A1–A3, B1–B2, C1–C2 grün.
 
+- **F8 (abgeschlossen)**: Schlüssel-, Tor- & Sektorfreischaltung — Core `KeyInventory` (HashSet gehaltener
+  Schlüssel-IDs: AddKey/RemoveKeys/HasKeys, kein Duplikat), `GateLockData` (RequiredKeyIds[], `CanOpen(KeyInventory)`),
+  `GateState` (Closed/Opening/Open). Runtime `KeyInventoryManager` (hält `KeyInventory` + Icon-Map, `OnInventoryChanged`,
+  CollectKey/ConsumeKeys; auf GameManager-Objekt), `KeyPickup` (IInteractable, geht NICHT in den Carry-Stack →
+  `CollectKey` + Destroy), `KeyHudView` (editor-authored Icon-Slots, nur Binding/Refresh), `GateController`
+  (Proximity-Trigger, öffnet automatisch bei `CanOpen`, verbraucht Schlüssel, Slerp-Rotation um `doorPivot`, bleibt
+  dauerhaft offen), `KeySpawnBinding` (spawnt Schlüssel-Prefab einmalig bei `AreaTracker.OnAreaCompleted` an
+  `spawnTransform`). Runtime `AreaManager` + `AreaZone` (BoxCollider-Trigger, Player-Erkennung über
+  `FirstPersonController`; Overlap zeigt mehrere HUD-Sektionen gleichzeitig, kein Stack/Fallback). Editor-Setup
+  „CozySanta/Setup F8 (Schlüssel, Tore, Zones)" erstellt GameManager, Key-HUD und Prefabs (`KeyItem`, `Gate`,
+  `AreaZone`). EditMode-Tests K1–K4, G1–G2, Z1–Z2 grün. Diagramme unter `specs/008-schluessel-tor-sektor/diagrams/`.
+
+- **Spielersprung (additiv zu F2)**: Core `JumpCalculator` (Decide, testbar) — `ComputeJumpVelocity`
+  (v0 = √(2·g·h)) + `StepVerticalVelocity` (Boden-Anpressdruck, Absprung, Schwerkraft-Integration);
+  `FirstPersonController` um `jumpHeight` + `RequestJump()` erweitert, `PlayerInputRelay` liest die Leertaste.
+  EditMode-Tests J1–J5 grün.
+
 ## Status / MVP-Fokus
 
 Erster Sektor (Eingangsbereich + Poststelle, optional Dekorationsfabrik) als

@@ -20,15 +20,20 @@ namespace CozySanta.Runtime.Player
         [SerializeField] private float minPitch = -80f;
         [SerializeField] private float maxPitch = 80f;
         [SerializeField] private float gravity = -9.81f;
+        [SerializeField] private float jumpHeight = 1.1f;
 
         private CharacterController _controller;
         private float _pitch;
         private float _verticalVelocity;
+        private bool _jumpRequested;
         private Vector2 _moveInput;
         private Vector2 _lookInput;
 
         public void SetMoveInput(Vector2 value) => _moveInput = value;
         public void SetLookInput(Vector2 value) => _lookInput = value;
+
+        /// <summary>Fordert einen Sprung an; wird im nächsten <see cref="ApplyMove"/> verbraucht.</summary>
+        public void RequestJump() => _jumpRequested = true;
 
         /// <summary>Laufgeschwindigkeit (m/s). Andockpunkt für MoveSpeed-Upgrade (F6).</summary>
         public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
@@ -73,12 +78,12 @@ namespace CozySanta.Runtime.Player
                 new SN.Vector2(_moveInput.x, _moveInput.y), moveSpeed);
             var world = (transform.right * local.X) + (transform.forward * local.Y);
 
-            if (_controller.isGrounded && _verticalVelocity < 0f)
-            {
-                _verticalVelocity = -2f;
-            }
+            var jumpVelocity = JumpCalculator.ComputeJumpVelocity(jumpHeight, gravity);
+            _verticalVelocity = JumpCalculator.StepVerticalVelocity(
+                _verticalVelocity, _controller.isGrounded, _jumpRequested,
+                jumpVelocity, gravity, deltaTime);
+            _jumpRequested = false;
 
-            _verticalVelocity += gravity * deltaTime;
             var displacement = (world * deltaTime) + (Vector3.up * (_verticalVelocity * deltaTime));
             _controller.Move(displacement);
         }
