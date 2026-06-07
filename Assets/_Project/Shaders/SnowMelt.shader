@@ -7,8 +7,8 @@ Shader "CozySanta/SnowMelt"
         _Tiling ("Tiling", Float) = 4
         _EdgeWidth ("Randweichheit", Range(0,0.4)) = 0.12
         _NoiseScale ("Rand-Noise", Float) = 18
-        _LightDir ("Lichtrichtung", Vector) = (0.3,0.9,0.4,0)
-        _Ambient ("Grundhelligkeit", Range(0,1)) = 0.5
+        _LightDir ("Lichtrichtung (ungenutzt)", Vector) = (0.3,0.9,0.4,0)
+        _Ambient ("Mindesthelligkeit", Range(0,1)) = 0.08
         _Sparkle ("Glitzer", Range(0,1)) = 0.15
     }
 
@@ -19,12 +19,23 @@ Shader "CozySanta/SnowMelt"
         Pass
         {
             Name "SnowForward"
+            Tags { "LightMode"="UniversalForward" }
             Cull Off
 
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+
+            // URP-Lichtkeywords: echtes Haupt-/Zusatzlicht (Laternen) + Ambient.
+            // _FORWARD_PLUS ist wichtig, damit die Zusatzlichter im Forward+-Pfad gefunden werden.
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile _ _FORWARD_PLUS
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
             struct Attributes
             {
@@ -39,7 +50,8 @@ Shader "CozySanta/SnowMelt"
                 float4 positionHCS : SV_POSITION;
                 float2 uv          : TEXCOORD0;
                 float3 normalWS    : TEXCOORD1;
-                float  height      : TEXCOORD2;
+                float3 positionWS  : TEXCOORD2;
+                float  height      : TEXCOORD3;
             };
 
             TEXTURE2D(_BaseMap);
@@ -75,7 +87,9 @@ Shader "CozySanta/SnowMelt"
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
-                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                VertexPositionInputs pos = GetVertexPositionInputs(IN.positionOS.xyz);
+                OUT.positionHCS = pos.positionCS;
+                OUT.positionWS = pos.positionWS;
                 OUT.normalWS = TransformObjectToWorldNormal(IN.normalOS);
                 OUT.uv = IN.uv;
                 OUT.height = IN.color.r; // Schneehöhe 0..1 aus dem Vertex-Color
@@ -90,16 +104,36 @@ Shader "CozySanta/SnowMelt"
                 clip(IN.height - threshold);
 
                 float3 albedo = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv * _Tiling).rgb * _BaseColor.rgb;
+                float3 normalWS = normalize(IN.normalWS);
 
-                // Einfaches Fake-Lighting (robust gegenüber Mesh-Normalenrichtung).
-                float ndl = abs(dot(normalize(IN.normalWS), normalize(_LightDir.xyz)));
-                float light = _Ambient + (1.0 - _Ambient) * ndl;
+                // Echtes Ambient aus der Szene (Spherical Harmonics) -> folgt dem Tag/Nacht-Ambiente.
+                float3 lighting = SampleSH(normalWS) + _Ambient;
 
-                // Dezenter Glitzer
+                // Weiche „Wrap"-Beleuchtung, damit der flache Schnee auch von tief stehenden
+                // Laternen schön warm angeleuchtet wird (kein harter Terminator).
+                Light mainLight = GetMainLight();
+                float mainNdl = saturate(dot(normalWS, mainLight.direction) * 0.5 + 0.5);
+                lighting += mainLight.color * (mainNdl * mainLight.distanceAttenuation);
+
+                // Zusatzlichter (die Laternen): über die URP-Light-Loop-Makros, damit es im
+                // Forward+- UND im klassischen Forward-Pfad funktioniert.
+                InputData inputData = (InputData)0;
+                inputData.positionWS = IN.positionWS;
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(IN.positionHCS);
+
+                uint pixelLightCount = GetAdditionalLightsCount();
+                LIGHT_LOOP_BEGIN(pixelLightCount)
+                    Light l = GetAdditionalLight(lightIndex, IN.positionWS);
+                    float ndl = saturate(dot(normalWS, l.direction) * 0.5 + 0.5);
+                    lighting += l.color * (ndl * l.distanceAttenuation * l.shadowAttenuation);
+                LIGHT_LOOP_END
+
+                // Glitzer nur dort, wo auch Licht ankommt (nachts im Dunkeln kein Funkeln).
+                float lum = saturate(dot(lighting, float3(0.299, 0.587, 0.114)));
                 float sparkle = ValueNoise(IN.uv * _NoiseScale * 6.0);
-                sparkle = saturate((sparkle - 0.85) * 6.0) * _Sparkle;
+                sparkle = saturate((sparkle - 0.85) * 6.0) * _Sparkle * lum;
 
-                float3 color = (albedo * light) + sparkle;
+                float3 color = (albedo * lighting) + sparkle;
                 return half4(color, 1.0);
             }
             ENDHLSL

@@ -103,9 +103,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Snow.SnowPatch
   resolution: 64
-  size: 4
+  sizeX: 4
+  sizeZ: 4
   maxHeight: 0.5
   edgeFalloff: 0.5
+  carveFalloff: 0.5
 --- !u!1001 &312173869774018340
 PrefabInstance:
   m_ObjectHideFlags: 0
