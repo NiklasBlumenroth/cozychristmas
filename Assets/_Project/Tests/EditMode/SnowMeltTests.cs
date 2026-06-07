@@ -111,5 +111,16 @@ namespace CozySanta.Tests.EditMode
             field.Melt(0f, 0f, 0.2f, 2f); // Ecke (0,0)
             Assert.AreEqual(1f, field.HeightAt(4, 4), "Gegenüberliegende Ecke bleibt voll.");
         }
+
+        // M6 – Elliptischer Pinsel: getrennte UV-Radien wirken nur entlang der jeweiligen Achse
+        [Test]
+        public void M6_Melt_EllipticalBrush_RespectsPerAxisRadius()
+        {
+            var field = new MeltField(9); // Mitte = (4,4), u=v=0.5; last=8 -> rx=0.8, ry=3.6 Zellen
+            // Schmaler X-Radius, breiter Y-Radius: Punkt entlang Y wird erfasst, gleich weit in X nicht.
+            field.Melt(0.5f, 0.5f, 0.1f, 0.45f, 2f);
+            Assert.Less(field.HeightAt(4, 2), 1f, "Innerhalb des großen Y-Radius -> abgesenkt.");
+            Assert.AreEqual(1f, field.HeightAt(0, 4), "Außerhalb des kleinen X-Radius -> unverändert.");
+        }
     }
 }

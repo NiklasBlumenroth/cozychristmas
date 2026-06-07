@@ -14,8 +14,11 @@ namespace CozySanta.Runtime.Snow
     {
         [Tooltip("Zellen pro Achse (Grid ist Resolution × Resolution Vertices).")]
         [SerializeField] private int resolution = 64;
-        [Tooltip("Kantenlänge des Patches in Metern (quadratisch).")]
-        [SerializeField] private float size = 8f;
+        [Tooltip("Grundriss-Maß in X (Breite) in Metern.")]
+        [UnityEngine.Serialization.FormerlySerializedAs("size")]
+        [SerializeField] private float sizeX = 8f;
+        [Tooltip("Grundriss-Maß in Z (Tiefe) in Metern.")]
+        [SerializeField] private float sizeZ = 8f;
         [Tooltip("Volle Schneehöhe in Metern (Dicke der Decke).")]
         [SerializeField] private float maxHeight = 0.5f;
         [Tooltip("Breite des abgeschrägten Randauslaufs in Metern: über diese Strecke fällt die " +
@@ -70,7 +73,7 @@ namespace CozySanta.Runtime.Snow
 
             Gizmos.matrix = transform.localToWorldMatrix;
             var center = new Vector3(0f, maxHeight * 0.5f, 0f);
-            var box = new Vector3(size, Mathf.Max(0.02f, maxHeight), size);
+            var box = new Vector3(sizeX, Mathf.Max(0.02f, maxHeight), sizeZ);
 
             Gizmos.color = new Color(0.55f, 0.8f, 1f, 0.12f);
             Gizmos.DrawCube(center, box);
@@ -93,7 +96,7 @@ namespace CozySanta.Runtime.Snow
 
             box.isTrigger = true;
             box.center = new Vector3(0f, maxHeight * 0.5f, 0f);
-            box.size = new Vector3(size, Mathf.Max(0.02f, maxHeight), size);
+            box.size = new Vector3(sizeX, Mathf.Max(0.02f, maxHeight), sizeZ);
         }
 
         private void BuildMesh()
@@ -121,7 +124,7 @@ namespace CozySanta.Runtime.Snow
                     _cap[i] = 1f;    // sichere Voll-Basis, bis ShapeEdges den echten Deckel setzt
                                      // (ein noch nicht abgetasteter Nachbar wird so nie als „leer" gelesen)
                     _carve[i] = 1f;  // bis BuildCarveMask: überall Schnee erlaubt
-                    _verts[i] = new Vector3(fx * size, maxHeight * blend, fz * size);
+                    _verts[i] = new Vector3(fx * sizeX, maxHeight * blend, fz * sizeZ);
                     uvs[i] = new Vector2((float)x / (r - 1), (float)y / (r - 1));
                     _colors[i] = new Color(1f, 1f, 1f, 1f); // height in r-channel
                 }
@@ -157,8 +160,8 @@ namespace CozySanta.Runtime.Snow
         private float EdgeBlend(float fx, float fz)
         {
             if (edgeFalloff <= 0f) return 1f;
-            var distX = (0.5f - Mathf.Abs(fx)) * size;
-            var distZ = (0.5f - Mathf.Abs(fz)) * size;
+            var distX = (0.5f - Mathf.Abs(fx)) * sizeX;
+            var distZ = (0.5f - Mathf.Abs(fz)) * sizeZ;
             var edgeDist = Mathf.Min(distX, distZ);
             return Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(edgeDist / edgeFalloff));
         }
@@ -169,15 +172,16 @@ namespace CozySanta.Runtime.Snow
         public bool Melt(Vector3 world, float radiusMeters, float strength)
         {
             var local = transform.InverseTransformPoint(world);
-            var u = (local.x / size) + 0.5f;
-            var v = (local.z / size) + 0.5f;
-            var margin = radiusMeters / size;
-            if (u < -margin || u > 1f + margin || v < -margin || v > 1f + margin)
+            var u = (local.x / sizeX) + 0.5f;
+            var v = (local.z / sizeZ) + 0.5f;
+            var marginU = radiusMeters / sizeX;
+            var marginV = radiusMeters / sizeZ;
+            if (u < -marginU || u > 1f + marginU || v < -marginV || v > 1f + marginV)
             {
                 return false;
             }
 
-            _field.Melt(u, v, margin, strength);
+            _field.Melt(u, v, marginU, marginV, strength);
             Version++;
             SyncMesh();
             return true;
@@ -191,7 +195,7 @@ namespace CozySanta.Runtime.Snow
                 return false;
             }
 
-            _field.Add(u, v, radiusMeters / size, strength);
+            _field.Add(u, v, radiusMeters / sizeX, radiusMeters / sizeZ, strength);
             Version++;
             SyncMesh();
             return true;
@@ -200,8 +204,8 @@ namespace CozySanta.Runtime.Snow
         private bool TryWorldToUV(Vector3 world, out float u, out float v)
         {
             var local = transform.InverseTransformPoint(world);
-            u = (local.x / size) + 0.5f;
-            v = (local.z / size) + 0.5f;
+            u = (local.x / sizeX) + 0.5f;
+            v = (local.z / sizeZ) + 0.5f;
             return u >= 0f && u <= 1f && v >= 0f && v <= 1f;
         }
 

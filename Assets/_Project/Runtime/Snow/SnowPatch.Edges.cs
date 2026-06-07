@@ -25,14 +25,15 @@ namespace CozySanta.Runtime.Snow
             worldY = 0f;
             if (_field == null) return false;
             var local = transform.InverseTransformPoint(world);
-            var u = (local.x / size) + 0.5f;
-            var v = (local.z / size) + 0.5f;
-            var tol = 0.05f / size; // kleine Toleranz, damit an Ecken geteilte Randpunkte auf allen Patches aufgehen
-            if (u < -tol || u > 1f + tol || v < -tol || v > 1f + tol) return false;
+            var u = (local.x / sizeX) + 0.5f;
+            var v = (local.z / sizeZ) + 0.5f;
+            var tolU = 0.05f / sizeX; // kleine Toleranz, damit an Ecken geteilte Randpunkte auf allen Patches aufgehen
+            var tolV = 0.05f / sizeZ;
+            if (u < -tolU || u > 1f + tolU || v < -tolV || v > 1f + tolV) return false;
             u = Mathf.Clamp01(u);
             v = Mathf.Clamp01(v);
             var h = SampleRenderedBilinear(u, v);
-            worldY = transform.TransformPoint(new Vector3((u - 0.5f) * size, h * maxHeight, (v - 0.5f) * size)).y;
+            worldY = transform.TransformPoint(new Vector3((u - 0.5f) * sizeX, h * maxHeight, (v - 0.5f) * sizeZ)).y;
             return true;
         }
 
@@ -114,20 +115,23 @@ namespace CozySanta.Runtime.Snow
             // Weicher Übergang: carve = SmoothStep über carveFalloff Meter Abstand zur nächsten
             // belegten Zelle. Objektzellen = 0, ab carveFalloff = 1, dazwischen sanfter Auslauf.
             var fall = Mathf.Max(0.0001f, carveFalloff);
-            var cell = size / (r - 1);
-            var rad = Mathf.Max(1, Mathf.CeilToInt(fall / cell));
+            var cellX = sizeX / (r - 1);
+            var cellZ = sizeZ / (r - 1);
+            var radX = Mathf.Max(1, Mathf.CeilToInt(fall / cellX));
+            var radZ = Mathf.Max(1, Mathf.CeilToInt(fall / cellZ));
             for (var y = 0; y < r; y++)
                 for (var x = 0; x < r; x++)
                 {
                     var i = (y * r) + x;
                     if (occupied[i]) { _carve[i] = 0f; continue; }
                     var best = float.MaxValue;
-                    for (var dy = -rad; dy <= rad; dy++)
-                        for (var dx = -rad; dx <= rad; dx++)
+                    for (var dy = -radZ; dy <= radZ; dy++)
+                        for (var dx = -radX; dx <= radX; dx++)
                         {
                             int nx = x + dx, ny = y + dy;
                             if (nx < 0 || ny < 0 || nx >= r || ny >= r || !occupied[(ny * r) + nx]) continue;
-                            var d = Mathf.Sqrt((dx * dx) + (dy * dy)) * cell;
+                            float ddx = dx * cellX, ddz = dy * cellZ; // echte Weltdistanz bei rechteckigen Zellen
+                            var d = Mathf.Sqrt((ddx * ddx) + (ddz * ddz));
                             if (d < best) best = d;
                         }
                     _carve[i] = best >= fall ? 1f : Mathf.SmoothStep(0f, 1f, best / fall);
@@ -142,7 +146,7 @@ namespace CozySanta.Runtime.Snow
             var fz = ((float)y / (r - 1)) - 0.5f;
             // Start weit oben, damit der Strahl auch hohe Objekte (z. B. Capsule) von außen/oben trifft
             // statt im Collider zu beginnen (ein Raycast aus dem Inneren meldet keinen Treffer).
-            var origin = transform.TransformPoint(new Vector3(fx * size, maxHeight + 100f, fz * size));
+            var origin = transform.TransformPoint(new Vector3(fx * sizeX, maxHeight + 100f, fz * sizeZ));
             var hits = Physics.RaycastAll(origin, -transform.up, 300f, ~0, QueryTriggerInteraction.Collide);
             foreach (var hit in hits)
             {
@@ -225,7 +229,7 @@ namespace CozySanta.Runtime.Snow
             const float startAbove = 1f;
 
             var origin = transform.TransformPoint(new Vector3(
-                (fx * size) + (nx * outward), maxHeight + startAbove, (fz * size) + (nz * outward)));
+                (fx * sizeX) + (nx * outward), maxHeight + startAbove, (fz * sizeZ) + (nz * outward)));
             var hits = Physics.RaycastAll(origin, -transform.up, 50f, ~0, QueryTriggerInteraction.Collide);
 
             var best = 0f;
@@ -251,7 +255,7 @@ namespace CozySanta.Runtime.Snow
             var r = _field.Resolution;
             var fx = ((float)x / (r - 1)) - 0.5f;
             var fz = ((float)y / (r - 1)) - 0.5f;
-            var world = transform.TransformPoint(new Vector3(fx * size, 0f, fz * size));
+            var world = transform.TransformPoint(new Vector3(fx * sizeX, 0f, fz * sizeZ));
 
             var min = 1f;
             var found = false;

@@ -40,15 +40,22 @@ namespace CozySanta.Core.Snow
         /// <summary>Schneehöhe (0..1) an der Zelle.</summary>
         public float HeightAt(int x, int y) => _heights[Index(x, y)];
 
-        /// <summary>Senkt die Höhe um <paramref name="strength"/> in einem weichen Pinsel um (u,v).</summary>
-        public void Melt(float u, float v, float radius, float strength) => Apply(u, v, radius, -strength);
+        /// <summary>Senkt die Höhe um <paramref name="strength"/> in einem weichen, runden Pinsel um (u,v).</summary>
+        public void Melt(float u, float v, float radius, float strength) => Apply(u, v, radius, radius, -strength);
 
-        /// <summary>Hebt die Höhe um <paramref name="strength"/> in einem weichen Pinsel um (u,v).</summary>
-        public void Add(float u, float v, float radius, float strength) => Apply(u, v, radius, strength);
+        /// <summary>Hebt die Höhe um <paramref name="strength"/> in einem weichen, runden Pinsel um (u,v).</summary>
+        public void Add(float u, float v, float radius, float strength) => Apply(u, v, radius, radius, strength);
 
-        private void Apply(float u, float v, float radius, float delta)
+        /// <summary>Senkt die Höhe in einem weichen, elliptischen Pinsel um (u,v) – getrennte Radien je
+        /// UV-Achse, damit ein in der Welt runder Pinsel auf einem rechteckigen Grundriss rund bleibt.</summary>
+        public void Melt(float u, float v, float radiusU, float radiusV, float strength) => Apply(u, v, radiusU, radiusV, -strength);
+
+        /// <summary>Hebt die Höhe in einem weichen, elliptischen Pinsel um (u,v) (getrennte UV-Radien).</summary>
+        public void Add(float u, float v, float radiusU, float radiusV, float strength) => Apply(u, v, radiusU, radiusV, strength);
+
+        private void Apply(float u, float v, float radiusU, float radiusV, float delta)
         {
-            if (radius <= 0f || delta == 0f)
+            if (radiusU <= 0f || radiusV <= 0f || delta == 0f)
             {
                 return;
             }
@@ -56,16 +63,17 @@ namespace CozySanta.Core.Snow
             var last = Resolution - 1;
             var cx = u * last;
             var cy = v * last;
-            var r = radius * last;
-            if (r <= 0f)
+            var rx = radiusU * last;
+            var ry = radiusV * last;
+            if (rx <= 0f || ry <= 0f)
             {
                 return;
             }
 
-            var minX = (int)Math.Floor(cx - r);
-            var maxX = (int)Math.Ceiling(cx + r);
-            var minY = (int)Math.Floor(cy - r);
-            var maxY = (int)Math.Ceiling(cy + r);
+            var minX = (int)Math.Floor(cx - rx);
+            var maxX = (int)Math.Ceiling(cx + rx);
+            var minY = (int)Math.Floor(cy - ry);
+            var maxY = (int)Math.Ceiling(cy + ry);
 
             for (var y = minY; y <= maxY; y++)
             {
@@ -76,14 +84,14 @@ namespace CozySanta.Core.Snow
                         continue;
                     }
 
-                    float dx = x - cx, dy = y - cy;
+                    float dx = (x - cx) / rx, dy = (y - cy) / ry; // normierte Ellipsen-Distanz (1 = Rand)
                     var d = (float)Math.Sqrt((dx * dx) + (dy * dy));
-                    if (d > r)
+                    if (d > 1f)
                     {
                         continue;
                     }
 
-                    var falloff = 1f - (d / r); // weicher Pinsel: Mitte stark, Rand 0
+                    var falloff = 1f - d; // weicher Pinsel: Mitte stark, Rand 0
                     UpdateCell(Index(x, y), delta * falloff);
                 }
             }
