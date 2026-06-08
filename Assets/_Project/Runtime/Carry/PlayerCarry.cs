@@ -79,7 +79,16 @@ namespace CozySanta.Runtime.Carry
                 return false;
             }
 
-            var item = new CarryItem(component.GetInstanceID(), pickup.Weight);
+            var id = component.GetInstanceID();
+            // Schutz gegen Doppel-Aufnahme desselben Objekts (z. B. wenn der Interact-Input zweimal
+            // feuert): sonst entstehen doppelte Stapel-Einträge mit gleicher Id, _stack und _objects
+            // laufen auseinander → Lücken im Tragestapel, „2 auf einmal", hängender letzter Brief.
+            if (_objects.ContainsKey(id))
+            {
+                return false;
+            }
+
+            var item = new CarryItem(id, pickup.Weight);
             if (!_stack.TryPush(item))
             {
                 return false;

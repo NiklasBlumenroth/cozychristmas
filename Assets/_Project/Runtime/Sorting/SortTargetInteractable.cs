@@ -31,6 +31,10 @@ namespace CozySanta.Runtime.Sorting
         [SerializeField] private Vector3 stackDirection = Vector3.right;
         [Tooltip("Abstand zwischen zwei eingelegten Objekten entlang der Stapelrichtung (Meter).")]
         [SerializeField] private float stackSpacing = 0.03f;
+        [Tooltip("Größenfaktor für eingelegte Objekte im Fach (1 = Originalgröße des Objekts, 0.5 = halb " +
+                 "so groß, 2 = doppelt). Beeinflusst nur die Anzeige im Fach; beim Entnehmen wird die " +
+                 "Originalgröße wiederhergestellt.")]
+        [SerializeField] private float placedScale = 1f;
         [SerializeField] private string promptText = "Einsortieren / Entnehmen";
 
         [Tooltip("Einmaliges Abschluss-Ereignis (Andockpunkt für XP-Vergabe in F6).")]
@@ -38,6 +42,9 @@ namespace CozySanta.Runtime.Sorting
 
         private SortTarget _target;
         private readonly Dictionary<int, Component> _placed = new Dictionary<int, Component>();
+        // Original-Skalierung je eingelegtem Objekt, damit placedScale beim Entnehmen sauber
+        // zurückgesetzt werden kann (kein Aufsummieren bei mehrfachem Ein-/Auslagern).
+        private readonly Dictionary<int, Vector3> _originalScale = new Dictionary<int, Vector3>();
 
         /// <summary>Reiner Fach-Zustand (für Tests/Diagnose).</summary>
         public SortTarget Target => _target;
@@ -72,6 +79,7 @@ namespace CozySanta.Runtime.Sorting
             }
 
             _placed.Clear();
+            _originalScale.Clear();
             _target = new SortTarget(new SortKey(acceptedFacets), requiredCount);
         }
 
@@ -143,6 +151,13 @@ namespace CozySanta.Runtime.Sorting
             _target.TryRemoveTop(out _);
             _placed.Remove(id);
 
+            // Anzeigegröße zurücksetzen, bevor das Objekt zurück in die Hand geht.
+            if (_originalScale.TryGetValue(id, out var original))
+            {
+                component.transform.localScale = original;
+                _originalScale.Remove(id);
+            }
+
             // Interaktions-Collider wieder aktivieren, bevor das Objekt zurück in die Hand geht – sonst
             // bliebe es (Collider am Kind) nach späterem Ablegen in der Welt nicht mehr aufnehmbar.
             SetInteractionPhysics(component, active: true);
@@ -161,6 +176,17 @@ namespace CozySanta.Runtime.Sorting
             component.transform.position = reference.position + offset;
             component.transform.rotation = reference.rotation;
 
+            // Anzeigegröße im Fach: Originalskalierung merken und mit placedScale skalieren.
+            if (placedScale > 0f && !Mathf.Approximately(placedScale, 1f))
+            {
+                var id = component.GetInstanceID();
+                if (!_originalScale.ContainsKey(id))
+                {
+                    _originalScale[id] = component.transform.localScale;
+                }
+                component.transform.localScale = _originalScale[id] * placedScale;
+            }
+
             SetInteractionPhysics(component, active: false);
         }
 
@@ -173,15 +199,8 @@ namespace CozySanta.Runtime.Sorting
 
             onCompleted?.Invoke();
 
-            foreach (var component in _placed.Values)
-            {
-                if (component != null)
-                {
-                    Destroy(component.gameObject);
-                }
-            }
-
-            _placed.Clear();
+            // Eingelegte Objekte bleiben sichtbar im Fach liegen (kein Destroy). Das Fach ist über
+            // IsClosed gesperrt, daher werden sie nicht mehr entnommen/verschoben.
 
             // Fach aus der Interaktion nehmen (Opening-Collider am Root deaktivieren).
             foreach (var collider in GetComponents<Collider>())
