@@ -34,17 +34,27 @@ namespace CozySanta.Runtime.Player
 
         private void Update()
         {
+            // Interaktion über die Maus: links = aufnehmen / aus Fach entnehmen, rechts = ablegen /
+            // einsortieren. Ersetzt das frühere „E" (aufnehmen/einsortieren) und „Q" (ablegen).
+            var mouse = Mouse.current;
+            if (mouse != null && interaction != null)
+            {
+                if (mouse.leftButton.wasPressedThisFrame)
+                    interaction.TryTake();
+
+                if (mouse.rightButton.wasPressedThisFrame)
+                    interaction.TryPlace();
+            }
+
             var keyboard = Keyboard.current;
-            if (keyboard == null) return;
+            if (keyboard != null)
+            {
+                if (keyboard.spaceKey.wasPressedThisFrame && controller != null)
+                    controller.RequestJump();
 
-            if (keyboard.qKey.wasPressedThisFrame && carry != null)
-                carry.Drop();
-
-            if (keyboard.spaceKey.wasPressedThisFrame && controller != null)
-                controller.RequestJump();
-
-            if (keyboard.xKey.wasPressedThisFrame && skillMenu != null)
-                ToggleSkillMenu();
+                if (keyboard.xKey.wasPressedThisFrame && skillMenu != null)
+                    ToggleSkillMenu();
+            }
 
             HandleCharging();
         }
@@ -76,10 +86,10 @@ namespace CozySanta.Runtime.Player
                 controller.SetLookInput(value.Get<Vector2>());
         }
 
+        // Frühere „Interact"-Action (E): bewusst wirkungslos – Aufnehmen/Ablegen läuft jetzt über die
+        // Maus (siehe Update). Methode bleibt, damit PlayerInput (Send Messages) nichts vermisst.
         public void OnInteract(InputValue value)
         {
-            if (value.isPressed && interaction != null)
-                interaction.TryInteract();
         }
     }
 }

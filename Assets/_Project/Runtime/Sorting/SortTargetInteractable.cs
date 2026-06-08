@@ -110,6 +110,22 @@ namespace CozySanta.Runtime.Sorting
             }
         }
 
+        /// <summary>Einsortieren: legt das oberste getragene Objekt ins Fach. No-op bei leerer Hand
+        /// oder abgeschlossenem Fach. (Andockpunkt für die Maus-Steuerung: Rechtsklick.)</summary>
+        public void PlaceFromHand(PlayerCarry carry)
+        {
+            if (carry == null || _target == null || _target.IsClosed) return;
+            TryPlaceFromHand(carry);
+        }
+
+        /// <summary>Entnehmen: nimmt ein Objekt aus dem Fach in die Hand (aktuell LIFO). No-op bei
+        /// leerem oder abgeschlossenem Fach. (Andockpunkt für die Maus-Steuerung: Linksklick.)</summary>
+        public void RemoveToHand(PlayerCarry carry)
+        {
+            if (carry == null || _target == null || _target.IsClosed) return;
+            TryRemoveToHand(carry);
+        }
+
         private void TryPlaceFromHand(PlayerCarry carry)
         {
             if (!carry.TryHandOverTop(out var pickup) || pickup is not Component component)

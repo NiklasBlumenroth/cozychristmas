@@ -124,5 +124,44 @@ namespace CozySanta.Runtime.Interaction
 
             _focused.Interact();
         }
+
+        /// <summary>Nehmen (Linksklick): fokussiertes Aufnehmbares in die Hand, oder ein Objekt aus dem
+        /// fokussierten Fach entnehmen. Ohne Fokus passiert nichts.</summary>
+        public void TryTake()
+        {
+            if (_focused == null || carry == null)
+            {
+                return;
+            }
+
+            if (_focused is IPickup pickup)
+            {
+                carry.TryPickup(pickup);
+                return;
+            }
+
+            if (_focused is SortTargetInteractable sortTarget)
+            {
+                sortTarget.RemoveToHand(carry);
+            }
+        }
+
+        /// <summary>Ablegen (Rechtsklick): in das fokussierte Fach einsortieren; sonst das oberste
+        /// getragene Objekt vor dem Spieler fallen lassen.</summary>
+        public void TryPlace()
+        {
+            if (carry == null)
+            {
+                return;
+            }
+
+            if (_focused is SortTargetInteractable sortTarget)
+            {
+                sortTarget.PlaceFromHand(carry);
+                return;
+            }
+
+            carry.Drop();
+        }
     }
 }
