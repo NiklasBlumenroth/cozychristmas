@@ -140,6 +140,14 @@ Assets/_Project/
   „CozySanta/Setup F8 (Schlüssel, Tore, Zones)" erstellt GameManager, Key-HUD und Prefabs (`KeyItem`, `Gate`,
   `AreaZone`). EditMode-Tests K1–K4, G1–G2, Z1–Z2 grün. Diagramme unter `specs/008-schluessel-tor-sektor/diagrams/`.
 
+- **F9 (in Arbeit)**: Teleport (Eingang ↔ Innenraum) — Core `TeleportArbiter` (Re-Entry-Schutz
+  über Belegungs-Set: belegte Trigger feuern nicht, Ziel-Trigger werden beim Teleport vorbelegt →
+  kein Bounce); Runtime `TeleportRouter` (Inspector-Liste aus Paaren „Trigger-Collider → Ziel-Transform",
+  Spieler-Erkennung über `FirstPersonController`, CharacterController-sicherer Versatz + optionale
+  Ziel-Blickrichtung) + auto-angehängter `TeleportTriggerForwarder` (leitet `OnTriggerEnter/Exit` an den
+  Router). `FirstPersonController.ResetVerticalVelocity` additiv. EditMode-Tests TP1–TP4 grün. Doku/Diagramm
+  unter `specs/009-teleport-poststelle/`. Editor-Verdrahtung (Trigger/Ziele am Prefab) manuell.
+
 - **Spielersprung (additiv zu F2)**: Core `JumpCalculator` (Decide, testbar) — `ComputeJumpVelocity`
   (v0 = √(2·g·h)) + `StepVerticalVelocity` (Boden-Anpressdruck, Absprung, Schwerkraft-Integration);
   `FirstPersonController` um `jumpHeight` + `RequestJump()` erweitert, `PlayerInputRelay` liest die Leertaste.

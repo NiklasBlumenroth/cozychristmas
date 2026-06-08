@@ -35,6 +35,10 @@ namespace CozySanta.Runtime.Player
         /// <summary>Fordert einen Sprung an; wird im nächsten <see cref="ApplyMove"/> verbraucht.</summary>
         public void RequestJump() => _jumpRequested = true;
 
+        /// <summary>Setzt die vertikale Geschwindigkeit zurück (z. B. nach einem Teleport, damit der
+        /// Spieler nicht mit aufgesammeltem Fall-Impuls am Ziel ankommt).</summary>
+        public void ResetVerticalVelocity() => _verticalVelocity = 0f;
+
         /// <summary>Laufgeschwindigkeit (m/s). Andockpunkt für MoveSpeed-Upgrade (F6).</summary>
         public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
 
