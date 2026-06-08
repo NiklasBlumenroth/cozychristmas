@@ -75,3 +75,63 @@ graue Prototypen.
 - AI Navigation + Terrain-Module installiert.
 - Vorhanden: `InputSystem_Actions` (Default), `SampleScene`, URP-Settings,
   `New Terrain.asset`.
+
+
+
+
+Assets generieren:
+Gemeinsamer Stil- + Technik-Block (vor jeden Prompt setzen)
+
+cozy stylized 3D Santa's workshop interior building kit piece, whimsical handcrafted
+low-poly game art, soft warm festive palette, realistic sensible materials only
+(timber, plaster, stone, iron). Single isolated modular asset, centered, fully visible,
+flat-on orthographic, seamless tileable edges, clean straight square borders.
+Pure white background, flat even studio lighting, no cast shadows, no people, no text.
+
+Die Kit-Teile (für ALLE Gebäude gleich)
+
+1. Boden – Holzdiele
+   [Stil-Block] A square wooden plank floor tile, warm aged timber boards, subtle grain,
+   slightly worn cozy look, tileable on all four edges, top-down flat view.
+
+2. Wand – schlicht
+   [Stil-Block] A straight interior wall panel segment, lower timber wainscot, upper
+   warm plaster, simple wood corner studs, flat front view, tileable left/right edges.
+
+3. Wand – mit Fenster
+   [Stil-Block] A straight interior wall segment with one cozy square window, wooden frame
+   and muntins, warm glowing glass, timber wainscot below, plaster above, flat front view,
+   tileable left/right edges.
+
+4. Wand – mit Türöffnung
+   [Stil-Block] A straight interior wall segment with a wooden doorway opening (arched top),
+   timber frame, wainscot and plaster, flat front view, tileable left/right edges.
+
+5. Decke – mit Balken
+   [Stil-Block] A square ceiling tile with exposed dark timber rafter beams and warm plaster
+   between, rustic workshop look, bottom-up flat view, tileable on all four edges.
+
+6. Eck-/Stützpfeiler
+   [Stil-Block] A vertical corner support post, sturdy dark timber beam with simple iron
+   brackets, standalone, front view, matching the wall height.
+
+7. Sockelleiste / Zierleiste (optional)
+   [Stil-Block] A simple wooden skirting board / baseboard trim strip, warm timber,
+   straight long piece, front view, tileable along its length.
+
+  ---
+Pro Gebäude nur die Akzente tauschen
+
+Gleiche Hülle, anderes „Vibe" — variiere nur Farbe + Deko-Props:
+
+┌────────────┬───────────────────────┬─────────────────────────────────────────────────┐
+│  Gebäude   │      Akzentfarbe      │      Charakter-Props (separat generieren)       │
+├────────────┼───────────────────────┼─────────────────────────────────────────────────┤
+│ Poststelle │ Postrot               │ Briefregale, Sortierfächer, Paketwaage, Stempel │
+├────────────┼───────────────────────┼─────────────────────────────────────────────────┤
+│ Dekofabrik │ Bunt (Gold/Teal/Grün) │ Regale mit Kugeln, Girlanden, Kerzen, Bänder    │
+├────────────┼───────────────────────┼─────────────────────────────────────────────────┤
+│ Werkstatt  │ Eisen/Braun           │ Werkbank, Werkzeugwand, Rohre, Zahnräder        │
+├────────────┼───────────────────────┼─────────────────────────────────────────────────┤
+│ Lagerhalle │ Neutral/Holz          │ Hochregale, Lagerboxen, Sackkarre, Paletten     │
+└────────────┴───────────────────────┴─────────────────────────────────────────────────┘
