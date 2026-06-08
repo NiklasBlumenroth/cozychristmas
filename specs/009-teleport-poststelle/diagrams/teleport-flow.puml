@@ -1,0 +1,40 @@
+@startuml teleport-flow
+title Teleport – Betreten eines Triggers (mit Re-Entry-Schutz)
+
+actor Spieler
+participant "TeleportTriggerForwarder\n(am Collider)" as FWD
+participant "TeleportRouter\n(Apply)" as ROUTER
+participant "TeleportArbiter\n(Core/Decide)" as ARB
+participant "FirstPersonController\n+ CharacterController" as PLAYER
+
+== Betreten eines Triggers ==
+Spieler -> FWD : OnTriggerEnter(index A)
+FWD -> ROUTER : HandleEnter(A, collider)
+ROUTER -> ROUTER : ist Spieler? (FirstPersonController)
+ROUTER -> ARB : ShouldTeleport(A)
+alt A frei
+    ARB --> ROUTER : true (A belegt)
+    ROUTER -> PLAYER : CharacterController.enabled = false
+    ROUTER -> PLAYER : position = Ziel, rotation = Ziel-Yaw (optional)
+    ROUTER -> PLAYER : ResetVerticalVelocity()
+    ROUTER -> PLAYER : CharacterController.enabled = true
+    ROUTER -> ARB : MarkOccupied(jeder Trigger, der das Ziel überlappt)
+else A belegt (gerade gelandet / steht drin)
+    ARB --> ROUTER : false
+    ROUTER -> ROUTER : kein Teleport (Bounce verhindert)
+end
+
+== Lande-Trigger feuert direkt danach ==
+Spieler -> FWD : OnTriggerEnter(index B = Ziel-Trigger)
+FWD -> ROUTER : HandleEnter(B, collider)
+ROUTER -> ARB : ShouldTeleport(B)
+ARB --> ROUTER : false (B wurde via MarkOccupied belegt)
+note right of ROUTER : Kein Rück-Bounce
+
+== Verlassen ==
+Spieler -> FWD : OnTriggerExit(index)
+FWD -> ROUTER : HandleExit(index, collider)
+ROUTER -> ARB : NotifyExit(index)
+note right of ARB : Trigger wieder scharf
+
+@enduml
