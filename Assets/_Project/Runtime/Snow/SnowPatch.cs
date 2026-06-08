@@ -27,11 +27,18 @@ namespace CozySanta.Runtime.Snow
         [Tooltip("Breite des weichen Übergangs (m) um Objekte in der Fläche: über diese Strecke läuft " +
                  "der Schnee zur Objekt-Aussparung hin sanft aus (0 = harte Kante).")]
         [SerializeField] private float carveFalloff = 0.5f;
+        [Tooltip("Maximaler Anstieg der Schneeoberfläche als Höhe pro Horizontaldistanz. 1 = 45° " +
+                 "(pro 10 cm Strecke max. 10 cm Höhenunterschied). 0 deaktiviert die Begrenzung. " +
+                 "Glättet zu steile Nahtstellen zwischen Patches und an Schmelz-/Objektkanten.")]
+        [SerializeField] private float maxSlopeRatio = 1f;
 
         private MeltField _field;
         private Mesh _mesh;
         private Vector3[] _verts;
         private Color[] _colors;
+        // Gerenderte Höhe je Vertex in Metern (Schmelzhöhe, gedeckelt, ausgespart) – Arbeitspuffer für
+        // die Slope-Limit-Stufe in SyncMesh (wird vor dem Schreiben der Mesh-Höhen geglättet).
+        private float[] _renderH = System.Array.Empty<float>();
 
         // Geometrischer Rand-Blend je Vertex (0 am äußeren Rand … 1 ab edgeFalloff nach innen).
         private float[] _edgeBlend = System.Array.Empty<float>();
@@ -109,6 +116,7 @@ namespace CozySanta.Runtime.Snow
             _edgeBlend = new float[r * r];
             _cap = new float[r * r];
             _carve = new float[r * r];
+            _renderH = new float[r * r];
             var uvs  = new Vector2[r * r];
             var tris = new int[(r - 1) * (r - 1) * 6];
 
@@ -219,15 +227,76 @@ namespace CozySanta.Runtime.Snow
                     var i = (y * r) + x;
                     var h = _field.HeightAt(x, y);
                     var carve = _carve[i];
-                    _verts[i].y = Mathf.Min(h, _cap[i]) * carve * maxHeight; // gedeckelt durch Rand/Nachbar, ausgespart bei Objekten
+                    _renderH[i] = Mathf.Min(h, _cap[i]) * carve * maxHeight; // gedeckelt durch Rand/Nachbar, ausgespart bei Objekten
                     _colors[i].r = h * carve; // belegte Zellen → Shader clippt (kein Schnee im Objekt)
                 }
+            }
+
+            ClampSlope(r); // zu steile Anstiege auf max. maxSlopeRatio (45° bei 1) zurücknehmen
+
+            for (var i = 0; i < _verts.Length; i++)
+            {
+                _verts[i].y = _renderH[i];
             }
 
             _mesh.SetVertices(_verts);
             _mesh.SetColors(_colors);
             _mesh.RecalculateNormals();
             _mesh.RecalculateBounds();
+        }
+
+        // Begrenzt den Anstieg der gerenderten Oberfläche (in _renderH, Meter): kein Nachbar-Vertex darf
+        // höher liegen als der eigene + maxSlopeRatio × Horizontaldistanz. Realisiert als Chamfer-
+        // Distanztransform mit zwei Sweeps (vorwärts/rückwärts, je 8 Nachbarn) – das ergibt exakt die
+        // untere Hülle h[i] = min_j (h_raw[j] + ratio × dist(i,j)), senkt also nur Spitzen ab und füllt
+        // niemals freigeschmolzene/ausgesparte Stellen wieder auf.
+        private void ClampSlope(int r)
+        {
+            if (maxSlopeRatio <= 0f || r < 2)
+            {
+                return;
+            }
+
+            var cellX = sizeX / (r - 1);
+            var cellZ = sizeZ / (r - 1);
+            var costX = maxSlopeRatio * cellX;
+            var costZ = maxSlopeRatio * cellZ;
+            var costD = maxSlopeRatio * Mathf.Sqrt((cellX * cellX) + (cellZ * cellZ));
+
+            void Relax(int i, int j, float cost)
+            {
+                var limit = _renderH[j] + cost;
+                if (_renderH[i] > limit)
+                {
+                    _renderH[i] = limit;
+                }
+            }
+
+            // Vorwärts-Sweep: bereits verarbeitete Nachbarn (links, oben-links, oben, oben-rechts).
+            for (var y = 0; y < r; y++)
+            {
+                for (var x = 0; x < r; x++)
+                {
+                    var i = (y * r) + x;
+                    if (x > 0) Relax(i, i - 1, costX);
+                    if (y > 0) Relax(i, i - r, costZ);
+                    if (x > 0 && y > 0) Relax(i, i - r - 1, costD);
+                    if (x < r - 1 && y > 0) Relax(i, i - r + 1, costD);
+                }
+            }
+
+            // Rückwärts-Sweep: rechts, unten-rechts, unten, unten-links → vollständige untere Hülle.
+            for (var y = r - 1; y >= 0; y--)
+            {
+                for (var x = r - 1; x >= 0; x--)
+                {
+                    var i = (y * r) + x;
+                    if (x < r - 1) Relax(i, i + 1, costX);
+                    if (y < r - 1) Relax(i, i + r, costZ);
+                    if (x < r - 1 && y < r - 1) Relax(i, i + r + 1, costD);
+                    if (x > 0 && y < r - 1) Relax(i, i + r - 1, costD);
+                }
+            }
         }
     }
 }
