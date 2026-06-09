@@ -172,7 +172,9 @@ namespace CozySanta.Runtime.Carry
 
         private static void SetCarriedPhysics(Component component, bool carried)
         {
-            if (component.TryGetComponent<Collider>(out var collider))
+            // Alle Collider im Objekt (auch an Kind-Objekten, z. B. der Brief-Collider am Kind „Cube")
+            // deaktivieren, sonst trifft der Fadenkreuz-Raycast getragene Objekte vor der Kamera.
+            foreach (var collider in component.GetComponentsInChildren<Collider>(includeInactive: true))
             {
                 collider.enabled = !carried;
             }
