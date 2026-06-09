@@ -9,9 +9,10 @@ using UnityEngine.TestTools;
 namespace CozySanta.Tests.PlayMode
 {
     /// <summary>
-    /// PlayMode-E2E-Tests für F4 (E1–E4): Einsortieren, Vollständigkeit+Lampe+Schließen, sanftes
-    /// Fehlerfeedback und Entnahme inkl. Kapazitätsprüfung. Treibt das Routing direkt über
-    /// <see cref="SortTargetInteractable.HandleInteract"/>.
+    /// PlayMode-E2E-Tests für den Slot-Container (3D-Raster): Einlegen in eine Spalte (hinterster freier
+    /// Slot), Vollständigkeit + Lampe + Schließen, Ablehnung nicht passender Objekte, Entnahme (vorderster
+    /// belegter Slot) inkl. Kapazitätsprüfung. Treibt das Routing direkt über
+    /// <see cref="SortTargetInteractable.PlaceInColumn"/> / <see cref="SortTargetInteractable.RemoveFromColumn"/>.
     /// </summary>
     public sealed class SortingPlayModeTests
     {
@@ -41,24 +42,25 @@ namespace CozySanta.Tests.PlayMode
             return carry;
         }
 
-        private static SortTargetInteractable NewFach(string[] accepted, int required, GameObject lamp = null)
+        private static SortTargetInteractable NewFach(string[] accepted, int required, GameObject lamp = null,
+            Vector3Int? grid = null)
         {
             var go = new GameObject("fach");
             var fach = go.AddComponent<SortTargetInteractable>();
-            fach.Configure(accepted, required, slot: null, lampObject: lamp);
+            fach.Configure(accepted, required, slot: null, lampObject: lamp, grid: grid ?? new Vector3Int(1, 1, 5));
             return fach;
         }
 
-        // E1: passendes Objekt tragen + Fach-Interact -> im Fach, Hand leer, korrekt gezählt
+        // E1: passendes Objekt tragen + in Spalte (0,0) einlegen -> im Fach, Hand leer, korrekt gezählt
         [UnityTest]
-        public IEnumerator Place_CorrectItem_IntoFach()
+        public IEnumerator Place_CorrectItem_IntoColumn()
         {
             var carry = NewCarry(10f);
             var fach = NewFach(new[] { "Europe", "Rot", "Stern" }, 3);
             var item = NewItem("Brief", 0.3f, "Europe", "Rot", "Stern");
 
             Assert.IsTrue(carry.TryPickup(item));
-            fach.HandleInteract(carry);
+            fach.PlaceInColumn(0, 0, carry);
 
             Assert.AreEqual(0, carry.CarriedCount, "Hand ist nach dem Einsortieren leer.");
             Assert.AreEqual(fach.transform, item.transform.parent, "Brief liegt im Fach.");
@@ -69,9 +71,9 @@ namespace CozySanta.Tests.PlayMode
             Object.Destroy(carry.gameObject);
         }
 
-        // E2: Fach auf requiredCount korrekte füllen -> Lampe an, geschlossen, Visuals entfernt
+        // E2: Spalte auf requiredCount füllen -> Lampe an, geschlossen; Einlagen bleiben sichtbar
         [UnityTest]
-        public IEnumerator Complete_TurnsLampOn_ClosesAndRemovesVisuals()
+        public IEnumerator Complete_TurnsLampOn_AndCloses()
         {
             var carry = NewCarry(10f);
             var lamp = new GameObject("Lampe");
@@ -80,27 +82,26 @@ namespace CozySanta.Tests.PlayMode
 
             var a = NewItem("A", 0.3f, "X");
             carry.TryPickup(a);
-            fach.HandleInteract(carry);
+            fach.PlaceInColumn(0, 0, carry);
 
             var b = NewItem("B", 0.3f, "X");
             carry.TryPickup(b);
-            fach.HandleInteract(carry);
+            fach.PlaceInColumn(0, 0, carry);
 
             Assert.IsTrue(fach.Target.IsClosed, "Fach ist abgeschlossen.");
             Assert.IsTrue(lamp.activeSelf, "Lampe leuchtet bei Vollständigkeit.");
 
-            yield return null; // Destroy der Einlagen greift im nächsten Frame
-            Assert.IsTrue(a == null, "Eingelegte Visuals werden beim Schließen entfernt.");
-            Assert.IsTrue(b == null);
+            yield return null;
+            Assert.IsTrue(a != null && b != null, "Eingelegte Objekte bleiben im Fach liegen.");
 
             Object.Destroy(fach.gameObject);
             Object.Destroy(carry.gameObject);
             Object.Destroy(lamp);
         }
 
-        // E3: falsches Objekt -> bleibt im Fach, Lampe bleibt aus, nicht abgeschlossen
+        // E3: nicht passendes Objekt -> wird abgelehnt (bleibt in der Hand), Lampe bleibt aus
         [UnityTest]
-        public IEnumerator WrongItem_StaysAndLampStaysOff()
+        public IEnumerator WrongItem_Rejected_StaysInHand()
         {
             var carry = NewCarry(10f);
             var lamp = new GameObject("Lampe");
@@ -109,37 +110,35 @@ namespace CozySanta.Tests.PlayMode
 
             var wrong = NewItem("Falsch", 0.3f, "Asia", "Blau", "Teddy");
             carry.TryPickup(wrong);
-            fach.HandleInteract(carry);
+            fach.PlaceInColumn(0, 0, carry);
 
-            Assert.AreEqual(1, fach.Target.WrongCount);
-            Assert.AreEqual(SortTargetState.FalschEnthalten, fach.Target.Evaluate());
-            Assert.IsFalse(fach.Target.IsClosed);
-            Assert.IsFalse(lamp.activeSelf, "Lampe bleibt bei falscher Sortierung aus.");
-            Assert.AreEqual(fach.transform, wrong.transform.parent, "Falsches Objekt bleibt liegen.");
+            Assert.AreEqual(1, carry.CarriedCount, "Nicht passendes Objekt bleibt in der Hand.");
+            Assert.AreEqual(0, fach.Target.Count, "Nichts wird ins Fach gelegt.");
+            Assert.IsFalse(lamp.activeSelf, "Lampe bleibt aus.");
 
             yield return null;
             Object.Destroy(fach.gameObject);
             Object.Destroy(carry.gameObject);
-            Object.Destroy(lamp);
         }
 
-        // E4: Entnahme bei leerer Hand -> zuletzt eingelegtes (LIFO) kehrt zurück
+        // E4: Entnahme nimmt den vordersten belegten Slot (zuletzt eingelegt liegt vorne -> kommt zuerst)
         [UnityTest]
-        public IEnumerator RemoveTop_ReturnsToHand_LIFO()
+        public IEnumerator Remove_TakesFrontmost()
         {
             var carry = NewCarry(10f);
             var fach = NewFach(new[] { "X" }, 5);
 
             var a = NewItem("A", 0.3f, "X");
             carry.TryPickup(a);
-            fach.HandleInteract(carry); // A einsortiert
+            fach.PlaceInColumn(0, 0, carry); // A -> hinten
             var b = NewItem("B", 0.3f, "X");
             carry.TryPickup(b);
-            fach.HandleInteract(carry); // B einsortiert (Hand danach leer)
+            fach.PlaceInColumn(0, 0, carry); // B -> davor
 
-            fach.HandleInteract(carry); // Hand leer -> Entnahme (LIFO -> B)
+            fach.RemoveFromColumn(0, 0, carry); // vorderster = B
 
             Assert.AreEqual(1, carry.CarriedCount);
+            Assert.AreEqual(b, carry.TryPeekTopComponent(out var top) ? top : null, "B (vorne) wird zuerst entnommen.");
             Assert.AreEqual(1, fach.Target.Count, "Nach der Entnahme ist nur noch ein Objekt im Fach.");
 
             yield return null;
@@ -156,10 +155,10 @@ namespace CozySanta.Tests.PlayMode
 
             var heavy = NewItem("Box", 8f, "X");
             carry.TryPickup(heavy);
-            fach.HandleInteract(carry); // Box einsortiert
+            fach.PlaceInColumn(0, 0, carry); // Box einsortiert
 
-            carry.Capacity = 5f;        // Traglast jetzt zu klein für die Box
-            fach.HandleInteract(carry); // Hand leer -> Entnahme versucht
+            carry.Capacity = 5f;             // Traglast jetzt zu klein für die Box
+            fach.RemoveFromColumn(0, 0, carry);
 
             Assert.AreEqual(0, carry.CarriedCount, "Bei Überlast wird nicht entnommen.");
             Assert.AreEqual(1, fach.Target.Count, "Die Box bleibt im Fach.");

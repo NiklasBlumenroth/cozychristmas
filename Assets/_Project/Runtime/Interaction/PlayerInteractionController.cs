@@ -118,14 +118,19 @@ namespace CozySanta.Runtime.Interaction
                 return;
             }
 
-            var fach = _focused as SortTargetInteractable;
-            Component top = null;
-            if (carry != null && carry.CarriedCount > 0)
+            // Ghost am hintersten freien Slot der anvisierten Spalte – nur bei passendem getragenem Objekt.
+            if (_focused is SlotColumn column && column.Owner != null
+                && carry != null && carry.CarriedCount > 0 && carry.TryPeekTopComponent(out var top))
             {
-                carry.TryPeekTopComponent(out top);
+                var key = top.TryGetComponent<ISortable>(out var sortable) ? sortable.Key : default;
+                if (column.Owner.TryGetGhostCellPose(column.X, column.Y, key, out var pos, out var rot, out var scaleMul))
+                {
+                    _ghostPreview.Show(top, column.Owner.transform, pos, rot, scaleMul);
+                    return;
+                }
             }
 
-            _ghostPreview.Set(fach, top);
+            _ghostPreview.Hide();
         }
 
         /// <summary>Vom Interact-Input aufzurufen. Löst nur bei aufgelöstem Fokus aus (Gate in Core).
@@ -144,19 +149,19 @@ namespace CozySanta.Runtime.Interaction
                 return;
             }
 
-            // F4: fokussiertes Sortier-Fach erhält die Interaktion mit Trag-Kontext (Einsortieren/Entnehmen).
-            if (carry != null && _focused is SortTargetInteractable sortTarget)
+            // Slot-Spalte: bei gefüllter Hand einlegen, sonst entnehmen (Einzel-Taste-Fallback).
+            if (carry != null && _focused is SlotColumn column && column.Owner != null)
             {
-                sortTarget.HandleInteract(carry);
+                if (carry.CarriedCount > 0) column.Owner.PlaceInColumn(column.X, column.Y, carry);
+                else column.Owner.RemoveFromColumn(column.X, column.Y, carry);
                 return;
             }
 
             _focused.Interact();
         }
 
-        /// <summary>Nehmen (Linksklick): visiere ich einen im Fach liegenden Brief an, wird GENAU dieser
-        /// über sein Fach entnommen (Fadenkreuz-genau); sonst ein Welt-Aufnehmbares in die Hand; sonst ein
-        /// fokussiertes leeres Fach (LIFO-Fallback). Ohne Fokus passiert nichts.</summary>
+        /// <summary>Nehmen (Linksklick): visiere ich eine Slot-Spalte an, wird der vorderste belegte
+        /// Slot dieser Spalte entnommen; sonst ein Welt-Aufnehmbares in die Hand. Ohne Fokus passiert nichts.</summary>
         public void TryTake()
         {
             if (_focused == null || carry == null)
@@ -164,28 +169,20 @@ namespace CozySanta.Runtime.Interaction
                 return;
             }
 
-            // Im Fach liegender Brief? -> gezielt über das Besitzer-Fach entnehmen (Bookkeeping bleibt sauber).
-            if (TryGetPlacedItem(out var placed))
+            if (_focused is SlotColumn column && column.Owner != null)
             {
-                placed.Owner.RemoveSpecific(placed, carry);
+                column.Owner.RemoveFromColumn(column.X, column.Y, carry);
                 return;
             }
 
             if (_focused is IPickup pickup)
             {
                 carry.TryPickup(pickup);
-                return;
-            }
-
-            if (_focused is SortTargetInteractable sortTarget)
-            {
-                sortTarget.RemoveToHand(carry);
             }
         }
 
-        /// <summary>Einsortieren (Rechtsklick): in ein fokussiertes Fach – oder, wenn ich einen bereits
-        /// eingelegten Brief anvisiere, in dessen Fach. Ohne Fach-Fokus passiert nichts (Ablegen läuft
-        /// über <see cref="TryDrop"/> / Taste Q), damit Briefe nicht versehentlich daneben fallen.</summary>
+        /// <summary>Einsortieren (Rechtsklick): legt in den hintersten freien Slot der anvisierten
+        /// Slot-Spalte ein. Ohne Spalten-Fokus passiert nichts (Ablegen läuft über <see cref="TryDrop"/> / Q).</summary>
         public void TryPlace()
         {
             if (carry == null)
@@ -193,25 +190,10 @@ namespace CozySanta.Runtime.Interaction
                 return;
             }
 
-            if (_focused is SortTargetInteractable sortTarget)
+            if (_focused is SlotColumn column && column.Owner != null)
             {
-                sortTarget.PlaceFromHand(carry);
-                return;
+                column.Owner.PlaceInColumn(column.X, column.Y, carry);
             }
-
-            if (TryGetPlacedItem(out var placed))
-            {
-                placed.Owner.PlaceFromHand(carry);
-            }
-        }
-
-        // True, wenn das fokussierte Objekt ein im Fach abgelegter Brief mit gültigem Besitzer-Fach ist.
-        private bool TryGetPlacedItem(out PlacedItem placed)
-        {
-            placed = null;
-            return _focused is Component component
-                   && component.TryGetComponent(out placed)
-                   && placed.Owner != null;
         }
 
         /// <summary>Ablegen (Taste Q): lässt das oberste getragene Objekt vor dem Spieler fallen.</summary>

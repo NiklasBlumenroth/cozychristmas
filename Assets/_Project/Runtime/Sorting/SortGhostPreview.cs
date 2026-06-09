@@ -6,10 +6,9 @@ namespace CozySanta.Runtime.Sorting
 {
     /// <summary>
     /// Apply-only: verwaltet einen durchscheinenden Laufzeit-Klon des aktuell getragenen Objekts und
-    /// positioniert ihn am nächsten freien Slot des anvisierten Fachs. Enthält keine Fachlogik – die
-    /// Gültigkeit (offenes, nicht volles Fach) liefert <see cref="SortTargetInteractable.HasFreeSlot"/>
-    /// bzw. <see cref="SortTargetInteractable.TryGetSlotPose"/>. Wird vom Interaktions-Controller je
-    /// Frame über <see cref="Set"/> gespeist.
+    /// positioniert ihn an einer vorgegebenen Welt-Pose (Slot unter dem Fadenkreuz). Enthält keine
+    /// Fachlogik – Gültigkeit/Zielslot bestimmt der Aufrufer. Wird je Frame über <see cref="Show"/> /
+    /// <see cref="Hide"/> gespeist.
     /// </summary>
     public sealed class SortGhostPreview
     {
@@ -21,7 +20,6 @@ namespace CozySanta.Runtime.Sorting
 
         private GameObject _ghost;
         private int _sourceId;
-        private SortTargetInteractable _fach;
         // Zur Laufzeit erzeugte Materialinstanzen, damit sie beim Verstecken sauber zerstört werden.
         private readonly List<Material> _runtimeMaterials = new List<Material>();
 
@@ -31,24 +29,23 @@ namespace CozySanta.Runtime.Sorting
         }
 
         /// <summary>
-        /// Zeigt/aktualisiert den Ghost für (<paramref name="fach"/>, <paramref name="source"/>) oder
-        /// versteckt ihn, wenn etwas fehlt oder kein freier Slot vorhanden ist. Idempotent pro Frame.
+        /// Zeigt/aktualisiert den Ghost von <paramref name="source"/> exakt so, wie das echte Objekt im
+        /// Fach läge: unter <paramref name="parent"/> geparentet (erbt dessen Skalierung/Shear), an der
+        /// Welt-Pose und mit derselben lokalen Skalierung wie eine echte Einlage. Idempotent pro Frame.
         /// </summary>
-        public void Set(SortTargetInteractable fach, Component source)
+        public void Show(Component source, Transform parent, Vector3 position, Quaternion rotation, float scaleMultiplier)
         {
-            if (fach == null || source == null
-                || !fach.TryGetSlotPose(out var pos, out var rot, out var scaleMul))
+            if (source == null)
             {
                 Hide();
                 return;
             }
 
             var srcId = source.GetInstanceID();
-            if (_ghost == null || _sourceId != srcId || _fach != fach)
+            if (_ghost == null || _sourceId != srcId)
             {
                 Rebuild(source);
                 _sourceId = srcId;
-                _fach = fach;
             }
 
             if (_ghost == null)
@@ -56,9 +53,10 @@ namespace CozySanta.Runtime.Sorting
                 return;
             }
 
-            _ghost.transform.SetParent(fach.transform, worldPositionStays: false);
-            _ghost.transform.SetPositionAndRotation(pos, rot);
-            _ghost.transform.localScale = source.transform.localScale * scaleMul;
+            _ghost.transform.SetParent(parent, worldPositionStays: false);
+            _ghost.transform.SetPositionAndRotation(position, rotation);
+            // Gleiche lokale Skalierung wie eine echte Einlage (PlaceVisual) -> identische Weltgröße.
+            _ghost.transform.localScale = source.transform.localScale * scaleMultiplier;
             if (!_ghost.activeSelf)
             {
                 _ghost.SetActive(true);
@@ -84,7 +82,6 @@ namespace CozySanta.Runtime.Sorting
             _runtimeMaterials.Clear();
             _ghost = null;
             _sourceId = 0;
-            _fach = null;
         }
 
         private void Rebuild(Component source)
