@@ -74,11 +74,12 @@ MonoBehaviour:
   - Rot
   - Stern
   requiredCount: 3
+  gridSize: {x: 3, y: 1, z: 1}
+  cellSpacing: {x: 0.12, y: 0.12, z: 0.12}
   slotAnchor: {fileID: 4711426391197097430}
+  placedScale: 0.5
+  placedEuler: {x: 0, y: 0, z: 0}
   lamp: {fileID: 7644557196550730579}
-  stackDirection: {x: 0, y: 0, z: 1}
-  stackSpacing: 0.01
-  placedScale: 1
   promptText: Einsortieren / Entnehmen
   onCompleted:
     m_PersistentCalls:

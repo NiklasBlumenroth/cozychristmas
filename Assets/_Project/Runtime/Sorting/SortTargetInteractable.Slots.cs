@@ -49,7 +49,7 @@ namespace CozySanta.Runtime.Sorting
                     go.transform.rotation = reference.rotation;
 
                     var box = go.AddComponent<BoxCollider>();
-                    box.size = new Vector3(cellSpacing.x, cellSpacing.y, Mathf.Max(cellSpacing.z, cellSpacing.z * sz));
+                    box.size = ColumnColliderSize(sz);
 
                     var column = go.AddComponent<SlotColumn>();
                     column.Bind(this, ix, iy);
@@ -107,10 +107,20 @@ namespace CozySanta.Runtime.Sorting
             return reference.position + (reference.rotation * CellOffset(ix, iy, iz));
         }
 
+        private Quaternion ReferenceRotation() => (slotAnchor != null ? slotAnchor : transform).rotation;
+
         // Reihenrichtung folgt der Anker-Rotation; die Einlage-Orientierung wird zusätzlich um
         // placedEuler gedreht (entkoppelt von der Rasterrichtung).
-        private Quaternion CellRotation()
-            => (slotAnchor != null ? slotAnchor : transform).rotation * Quaternion.Euler(placedEuler);
+        private Quaternion CellRotation() => ReferenceRotation() * Quaternion.Euler(placedEuler);
+
+        // Größe des Spalten-Colliders: x,y = Querschnitt, z = über alle Tiefen-Slots gespannt.
+        // Fällt auf cellSpacing zurück, wenn colliderSize (0,0,0) ist.
+        private Vector3 ColumnColliderSize(int depth)
+        {
+            var cs = colliderSize.sqrMagnitude > 1e-6f ? colliderSize : cellSpacing;
+            var d = Mathf.Max(1, depth);
+            return new Vector3(Mathf.Abs(cs.x), Mathf.Abs(cs.y), Mathf.Max(Mathf.Abs(cs.z), Mathf.Abs(cs.z) * d));
+        }
 
         private void PlaceVisual(Component component, int x, int y, int z)
         {
@@ -191,26 +201,30 @@ namespace CozySanta.Runtime.Sorting
             }
 
             var dims = GridDims();
-            var rot = CellRotation();
-            var cellSize = new Vector3(
-                Mathf.Max(0.01f, Mathf.Abs(cellSpacing.x) * 0.9f),
-                Mathf.Max(0.01f, Mathf.Abs(cellSpacing.y) * 0.9f),
-                Mathf.Max(0.01f, Mathf.Abs(cellSpacing.z) * 0.9f));
+            var refRot = ReferenceRotation();
+            var cellRot = CellRotation();
+            var colliderBox = ColumnColliderSize(dims.z);
 
             for (var x = 0; x < dims.x; x++)
             {
                 for (var y = 0; y < dims.y; y++)
                 {
+                    // Gelb: anvisierbarer Spalten-Collider (Trefferfläche, deckt die ganze Tiefe ab).
+                    var columnCenter = CellWorldPos(x, y, (dims.z - 1) * 0.5f);
+                    Gizmos.matrix = Matrix4x4.TRS(columnCenter, refRot, Vector3.one);
+                    Gizmos.color = new Color(1f, 0.85f, 0.2f, 0.85f);
+                    Gizmos.DrawWireCube(Vector3.zero, colliderBox);
+
+                    // Pro Slot: Position + Einlage-Orientierung (blauer Tick), hinterster = Füllstart.
                     for (var z = 0; z < dims.z; z++)
                     {
-                        Gizmos.matrix = Matrix4x4.TRS(CellWorldPos(x, y, z), rot, Vector3.one);
+                        Gizmos.matrix = Matrix4x4.TRS(CellWorldPos(x, y, z), cellRot, Vector3.one);
                         Gizmos.color = z == dims.z - 1
-                            ? new Color(0.30f, 1f, 0.40f, 0.90f)   // hinterster Slot = Füllstart
-                            : new Color(0.30f, 1f, 0.40f, 0.35f);
-                        Gizmos.DrawWireCube(Vector3.zero, cellSize);
-
+                            ? new Color(0.30f, 1f, 0.40f, 0.95f)   // hinterster Slot = Füllstart
+                            : new Color(0.30f, 1f, 0.40f, 0.55f);
+                        Gizmos.DrawSphere(Vector3.zero, 0.01f);
                         Gizmos.color = new Color(0.20f, 0.60f, 1f, 0.90f);
-                        Gizmos.DrawLine(Vector3.zero, Vector3.forward * (cellSize.z * 0.5f + 0.02f));
+                        Gizmos.DrawLine(Vector3.zero, Vector3.forward * (Mathf.Abs(cellSpacing.z) * 0.4f + 0.02f));
                     }
                 }
             }

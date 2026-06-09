@@ -27,6 +27,9 @@ namespace CozySanta.Runtime.Sorting
         [SerializeField] private Vector3Int gridSize = new Vector3Int(3, 1, 1);
         [Tooltip("Abstand zwischen den Slot-Mittelpunkten je Achse (Meter, im lokalen Raum des Ankers).")]
         [SerializeField] private Vector3 cellSpacing = new Vector3(0.12f, 0.12f, 0.12f);
+        [Tooltip("Größe des anvisierbaren Spalten-Colliders: x,y = Querschnitt (Trefferfläche), z = Tiefe " +
+                 "pro Slot. Bei (0,0,0) wird automatisch cellSpacing verwendet.")]
+        [SerializeField] private Vector3 colliderSize = Vector3.zero;
         [Tooltip("Positions-/Rotationsreferenz für das Raster (Mitte vorne). Fallback: dieses Transform.")]
         [SerializeField] private Transform slotAnchor;
         [Tooltip("Größenfaktor für eingelegte Objekte im Fach (1 = Originalgröße).")]
