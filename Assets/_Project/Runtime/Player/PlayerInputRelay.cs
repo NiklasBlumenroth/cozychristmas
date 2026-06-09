@@ -34,8 +34,9 @@ namespace CozySanta.Runtime.Player
 
         private void Update()
         {
-            // Interaktion über die Maus: links = aufnehmen / aus Fach entnehmen, rechts = ablegen /
-            // einsortieren. Ersetzt das frühere „E" (aufnehmen/einsortieren) und „Q" (ablegen).
+            // Interaktion über die Maus: links = aufnehmen / aus Fach entnehmen, rechts = NUR
+            // einsortieren (in ein fokussiertes Fach). Ablegen läuft über Taste „Q", damit Briefe
+            // nicht versehentlich neben dem Fach fallen gelassen werden.
             var mouse = Mouse.current;
             if (mouse != null && interaction != null)
             {
@@ -49,6 +50,9 @@ namespace CozySanta.Runtime.Player
             var keyboard = Keyboard.current;
             if (keyboard != null)
             {
+                if (keyboard.qKey.wasPressedThisFrame && interaction != null)
+                    interaction.TryDrop();
+
                 if (keyboard.spaceKey.wasPressedThisFrame && controller != null)
                     controller.RequestJump();
 

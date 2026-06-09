@@ -132,5 +132,22 @@ namespace CozySanta.Tests.EditMode
             target.TryPlace(3, Europe);
             Assert.IsFalse(target.JustCompleted);
         }
+
+        // S11 – HasFreeSlot: offen und unter Soll-Menge -> frei; voll oder geschlossen -> nicht frei
+        [Test]
+        public void S11_HasFreeSlot_OpenAndBelowRequired()
+        {
+            var target = new SortTarget(Europe, 2);
+            Assert.IsTrue(target.HasFreeSlot);          // leer, offen, unter Soll
+            target.TryPlace(1, Asia);                   // falsch eingelegt -> Count 1, noch nicht geschlossen
+            Assert.IsTrue(target.HasFreeSlot);          // Count 1 < 2
+            target.TryPlace(2, Asia);                   // Count 2 == Soll, aber falsch -> nicht geschlossen
+            Assert.IsFalse(target.HasFreeSlot);         // voll (Count >= Soll)
+
+            var closed = new SortTarget(Europe, 1);
+            closed.TryPlace(1, Europe);                 // schließt sofort
+            Assert.IsTrue(closed.IsClosed);
+            Assert.IsFalse(closed.HasFreeSlot);         // geschlossen -> nicht frei
+        }
     }
 }

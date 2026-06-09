@@ -14,7 +14,7 @@ namespace CozySanta.Runtime.Sorting
     /// <see cref="IInteractable"/>; das Routing (Player) ruft <see cref="HandleInteract"/> mit dem
     /// <see cref="PlayerCarry"/> auf. Kein <c>IPickup</c> → fällt nicht in den Aufnehmen-Pfad.
     /// </summary>
-    public sealed class SortTargetInteractable : MonoBehaviour, IInteractable
+    public sealed partial class SortTargetInteractable : MonoBehaviour, IInteractable
     {
         [Header("Sortierregel (editor-authored)")]
         [Tooltip("Akzeptierte Facetten dieses Fachs (muss zur Rahmen-Beschriftung passen).")]
@@ -58,6 +58,9 @@ namespace CozySanta.Runtime.Sorting
         private void Awake()
         {
             _target = new SortTarget(new SortKey(acceptedFacets), requiredCount);
+            Debug.Log($"[SortDbg] Awake Fach '{name}': requiredCount={requiredCount}, " +
+                      $"accepted=[{string.Join(",", acceptedFacets)}], placedScale={placedScale}, " +
+                      $"stackSpacing={stackSpacing}, slotAnchor={(slotAnchor != null ? slotAnchor.name : "<null/Fallback transform>")}", this);
         }
 
         /// <summary>
@@ -114,7 +117,13 @@ namespace CozySanta.Runtime.Sorting
         /// oder abgeschlossenem Fach. (Andockpunkt für die Maus-Steuerung: Rechtsklick.)</summary>
         public void PlaceFromHand(PlayerCarry carry)
         {
-            if (carry == null || _target == null || _target.IsClosed) return;
+            Debug.Log($"[SortDbg] PlaceFromHand '{name}': carry={(carry != null ? carry.CarriedCount.ToString() : "null")}, " +
+                      $"IsClosed={_target?.IsClosed}, Count={_target?.Count}, Correct={_target?.CorrectCount}, Wrong={_target?.WrongCount}", this);
+            if (carry == null || _target == null || _target.IsClosed)
+            {
+                Debug.Log($"[SortDbg] PlaceFromHand '{name}' ABGEBROCHEN (carry null / target null / IsClosed).", this);
+                return;
+            }
             TryPlaceFromHand(carry);
         }
 
@@ -122,7 +131,13 @@ namespace CozySanta.Runtime.Sorting
         /// leerem oder abgeschlossenem Fach. (Andockpunkt für die Maus-Steuerung: Linksklick.)</summary>
         public void RemoveToHand(PlayerCarry carry)
         {
-            if (carry == null || _target == null || _target.IsClosed) return;
+            Debug.Log($"[SortDbg] RemoveToHand '{name}': carry={(carry != null ? carry.CarriedCount.ToString() : "null")}, " +
+                      $"IsClosed={_target?.IsClosed}, Count={_target?.Count}, _placed={_placed.Count}", this);
+            if (carry == null || _target == null || _target.IsClosed)
+            {
+                Debug.Log($"[SortDbg] RemoveToHand '{name}' ABGEBROCHEN (carry null / target null / IsClosed).", this);
+                return;
+            }
             TryRemoveToHand(carry);
         }
 
@@ -130,20 +145,30 @@ namespace CozySanta.Runtime.Sorting
         {
             if (!carry.TryHandOverTop(out var pickup) || pickup is not Component component)
             {
+                Debug.Log($"[SortDbg] TryPlaceFromHand '{name}': KEIN Objekt aus der Hand erhalten (TryHandOverTop=false oder kein Component).", this);
                 return;
             }
 
-            var key = component.TryGetComponent<ISortable>(out var sortable) ? sortable.Key : default;
+            var hasSortable = component.TryGetComponent<ISortable>(out var sortable);
+            var key = hasSortable ? sortable.Key : default;
             var id = component.GetInstanceID();
+            var correct = _target.Classify(key);
+            Debug.Log($"[SortDbg] TryPlaceFromHand '{name}': Objekt='{component.name}' id={id}, " +
+                      $"hasSortable={hasSortable}, key=[{key}], classify(correct)={correct}", this);
+
             if (!_target.TryPlace(id, key))
             {
                 // Sollte nicht eintreten (IsClosed oben geprüft); zur Sicherheit zurück in die Hand.
+                Debug.LogWarning($"[SortDbg] TryPlaceFromHand '{name}': TryPlace=false (IsClosed={_target.IsClosed}) -> zurück in die Hand.", this);
                 carry.TryPickup(pickup);
                 return;
             }
 
             _placed[id] = component;
             AttachToSlot(component, _target.Count - 1);
+            Debug.Log($"[SortDbg] TryPlaceFromHand '{name}': PLATZIERT id={id}. " +
+                      $"Count={_target.Count}, Correct={_target.CorrectCount}, Wrong={_target.WrongCount}, " +
+                      $"_placed={_placed.Count}, JustCompleted={_target.JustCompleted}, IsClosed={_target.IsClosed}", this);
 
             if (_target.JustCompleted)
             {
@@ -153,19 +178,30 @@ namespace CozySanta.Runtime.Sorting
 
         private void TryRemoveToHand(PlayerCarry carry)
         {
-            if (!_target.TryPeekTop(out var id) || !_placed.TryGetValue(id, out var component))
+            var peeked = _target.TryPeekTop(out var id);
+            Component component = null;
+            var inPlaced = peeked && _placed.TryGetValue(id, out component);
+            if (!peeked || !inPlaced)
             {
+                Debug.LogWarning($"[SortDbg] TryRemoveToHand '{name}': nichts entnehmbar. " +
+                                 $"TryPeekTop={peeked}, peekId={id}, inPlaced={inPlaced}, " +
+                                 $"Count={_target.Count}, _placed={_placed.Count}. " +
+                                 (peeked && !inPlaced ? "DIVERGENZ: Eintrag im SortTarget, aber kein Component in _placed!" : ""), this);
                 return;
             }
 
             var weight = component.TryGetComponent<IPickup>(out var pickup) ? pickup.Weight : 0f;
             if (pickup == null || !carry.CanCarry(weight))
             {
+                Debug.Log($"[SortDbg] TryRemoveToHand '{name}': bleibt im Fach. id={id}, " +
+                          $"pickup={(pickup != null)}, weight={weight}, CanCarry={carry.CanCarry(weight)}.", this);
                 return; // Überlast oder nicht aufnehmbar -> Objekt bleibt im Fach.
             }
 
             _target.TryRemoveTop(out _);
             _placed.Remove(id);
+            Debug.Log($"[SortDbg] TryRemoveToHand '{name}': ENTNOMMEN id={id} '{component.name}'. " +
+                      $"Count={_target.Count}, _placed={_placed.Count}.", this);
 
             // Anzeigegröße zurücksetzen, bevor das Objekt zurück in die Hand geht.
             if (_originalScale.TryGetValue(id, out var original))
@@ -191,6 +227,9 @@ namespace CozySanta.Runtime.Sorting
             component.transform.SetParent(transform, worldPositionStays: false);
             component.transform.position = reference.position + offset;
             component.transform.rotation = reference.rotation;
+            Debug.Log($"[SortDbg] AttachToSlot '{name}': '{component.name}' index={index}, " +
+                      $"refPos={reference.position}, offset={offset}, worldPos={component.transform.position}, " +
+                      $"lossyScale={component.transform.lossyScale}, activeInHierarchy={component.gameObject.activeInHierarchy}", this);
 
             // Anzeigegröße im Fach: Originalskalierung merken und mit placedScale skalieren.
             if (placedScale > 0f && !Mathf.Approximately(placedScale, 1f))
@@ -208,6 +247,9 @@ namespace CozySanta.Runtime.Sorting
 
         private void Close()
         {
+            Debug.Log($"[SortDbg] Close '{name}': Fach GESCHLOSSEN/GESPERRT. " +
+                      $"Count={_target.Count}, Correct={_target.CorrectCount}, _placed={_placed.Count}. " +
+                      "Root-Collider werden deaktiviert -> Fach nicht mehr fokussierbar.", this);
             if (lamp != null)
             {
                 lamp.SetActive(true);

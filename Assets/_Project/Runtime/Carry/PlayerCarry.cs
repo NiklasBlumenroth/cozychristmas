@@ -40,6 +40,20 @@ namespace CozySanta.Runtime.Carry
         /// <summary>True, wenn ein Objekt mit <paramref name="weight"/> noch in die Traglast passt.</summary>
         public bool CanCarry(float weight) => _stack != null && _stack.CanPickUp(weight);
 
+        /// <summary>Liest das oberste getragene Objekt als <see cref="Component"/> (LIFO) ohne Entnahme –
+        /// nur lesend, z. B. als Quelle für die Ghost-Vorschau. False bei leerem Stapel.</summary>
+        public bool TryPeekTopComponent(out Component component)
+        {
+            component = null;
+            if (_stack == null || !_stack.TryPeek(out var item) || !_objects.TryGetValue(item.Id, out var pickup))
+            {
+                return false;
+            }
+
+            component = pickup as Component;
+            return component != null;
+        }
+
         /// <summary>
         /// Übergibt das oberste getragene Objekt an einen Aufrufer (z. B. ein Fach beim Einsortieren):
         /// entnimmt es aus dem Tragstapel, OHNE es in der Welt abzulegen oder seine Physik zu verändern –
@@ -50,12 +64,14 @@ namespace CozySanta.Runtime.Carry
             pickup = null;
             if (_stack == null || !_stack.TryPeek(out var item) || !_objects.TryGetValue(item.Id, out pickup))
             {
+                Debug.Log($"[SortDbg] TryHandOverTop: nichts zu übergeben (Stack leer={_stack == null || _stack.Count == 0}).", this);
                 return false;
             }
 
             _stack.TryPop(out _);
             _objects.Remove(item.Id);
             RelayoutHands();
+            Debug.Log($"[SortDbg] TryHandOverTop: id={item.Id} '{(pickup as Component)?.name}' übergeben. Rest im Stapel={_stack.Count}.", this);
             return true;
         }
 
@@ -80,6 +96,9 @@ namespace CozySanta.Runtime.Carry
             }
 
             var id = component.GetInstanceID();
+            Debug.Log($"[SortDbg] TryPickup: '{component.name}' id={id}, weight={pickup.Weight}, " +
+                      $"bereitsGetragen={_objects.ContainsKey(id)}, CanCarry={_stack.CanPickUp(pickup.Weight)}, " +
+                      $"Stapel={_stack.Count}, TotalWeight={_stack.TotalWeight}, Capacity={_stack.Capacity}.", this);
             // Schutz gegen Doppel-Aufnahme desselben Objekts (z. B. wenn der Interact-Input zweimal
             // feuert): sonst entstehen doppelte Stapel-Einträge mit gleicher Id, _stack und _objects
             // laufen auseinander → Lücken im Tragestapel, „2 auf einmal", hängender letzter Brief.
@@ -105,8 +124,11 @@ namespace CozySanta.Runtime.Carry
         {
             if (!_stack.TryPop(out var item))
             {
+                Debug.Log("[SortDbg] Drop: Stapel leer, nichts abzulegen.", this);
                 return;
             }
+
+            Debug.LogWarning($"[SortDbg] Drop: id={item.Id} wird VOR dem Spieler fallen gelassen (kein Fach fokussiert?). Rest im Stapel={_stack.Count}.", this);
 
             if (_objects.TryGetValue(item.Id, out var pickup) && pickup is Component component)
             {

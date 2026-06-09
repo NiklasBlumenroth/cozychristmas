@@ -18,9 +18,15 @@ namespace CozySanta.Runtime.Interaction
         [SerializeField] private InteractionPromptPresenter prompt;
         [SerializeField] private PlayerCarry carry;
 
+        [Header("Ghost-Vorschau (optional)")]
+        [Tooltip("Optionaler Material-Override für die Einlage-Vorschau. Bleibt das Feld leer, wird der " +
+                 "Klon zur Laufzeit aus dem Originalmaterial abgeleitet und grün-transparent eingefärbt.")]
+        [SerializeField] private Material ghostMaterial;
+
         private IInteractionProbe _probe;
         private IInteractableResolver _resolver;
         private IInteractable _focused;
+        private SortGhostPreview _ghostPreview;
 
         /// <summary>Rohes Fokusergebnis der F1-Entscheidung.</summary>
         public bool HasFocus { get; private set; }
@@ -60,6 +66,8 @@ namespace CozySanta.Runtime.Interaction
             {
                 _resolver = GetComponent<IInteractableResolver>();
             }
+
+            _ghostPreview = new SortGhostPreview(ghostMaterial);
         }
 
         private void Update()
@@ -97,6 +105,27 @@ namespace CozySanta.Runtime.Interaction
                     prompt.Hide();
                 }
             }
+
+            UpdateGhostPreview();
+        }
+
+        /// <summary>Zeigt eine durchscheinende Einlage-Vorschau, wenn ein offenes, nicht volles Fach
+        /// anvisiert wird und der Spieler etwas trägt; sonst wird die Vorschau versteckt.</summary>
+        private void UpdateGhostPreview()
+        {
+            if (_ghostPreview == null)
+            {
+                return;
+            }
+
+            var fach = _focused as SortTargetInteractable;
+            Component top = null;
+            if (carry != null && carry.CarriedCount > 0)
+            {
+                carry.TryPeekTopComponent(out top);
+            }
+
+            _ghostPreview.Set(fach, top);
         }
 
         /// <summary>Vom Interact-Input aufzurufen. Löst nur bei aufgelöstem Fokus aus (Gate in Core).
@@ -134,6 +163,8 @@ namespace CozySanta.Runtime.Interaction
                 return;
             }
 
+            Debug.Log($"[SortDbg] TryTake (Linksklick): Fokus={(_focused == null ? "<keiner>" : _focused.GetType().Name)}, carry={carry.CarriedCount}.");
+
             if (_focused is IPickup pickup)
             {
                 carry.TryPickup(pickup);
@@ -146,8 +177,9 @@ namespace CozySanta.Runtime.Interaction
             }
         }
 
-        /// <summary>Ablegen (Rechtsklick): in das fokussierte Fach einsortieren; sonst das oberste
-        /// getragene Objekt vor dem Spieler fallen lassen.</summary>
+        /// <summary>Einsortieren (Rechtsklick): NUR in ein fokussiertes Fach. Ohne Fach-Fokus passiert
+        /// bewusst nichts mehr (Ablegen läuft jetzt über <see cref="TryDrop"/> / Taste Q), damit Briefe
+        /// nicht versehentlich neben dem Fach fallen gelassen werden.</summary>
         public void TryPlace()
         {
             if (carry == null)
@@ -155,9 +187,22 @@ namespace CozySanta.Runtime.Interaction
                 return;
             }
 
+            Debug.Log($"[SortDbg] TryPlace (Rechtsklick): Fokus={(_focused == null ? "<keiner>" : _focused.GetType().Name)}, carry={carry.CarriedCount}.");
+
             if (_focused is SortTargetInteractable sortTarget)
             {
                 sortTarget.PlaceFromHand(carry);
+                return;
+            }
+
+            Debug.Log("[SortDbg] TryPlace: kein Fach fokussiert -> kein Einsortieren (Ablegen jetzt via Q).");
+        }
+
+        /// <summary>Ablegen (Taste Q): lässt das oberste getragene Objekt vor dem Spieler fallen.</summary>
+        public void TryDrop()
+        {
+            if (carry == null)
+            {
                 return;
             }
 

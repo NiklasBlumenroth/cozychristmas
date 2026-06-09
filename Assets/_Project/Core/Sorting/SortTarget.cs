@@ -45,6 +45,10 @@ namespace CozySanta.Core.Sorting
         /// <summary>Gesamtzahl eingelegter Objekte.</summary>
         public int Count => _entries.Count;
 
+        /// <summary>Decide: Hat das Fach noch einen freien Platz (offen und unter der Soll-Menge)?
+        /// Andockpunkt für die Ghost-Vorschau ("valider, nicht voller Slot").</summary>
+        public bool HasFreeSlot => !IsClosed && _entries.Count < RequiredCount;
+
         /// <summary>True, sobald das Fach einmal vollständig war (danach gesperrt).</summary>
         public bool IsClosed { get; private set; }
 
