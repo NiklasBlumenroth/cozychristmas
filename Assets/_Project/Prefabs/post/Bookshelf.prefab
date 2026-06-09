@@ -128,10 +128,6 @@ PrefabInstance:
       propertyPath: m_Center.x
       value: 0.09
       objectReference: {fileID: 0}
-    - target: {fileID: 7644557196550730579, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: gridSize.x
       value: 20
