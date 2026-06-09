@@ -100,6 +100,42 @@ namespace CozySanta.Core.Sorting
         }
 
         /// <summary>
+        /// Entnimmt gezielt das Objekt mit <paramref name="id"/> (für Fadenkreuz-genaues Entnehmen).
+        /// Aktualisiert die Zählstände. False bei abgeschlossenem Fach oder unbekannter Id.
+        /// </summary>
+        public bool TryRemove(int id)
+        {
+            JustCompleted = false;
+            if (IsClosed)
+            {
+                return false;
+            }
+
+            for (var i = _entries.Count - 1; i >= 0; i--)
+            {
+                if (_entries[i].Id != id)
+                {
+                    continue;
+                }
+
+                var entry = _entries[i];
+                _entries.RemoveAt(i);
+                if (entry.Correct)
+                {
+                    CorrectCount--;
+                }
+                else
+                {
+                    WrongCount--;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Entnimmt das zuletzt eingelegte Objekt (LIFO) und liefert dessen Id. False bei leerem oder
         /// abgeschlossenem Fach.
         /// </summary>

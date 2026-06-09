@@ -154,8 +154,9 @@ namespace CozySanta.Runtime.Interaction
             _focused.Interact();
         }
 
-        /// <summary>Nehmen (Linksklick): fokussiertes Aufnehmbares in die Hand, oder ein Objekt aus dem
-        /// fokussierten Fach entnehmen. Ohne Fokus passiert nichts.</summary>
+        /// <summary>Nehmen (Linksklick): visiere ich einen im Fach liegenden Brief an, wird GENAU dieser
+        /// über sein Fach entnommen (Fadenkreuz-genau); sonst ein Welt-Aufnehmbares in die Hand; sonst ein
+        /// fokussiertes leeres Fach (LIFO-Fallback). Ohne Fokus passiert nichts.</summary>
         public void TryTake()
         {
             if (_focused == null || carry == null)
@@ -163,7 +164,12 @@ namespace CozySanta.Runtime.Interaction
                 return;
             }
 
-            Debug.Log($"[SortDbg] TryTake (Linksklick): Fokus={(_focused == null ? "<keiner>" : _focused.GetType().Name)}, carry={carry.CarriedCount}.");
+            // Im Fach liegender Brief? -> gezielt über das Besitzer-Fach entnehmen (Bookkeeping bleibt sauber).
+            if (TryGetPlacedItem(out var placed))
+            {
+                placed.Owner.RemoveSpecific(placed, carry);
+                return;
+            }
 
             if (_focused is IPickup pickup)
             {
@@ -177,9 +183,9 @@ namespace CozySanta.Runtime.Interaction
             }
         }
 
-        /// <summary>Einsortieren (Rechtsklick): NUR in ein fokussiertes Fach. Ohne Fach-Fokus passiert
-        /// bewusst nichts mehr (Ablegen läuft jetzt über <see cref="TryDrop"/> / Taste Q), damit Briefe
-        /// nicht versehentlich neben dem Fach fallen gelassen werden.</summary>
+        /// <summary>Einsortieren (Rechtsklick): in ein fokussiertes Fach – oder, wenn ich einen bereits
+        /// eingelegten Brief anvisiere, in dessen Fach. Ohne Fach-Fokus passiert nichts (Ablegen läuft
+        /// über <see cref="TryDrop"/> / Taste Q), damit Briefe nicht versehentlich daneben fallen.</summary>
         public void TryPlace()
         {
             if (carry == null)
@@ -187,15 +193,25 @@ namespace CozySanta.Runtime.Interaction
                 return;
             }
 
-            Debug.Log($"[SortDbg] TryPlace (Rechtsklick): Fokus={(_focused == null ? "<keiner>" : _focused.GetType().Name)}, carry={carry.CarriedCount}.");
-
             if (_focused is SortTargetInteractable sortTarget)
             {
                 sortTarget.PlaceFromHand(carry);
                 return;
             }
 
-            Debug.Log("[SortDbg] TryPlace: kein Fach fokussiert -> kein Einsortieren (Ablegen jetzt via Q).");
+            if (TryGetPlacedItem(out var placed))
+            {
+                placed.Owner.PlaceFromHand(carry);
+            }
+        }
+
+        // True, wenn das fokussierte Objekt ein im Fach abgelegter Brief mit gültigem Besitzer-Fach ist.
+        private bool TryGetPlacedItem(out PlacedItem placed)
+        {
+            placed = null;
+            return _focused is Component component
+                   && component.TryGetComponent(out placed)
+                   && placed.Owner != null;
         }
 
         /// <summary>Ablegen (Taste Q): lässt das oberste getragene Objekt vor dem Spieler fallen.</summary>

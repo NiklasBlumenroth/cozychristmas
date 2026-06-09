@@ -149,5 +149,25 @@ namespace CozySanta.Tests.EditMode
             Assert.IsTrue(closed.IsClosed);
             Assert.IsFalse(closed.HasFreeSlot);         // geschlossen -> nicht frei
         }
+
+        // S12 – TryRemove: gezielte Entnahme einer Id aus der Mitte, Zähler konsistent
+        [Test]
+        public void S12_TryRemove_SpecificId()
+        {
+            var target = new SortTarget(Europe, 5);
+            target.TryPlace(10, Europe);
+            target.TryPlace(20, Asia);   // falsch
+            target.TryPlace(30, Europe);
+
+            Assert.IsTrue(target.TryRemove(20));         // mittleren (falschen) Eintrag entfernen
+            Assert.AreEqual(2, target.Count);
+            Assert.AreEqual(2, target.CorrectCount);
+            Assert.AreEqual(0, target.WrongCount);
+
+            Assert.IsFalse(target.TryRemove(999));       // unbekannte Id
+            Assert.IsTrue(target.TryRemove(10));
+            Assert.IsTrue(target.TryRemove(30));
+            Assert.AreEqual(0, target.Count);
+        }
     }
 }
