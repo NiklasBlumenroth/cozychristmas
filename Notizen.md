@@ -119,19 +119,3 @@ Die Kit-Teile (für ALLE Gebäude gleich)
    [Stil-Block] A simple wooden skirting board / baseboard trim strip, warm timber,
    straight long piece, front view, tileable along its length.
 
-  ---
-Pro Gebäude nur die Akzente tauschen
-
-Gleiche Hülle, anderes „Vibe" — variiere nur Farbe + Deko-Props:
-
-┌────────────┬───────────────────────┬─────────────────────────────────────────────────┐
-│  Gebäude   │      Akzentfarbe      │      Charakter-Props (separat generieren)       │
-├────────────┼───────────────────────┼─────────────────────────────────────────────────┤
-│ Poststelle │ Postrot               │ Briefregale, Sortierfächer, Paketwaage, Stempel │
-├────────────┼───────────────────────┼─────────────────────────────────────────────────┤
-│ Dekofabrik │ Bunt (Gold/Teal/Grün) │ Regale mit Kugeln, Girlanden, Kerzen, Bänder    │
-├────────────┼───────────────────────┼─────────────────────────────────────────────────┤
-│ Werkstatt  │ Eisen/Braun           │ Werkbank, Werkzeugwand, Rohre, Zahnräder        │
-├────────────┼───────────────────────┼─────────────────────────────────────────────────┤
-│ Lagerhalle │ Neutral/Holz          │ Hochregale, Lagerboxen, Sackkarre, Paletten     │
-└────────────┴───────────────────────┴─────────────────────────────────────────────────┘

@@ -19,9 +19,12 @@ namespace CozySanta.Editor
         private const string TestPickupPath = "Assets/_Project/Prefabs/TestPickup.prefab";
         private const string FachPath = "Assets/_Project/Prefabs/Fach.prefab";
 
-        private static readonly string[] BriefFacets = { "Europe", "Rot", "Stern" };
-        private static readonly string[] TestPickupFacets = { "Asia", "Blau", "Teddy" };
-        private static readonly string[] FachAccepts = { "Europe", "Rot", "Stern" };
+        // Sortier-Vokabular ab Buch-Variante: 2 Facetten [Farbe, Symbol] (kein Kontinent mehr).
+        // Gültige Farben:  Tannenrot, Tannengruen, Mitternachtsblau, Salbeigruen, Beere, Anthrazit, Karamell, Schokobraun
+        // Gültige Symbole: Stern, Tannenbaum, Schneeflocke, Geschenk, Christbaumkugel, Herz, Glocke, Kerze, Schneemann, Schluessel
+        private static readonly string[] BriefFacets = { "Tannenrot", "Stern" };
+        private static readonly string[] TestPickupFacets = { "Mitternachtsblau", "Schneeflocke" };
+        private static readonly string[] FachAccepts = { "Tannenrot", "Stern" };
         private const int FachRequiredCount = 3;
 
         [MenuItem("CozySanta/Setup F4 (Sortieren + Dev-Spawn)")]
