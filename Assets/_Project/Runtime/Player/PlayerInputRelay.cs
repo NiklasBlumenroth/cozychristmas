@@ -53,6 +53,10 @@ namespace CozySanta.Runtime.Player
                 if (keyboard.qKey.wasPressedThisFrame && interaction != null)
                     interaction.TryDrop();
 
+                // Blick + E: generische Interaktion (z. B. Schranktüren auf/zu).
+                if (keyboard.eKey.wasPressedThisFrame && interaction != null)
+                    interaction.TryInteract();
+
                 if (keyboard.spaceKey.wasPressedThisFrame && controller != null)
                     controller.RequestJump();
 
@@ -90,8 +94,9 @@ namespace CozySanta.Runtime.Player
                 controller.SetLookInput(value.Get<Vector2>());
         }
 
-        // Frühere „Interact"-Action (E): bewusst wirkungslos – Aufnehmen/Ablegen läuft jetzt über die
-        // Maus (siehe Update). Methode bleibt, damit PlayerInput (Send Messages) nichts vermisst.
+        // „Interact"-Action (PlayerInput/Send Messages): bewusst leer. Aufnehmen/Ablegen läuft über die
+        // Maus, die generische Interaktion (E → TryInteract, z. B. Türen) wird direkt in Update gelesen.
+        // Methode bleibt, damit PlayerInput (Send Messages) nichts vermisst.
         public void OnInteract(InputValue value)
         {
         }
