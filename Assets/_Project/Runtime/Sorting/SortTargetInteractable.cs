@@ -7,6 +7,16 @@ using UnityEngine.Events;
 
 namespace CozySanta.Runtime.Sorting
 {
+    /// <summary>Füllverhalten eines Fachs.</summary>
+    public enum SortFillMode
+    {
+        /// <summary>Jede (x,y)-Spalte wird einzeln anvisiert; nur die Tiefe (z) füllt automatisch.</summary>
+        PerColumn,
+        /// <summary>Jede x-Spalte = ein Behälter (Spalte per Zielen wählen); y (Höhe) und z (Tiefe)
+        /// füllen automatisch: unten→oben, hinten→vorne.</summary>
+        Container
+    }
+
     /// <summary>
     /// Generischer 3D-Slot-Container (Apply-Schicht). Erzeugt aus <see cref="gridSize"/> ein Raster
     /// aus Spalten (x), Reihen (y) und Tiefe (z) und je Spalte einen <see cref="SlotColumn"/>-Collider
@@ -21,6 +31,10 @@ namespace CozySanta.Runtime.Sorting
         [SerializeField] private string[] acceptedFacets = new string[0];
         [Tooltip("Soll-Menge korrekter Objekte für den Abschluss.")]
         [SerializeField] private int requiredCount = 25;
+        [Tooltip("PerColumn: jede (x,y)-Spalte einzeln anvisieren (nur Tiefe automatisch). " +
+                 "Container: pro x-Spalte ein Behälter – x wählst du durchs Zielen, y (Höhe) und z (Tiefe) " +
+                 "füllen automatisch (unten→oben, hinten→vorne).")]
+        [SerializeField] private SortFillMode fillMode = SortFillMode.PerColumn;
 
         [Header("Slot-Raster")]
         [Tooltip("Rasergröße: x = Spalten (Breite), y = Reihen (Höhe), z = Tiefe (hintereinander).")]
@@ -98,9 +112,9 @@ namespace CozySanta.Runtime.Sorting
             }
 
             var key = top.TryGetComponent<ISortable>(out var sortable) ? sortable.Key : default;
-            if (!_target.Classify(key) || !TryGetRearEmpty(x, y, out var z))
+            if (!_target.Classify(key) || !TryGetFillCell(x, y, out var cx, out var cy, out var cz))
             {
-                return; // nicht passend oder Spalte voll
+                return; // nicht passend oder Fach voll
             }
 
             if (!carry.TryHandOverTop(out var pickup) || pickup is not Component component)
@@ -115,8 +129,8 @@ namespace CozySanta.Runtime.Sorting
                 return;
             }
 
-            _grid[x, y, z] = component;
-            PlaceVisual(component, x, y, z);
+            _grid[cx, cy, cz] = component;
+            PlaceVisual(component, cx, cy, cz);
 
             if (_target.JustCompleted)
             {
@@ -133,12 +147,12 @@ namespace CozySanta.Runtime.Sorting
                 return;
             }
 
-            if (!TryGetFrontOccupied(x, y, out var z))
+            if (!TryGetRemoveCell(x, y, out var cx, out var cy, out var cz))
             {
                 return;
             }
 
-            var component = _grid[x, y, z];
+            var component = _grid[cx, cy, cz];
             var weight = component.TryGetComponent<IPickup>(out var pickup) ? pickup.Weight : 0f;
             if (pickup == null || !carry.CanCarry(weight))
             {
@@ -151,7 +165,7 @@ namespace CozySanta.Runtime.Sorting
                 return;
             }
 
-            _grid[x, y, z] = null;
+            _grid[cx, cy, cz] = null;
             RestoreVisual(component, id);
             carry.TryPickup(pickup); // setzt Physik auf „getragen"
         }

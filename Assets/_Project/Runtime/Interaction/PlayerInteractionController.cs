@@ -160,6 +160,19 @@ namespace CozySanta.Runtime.Interaction
             _focused.Interact();
         }
 
+        /// <summary>Blick + E: nur die generische <c>Interact()</c>-Aktion (z. B. Schranktüren).
+        /// Aufnehmbare Objekte (<see cref="IPickup"/>) und Slot-Spalten werden bewusst ignoriert –
+        /// Nehmen/Einsortieren läuft über die Maus.</summary>
+        public void TryInteractGeneric()
+        {
+            if (_focused == null || _focused is IPickup || _focused is SlotColumn)
+            {
+                return;
+            }
+
+            _focused.Interact();
+        }
+
         /// <summary>Nehmen (Linksklick): visiere ich eine Slot-Spalte an, wird der vorderste belegte
         /// Slot dieser Spalte entnommen; sonst ein Welt-Aufnehmbares in die Hand. Ohne Fokus passiert nichts.</summary>
         public void TryTake()

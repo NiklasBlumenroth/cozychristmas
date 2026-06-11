@@ -34,10 +34,31 @@ namespace CozySanta.Runtime.Sorting
                 bodyCollider.enabled = false;
             }
 
-            _columns = new SlotColumn[sx, sy];
             var reference = slotAnchor != null ? slotAnchor : transform;
             var inverse = InverseScale(transform.lossyScale);
 
+            if (fillMode == SortFillMode.Container)
+            {
+                // Ein Behälter-Collider PRO x-Spalte (deckt alle Reihen y und Tiefen z ab);
+                // x wählst du durchs Zielen, y/z füllen automatisch.
+                _columns = new SlotColumn[sx, 1];
+                for (var ix = 0; ix < sx; ix++)
+                {
+                    var go = new GameObject($"Bin_{ix}");
+                    go.transform.SetParent(transform, worldPositionStays: false);
+                    go.transform.localScale = inverse;
+                    go.transform.position = BinCenter(ix, sz);
+                    go.transform.rotation = reference.rotation;
+                    go.AddComponent<BoxCollider>().size = BinColliderSize(sy, sz);
+                    var bin = go.AddComponent<SlotColumn>();
+                    bin.Bind(this, ix, 0);
+                    _columns[ix, 0] = bin;
+                }
+
+                return;
+            }
+
+            _columns = new SlotColumn[sx, sy];
             for (var ix = 0; ix < sx; ix++)
             {
                 for (var iy = 0; iy < sy; iy++)
@@ -56,6 +77,72 @@ namespace CozySanta.Runtime.Sorting
                     _columns[ix, iy] = column;
                 }
             }
+        }
+
+        // Zielzelle fürs Einlegen: Container → in der anvisierten x-Spalte unten→oben/hinten→vorne;
+        // sonst hinterster freier z der (x,y)-Spalte.
+        private bool TryGetFillCell(int x, int y, out int cx, out int cy, out int cz)
+        {
+            cx = x;
+            if (fillMode == SortFillMode.Container)
+            {
+                return SlotFillOrder.TryNextFree(Occupancy(), x, out cy, out cz);
+            }
+
+            cy = y;
+            return TryGetRearEmpty(x, y, out cz);
+        }
+
+        // Zielzelle fürs Entnehmen: Container → in der anvisierten x-Spalte oben→unten/vorne→hinten;
+        // sonst vorderster belegter z der (x,y)-Spalte.
+        private bool TryGetRemoveCell(int x, int y, out int cx, out int cy, out int cz)
+        {
+            cx = x;
+            if (fillMode == SortFillMode.Container)
+            {
+                return SlotFillOrder.TryNextOccupied(Occupancy(), x, out cy, out cz);
+            }
+
+            cy = y;
+            return TryGetFrontOccupied(x, y, out cz);
+        }
+
+        private bool[,,] Occupancy()
+        {
+            var sx = _grid.GetLength(0);
+            var sy = _grid.GetLength(1);
+            var sz = _grid.GetLength(2);
+            var occ = new bool[sx, sy, sz];
+            for (var ix = 0; ix < sx; ix++)
+            for (var iy = 0; iy < sy; iy++)
+            for (var iz = 0; iz < sz; iz++)
+            {
+                occ[ix, iy, iz] = _grid[ix, iy, iz] != null;
+            }
+
+            return occ;
+        }
+
+        // Mittelpunkt des x-Spalten-Behälters: x an der Spalte, über alle Reihen (y) zentriert, z gemittelt.
+        private Vector3 BinCenter(int ix, int sz)
+        {
+            var dims = GridDims();
+            var off = new Vector3(
+                (ix - (dims.x - 1) * 0.5f) * cellSpacing.x,
+                0f,
+                (sz - 1) * 0.5f * cellSpacing.z);
+            var reference = slotAnchor != null ? slotAnchor : transform;
+            return reference.position + (reference.rotation * off);
+        }
+
+        // Größe des x-Spalten-Behälters: Querschnitt x; deckt alle Reihen (y) und Tiefen (z) ab.
+        private Vector3 BinColliderSize(int sy, int sz)
+        {
+            var cs = colliderSize.sqrMagnitude > 1e-6f ? colliderSize : cellSpacing;
+            return new Vector3(
+                Mathf.Abs(cs.x),
+                Mathf.Abs(cs.y) + (Mathf.Max(1, sy) - 1) * Mathf.Abs(cellSpacing.y),
+                Mathf.Max(Mathf.Abs(cs.z), Mathf.Abs(cs.z) * Mathf.Max(1, sz)));
         }
 
         private bool InRange(int x, int y)
@@ -180,12 +267,12 @@ namespace CozySanta.Runtime.Sorting
                 return false;
             }
 
-            if (!TryGetRearEmpty(x, y, out var z))
+            if (!TryGetFillCell(x, y, out var cx, out var cy, out var cz))
             {
                 return false;
             }
 
-            position = CellWorldPos(x, y, z);
+            position = CellWorldPos(cx, cy, cz);
             rotation = CellRotation();
             return true;
         }
@@ -205,15 +292,29 @@ namespace CozySanta.Runtime.Sorting
             var cellRot = CellRotation();
             var colliderBox = ColumnColliderSize(dims.z);
 
+            // Container: ein gelber Behälter pro x-Spalte (deckt alle Reihen/Tiefen ab).
+            if (fillMode == SortFillMode.Container)
+            {
+                Gizmos.color = new Color(1f, 0.85f, 0.2f, 0.85f);
+                for (var bx = 0; bx < dims.x; bx++)
+                {
+                    Gizmos.matrix = Matrix4x4.TRS(BinCenter(bx, dims.z), refRot, Vector3.one);
+                    Gizmos.DrawWireCube(Vector3.zero, BinColliderSize(dims.y, dims.z));
+                }
+            }
+
             for (var x = 0; x < dims.x; x++)
             {
                 for (var y = 0; y < dims.y; y++)
                 {
-                    // Gelb: anvisierbarer Spalten-Collider (Trefferfläche, deckt die ganze Tiefe ab).
-                    var columnCenter = CellWorldPos(x, y, (dims.z - 1) * 0.5f);
-                    Gizmos.matrix = Matrix4x4.TRS(columnCenter, refRot, Vector3.one);
-                    Gizmos.color = new Color(1f, 0.85f, 0.2f, 0.85f);
-                    Gizmos.DrawWireCube(Vector3.zero, colliderBox);
+                    // Gelb: anvisierbarer Spalten-Collider (nur PerColumn; Container zeichnet eine Box oben).
+                    if (fillMode != SortFillMode.Container)
+                    {
+                        var columnCenter = CellWorldPos(x, y, (dims.z - 1) * 0.5f);
+                        Gizmos.matrix = Matrix4x4.TRS(columnCenter, refRot, Vector3.one);
+                        Gizmos.color = new Color(1f, 0.85f, 0.2f, 0.85f);
+                        Gizmos.DrawWireCube(Vector3.zero, colliderBox);
+                    }
 
                     // Pro Slot: Position + Einlage-Orientierung (blauer Tick), hinterster = Füllstart.
                     for (var z = 0; z < dims.z; z++)

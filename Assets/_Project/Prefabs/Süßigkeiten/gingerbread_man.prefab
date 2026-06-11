@@ -9,6 +9,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 8fada961945d2b3489f9ce7ba64993a4, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8fada961945d2b3489f9ce7ba64993a4, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8fada961945d2b3489f9ce7ba64993a4, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8fada961945d2b3489f9ce7ba64993a4, type: 3}
       propertyPath: m_LocalPosition.x
       value: -53.319355
       objectReference: {fileID: 0}
@@ -59,6 +71,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8fada961945d2b3489f9ce7ba64993a4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6524677290796729560}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8fada961945d2b3489f9ce7ba64993a4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1527595918263640266}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8fada961945d2b3489f9ce7ba64993a4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -1481277741533912586}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8fada961945d2b3489f9ce7ba64993a4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5763139936041444328}
   m_SourcePrefab: {fileID: 100100000, guid: 8fada961945d2b3489f9ce7ba64993a4, type: 3}
 --- !u!1 &1346874637626581675 stripped
 GameObject:
@@ -86,3 +107,58 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.005577066, y: 0.0073475656, z: 0.0011295471}
   m_Center: {x: 0, y: 0.00030408878, z: 0.00056477345}
+--- !u!54 &1527595918263640266
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346874637626581675}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &-1481277741533912586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346874637626581675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6d1dae674f183d45a5d6f62a71908b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Carry.PickupInteractable
+  promptText: Aufnehmen
+  weight: 0.3
+--- !u!114 &-5763139936041444328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346874637626581675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a7c8bae04bfa1d42bdcf1912767b24f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Sorting.Sortable
+  facets:
+  - gingerbread_man

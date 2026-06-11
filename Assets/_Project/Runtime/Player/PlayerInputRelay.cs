@@ -53,9 +53,9 @@ namespace CozySanta.Runtime.Player
                 if (keyboard.qKey.wasPressedThisFrame && interaction != null)
                     interaction.TryDrop();
 
-                // Blick + E: generische Interaktion (z. B. Schranktüren auf/zu).
+                // Blick + E: nur generische Interaktion (z. B. Schranktüren). Kein Aufnehmen/Einsortieren.
                 if (keyboard.eKey.wasPressedThisFrame && interaction != null)
-                    interaction.TryInteract();
+                    interaction.TryInteractGeneric();
 
                 if (keyboard.spaceKey.wasPressedThisFrame && controller != null)
                     controller.RequestJump();
