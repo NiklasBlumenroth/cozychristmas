@@ -52,6 +52,9 @@ namespace CozySanta.Runtime.Snow
         /// <summary>Flächen-Fortschritt 0..1 (Anteil freigelegt) aus der Core-Logik.</summary>
         public float Coverage => _field != null ? _field.Coverage : 0f;
 
+        /// <summary>Gesamtzahl der Zellen dieses Patches (zum zellgewichteten Aggregieren mehrerer Patches).</summary>
+        public int CellCount => _field != null ? _field.CellCount : 0;
+
         /// <summary>Volle Schneehöhe (für das Zielen auf das Schnee-Volumen).</summary>
         public float AimHeight => maxHeight;
 

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using CozySanta.Core.Progression;
+using CozySanta.Core.Snow;
 using CozySanta.Runtime.Snow;
 using CozySanta.Runtime.Sorting;
 using UnityEngine;
@@ -28,6 +30,16 @@ namespace CozySanta.Runtime.Progression
             public string                 taskId = "";
         }
 
+        [Serializable]
+        public sealed class SortGroup
+        {
+            [Tooltip("Alle SortTargetInteractable (Fächer) unterhalb von 'root' werden auf diese Task-ID gebucht.")]
+            public string    taskId = "";
+            public Transform root;
+            [Tooltip("Setzt die Soll-Menge der Aufgabe automatisch = Anzahl gefundener Fächer.")]
+            public bool      autoRequired = true;
+        }
+
         [Header("Area-Konfiguration")]
         [SerializeField] private string      areaName = "Area";
         [SerializeField] private int         areaXp   = 100;
@@ -36,59 +48,152 @@ namespace CozySanta.Runtime.Progression
         [Header("Sort-Anbindung (Fach → Task-ID)")]
         [SerializeField] private SortBinding[] sortBindings = new SortBinding[0];
 
+        [Header("Sort-Gruppen (alle Fächer unter root → eine Task-ID)")]
+        [SerializeField] private SortGroup[] sortGroups = new SortGroup[0];
+
         [Header("Melt-Anbindung")]
         [SerializeField] private string        meltTaskId = "";
+        [Tooltip("Wurzel der Schnee-Region DIESES Sektors: alle SnowPatches darunter zählen für den " +
+                 "Melt-Task (zellgewichtet). Pro Sektor eine eigene Wurzel → mehrere Schnee-Sektoren " +
+                 "sind unabhängig. Leer = Fallback auf melt.Coverage (eine globale Lampe).")]
+        [SerializeField] private Transform     meltRoot;
+        [Tooltip("Die Lampe (für die Akku-Anzeige; eine pro Spiel). Coverage kommt aus meltRoot, " +
+                 "falls gesetzt.")]
         [SerializeField] private MeltController melt;
 
         [Header("Referenzen")]
         [SerializeField] private PlayerProgression progression;
         [SerializeField] private AreaHudView       hudView;
 
-        private AreaProgress _progress;
-        private float        _lastCoverage;
+        private AreaProgress     _progress;
+        private CoverageProgress _coverage = new CoverageProgress();
+        private SnowPatch[]      _meltPatches;
+        private bool             _hudActive;
 
         /// <summary>Für Tests und Diagnose.</summary>
         public AreaProgress Progress => _progress;
 
+        /// <summary>Wird vom <see cref="AreaManager"/> beim Betreten/Verlassen der zugehörigen Zone
+        /// gesetzt: nur die gerade aktive Area beschreibt das (geteilte) HUD-Panel. Fortschritt
+        /// (Sortieren/Schmelzen) wird unabhängig davon weiter gebucht.</summary>
+        public void SetHudActive(bool active)
+        {
+            _hudActive = active;
+            if (active && hudView != null)
+            {
+                hudView.SetAreaName(areaName);
+                RefreshHud();
+            }
+        }
+
         private void Awake()
         {
+            // Schnee-Region dieses Sektors einsammeln (für den Melt-Task).
+            if (meltRoot != null)
+                _meltPatches = meltRoot.GetComponentsInChildren<SnowPatch>(includeInactive: true);
+
+            // Sort-Gruppen einsammeln: alle Fächer unter root, dedupliziert je Task-ID.
+            var grouped = CollectSortGroups();
+
             var tasks = new AreaTask[taskEntries.Length];
             for (var i = 0; i < taskEntries.Length; i++)
             {
                 var e = taskEntries[i];
-                tasks[i] = new AreaTask(e.taskId, e.taskType, e.description, e.required);
+                var required = AutoRequired(e.taskId, grouped) ?? e.required;
+                tasks[i] = new AreaTask(e.taskId, e.taskType, e.description, required);
             }
             _progress = new AreaProgress(new AreaDefinition(areaName, tasks, areaXp));
             _progress.OnCompleted += HandleCompletion;
 
+            // Explizite Einzel-Bindings (weiterhin unterstützt).
             foreach (var b in sortBindings)
             {
                 if (b.target == null) continue;
                 var id = b.taskId;
                 b.target.AddCompletionListener(() => _progress.BookSort(id));
             }
+
+            // Gruppen-Bindings: jedes gefundene Fach bucht +1 auf seine Task-ID.
+            foreach (var kv in grouped)
+            {
+                var id = kv.Key;
+                foreach (var fach in kv.Value)
+                {
+                    if (fach != null) fach.AddCompletionListener(() => _progress.BookSort(id));
+                }
+            }
+        }
+
+        private Dictionary<string, HashSet<SortTargetInteractable>> CollectSortGroups()
+        {
+            var grouped = new Dictionary<string, HashSet<SortTargetInteractable>>();
+            foreach (var g in sortGroups)
+            {
+                if (g == null || g.root == null || string.IsNullOrEmpty(g.taskId)) continue;
+                if (!grouped.TryGetValue(g.taskId, out var set))
+                {
+                    set = new HashSet<SortTargetInteractable>();
+                    grouped[g.taskId] = set;
+                }
+                foreach (var fach in g.root.GetComponentsInChildren<SortTargetInteractable>(includeInactive: true))
+                {
+                    set.Add(fach);
+                }
+            }
+            return grouped;
+        }
+
+        /// <summary>Liefert die auto-ermittelte Soll-Menge (Anzahl Fächer) für eine Task-ID, sofern eine
+        /// zugehörige Gruppe autoRequired gesetzt hat und Fächer gefunden wurden; sonst null.</summary>
+        private float? AutoRequired(string taskId, Dictionary<string, HashSet<SortTargetInteractable>> grouped)
+        {
+            var wants = false;
+            foreach (var g in sortGroups)
+            {
+                if (g != null && g.autoRequired && g.taskId == taskId && g.root != null) wants = true;
+            }
+            if (!wants || !grouped.TryGetValue(taskId, out var set) || set.Count == 0) return null;
+            return set.Count;
         }
 
         private void Start()
         {
-            if (melt != null) _lastCoverage = melt.Coverage;
-            if (hudView != null) hudView.SetAreaName(areaName);
-            RefreshHud();
+            _coverage = new CoverageProgress(CurrentMeltCoverage());
         }
 
         private void Update()
         {
-            TrackMelt();
-            RefreshHud();
+            TrackMelt();                       // Fortschritt immer buchen …
+            if (_hudActive) RefreshHud();      // … aber nur die aktive Area beschreibt das HUD.
         }
 
         private void TrackMelt()
         {
-            if (melt == null || string.IsNullOrEmpty(meltTaskId)) return;
-            var current = melt.Coverage;
-            var delta   = current - _lastCoverage;
-            if (delta > 0.0001f) _progress.BookMelt(meltTaskId, delta * 100f);
-            _lastCoverage = current;
+            if (string.IsNullOrEmpty(meltTaskId)) return;
+            // Jeden positiven Zuwachs buchen; CoverageProgress schreibt den Stand nur dann fort, sodass
+            // sich auch winzige Pro-Frame-Deltas (großer Nenner) korrekt aufsummieren.
+            var inc = _coverage.Advance(CurrentMeltCoverage());
+            if (inc > 0f) _progress.BookMelt(meltTaskId, inc * 100f);
+        }
+
+        /// <summary>Flächen-Fortschritt 0..1 für den Melt-Task: zellgewichtet über die Schnee-Region
+        /// dieses Sektors (<see cref="meltRoot"/>); sonst Fallback auf die Lampe (<see cref="melt"/>).</summary>
+        private float CurrentMeltCoverage()
+        {
+            if (_meltPatches != null && _meltPatches.Length > 0)
+            {
+                float cleared = 0f, total = 0f;
+                foreach (var p in _meltPatches)
+                {
+                    if (p == null) continue;
+                    var cells = p.CellCount;
+                    cleared += p.Coverage * cells;
+                    total   += cells;
+                }
+                return total > 0f ? cleared / total : 0f;
+            }
+
+            return melt != null ? melt.Coverage : 0f;
         }
 
         private void RefreshHud()

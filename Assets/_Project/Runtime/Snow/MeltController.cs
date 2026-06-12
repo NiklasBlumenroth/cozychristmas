@@ -31,8 +31,35 @@ namespace CozySanta.Runtime.Snow
         /// <summary>Akku-Ladestand 0..1 (Andockpunkt für eine spätere HUD-Anzeige, F7).</summary>
         public float BatteryFraction => _battery != null ? _battery.Fraction : 0f;
 
-        /// <summary>Flächen-Fortschritt 0..1 des angesteuerten Patches.</summary>
-        public float Coverage => patch != null ? patch.Coverage : 0f;
+        [Tooltip("Empfohlen: Wurzel-Transform der Schnee-Region, die dieser Task zählt. Es werden nur " +
+                 "die SnowPatches UNTER dieser Wurzel aggregiert. Leer = ganze Szene (sehr großer Nenner!).")]
+        [SerializeField] private Transform coverageRoot;
+        [Tooltip("Optional: feste Patch-Liste. Hat Vorrang vor coverageRoot. Leer = coverageRoot bzw. ganze Szene.")]
+        [SerializeField] private SnowPatch[] coveragePatches = new SnowPatch[0];
+
+        private SnowPatch[] _coveragePatches;
+
+        /// <summary>Flächen-Fortschritt 0..1 aller erfassten Patches (zellgewichtet). Spiegelt den
+        /// gesamten freigelegten Schnee, nicht nur eine einzelne Kachel.</summary>
+        public float Coverage
+        {
+            get
+            {
+                var patches = _coveragePatches;
+                if (patches == null || patches.Length == 0)
+                    return patch != null ? patch.Coverage : 0f;
+
+                float cleared = 0f, total = 0f;
+                foreach (var p in patches)
+                {
+                    if (p == null) continue;
+                    var cells = p.CellCount;
+                    cleared += p.Coverage * cells;
+                    total   += cells;
+                }
+                return total > 0f ? cleared / total : 0f;
+            }
+        }
 
         /// <summary>Maximale Akku-Kapazität. Andockpunkt für LampBattery-Upgrade (F6).</summary>
         public float BatteryCapacity
@@ -56,6 +83,13 @@ namespace CozySanta.Runtime.Snow
         private void Awake()
         {
             _battery = new LampBattery(batteryCapacity);
+            // Fortschritts-Region bestimmen: feste Liste > coverageRoot-Teilbaum > ganze Szene.
+            if (coveragePatches != null && coveragePatches.Length > 0)
+                _coveragePatches = coveragePatches;
+            else if (coverageRoot != null)
+                _coveragePatches = coverageRoot.GetComponentsInChildren<SnowPatch>(includeInactive: true);
+            else
+                _coveragePatches = FindObjectsByType<SnowPatch>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         }
 
         private void Update()

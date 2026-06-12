@@ -16,14 +16,9 @@ namespace CozySanta.Runtime.Progression
         public void SetTask(string description, float current, float required, TaskType type)
         {
             if (taskNameText != null) taskNameText.text = description;
-            if (progressText != null) progressText.text = FormatProgress(current, required, type);
+            if (progressText != null) progressText.text = TaskProgressFormatter.Format(current, required, type);
         }
 
         public void SetVisible(bool visible) => gameObject.SetActive(visible);
-
-        private static string FormatProgress(float current, float required, TaskType type)
-            => type == TaskType.Melt
-                ? $"{current:F0} / {required:F0} %"
-                : $"{(int)current} / {(int)required}";
     }
 }
