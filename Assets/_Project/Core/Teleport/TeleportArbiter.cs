@@ -32,6 +32,11 @@ namespace CozySanta.Core.Teleport
         /// <summary>Meldet das Verlassen eines Triggers – danach kann er wieder auslösen.</summary>
         public void NotifyExit(int triggerId) => _occupied.Remove(triggerId);
 
+        /// <summary>Setzt die Belegung zurück (alle Trigger frei). Von der Apply-Schicht beim Teleport
+        /// genutzt, um die Belegung anschließend exakt auf die am Ziel überlappenden Trigger zu setzen –
+        /// so wird der Quell-Trigger sofort frei, auch wenn (nach dem Versetzen) kein OnTriggerExit feuert.</summary>
+        public void Reset() => _occupied.Clear();
+
         /// <summary>True, solange der Trigger als belegt gilt (Diagnose/Test).</summary>
         public bool IsOccupied(int triggerId) => _occupied.Contains(triggerId);
     }

@@ -1198,6 +1198,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5909790757422632091, guid: 3c2d1f734c9d471458b9b4c1f15b45f3, type: 3}
   m_PrefabInstance: {fileID: 100007375}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &101309607
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 101309608}
+  m_Layer: 0
+  m_Name: "ZielBibliothekAu\xDFen"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &101309608
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 101309607}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 37.61, y: 0.018999994, z: 20.81}
+  m_LocalScale: {x: 0.1, y: 0.09999998, z: 0.09999998}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 576861458}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &101698508
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1914,11 +1945,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 8391474015138107272, guid: 85de6af2543e03140a0f651715bf9547, type: 3}
   m_PrefabInstance: {fileID: 1780231672}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &150585177 stripped
-BoxCollider:
-  m_CorrespondingSourceObject: {fileID: 3975876291941812461, guid: 3d8ac291f5c29194d8ae7192e8c5627a, type: 3}
-  m_PrefabInstance: {fileID: 8012891692469096804}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &151537402 stripped
 Transform:
@@ -5658,7 +5684,7 @@ GameObject:
   - component: {fileID: 381414370}
   - component: {fileID: 381414371}
   m_Layer: 0
-  m_Name: AusgangCollider
+  m_Name: AusgangBibliothek
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5672,12 +5698,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 381414369}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.93, y: 0.99, z: -5.3}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 38.26043, y: 0.7799901, z: 181.45079}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1015923409}
+  m_Father: {fileID: 576861458}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &381414371
 BoxCollider:
@@ -6234,27 +6260,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!1 &411252290 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2501157575797522301, guid: 3d8ac291f5c29194d8ae7192e8c5627a, type: 3}
-  m_PrefabInstance: {fileID: 8012891692469096804}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &411252295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 411252290}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b51ec14396ab5d548bea4b500d62f374, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Teleport.TeleportRouter
-  pairs:
-  - trigger: {fileID: 150585177}
-    destination: {fileID: 527196839}
-    faceDestination: 0
 --- !u!4 &411252296 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3025914535111321031, guid: 3d8ac291f5c29194d8ae7192e8c5627a, type: 3}
@@ -6649,11 +6654,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 3898623793775140201, guid: e007cc5328ec84f47bf82c60b54c8ba7, type: 3}
   m_PrefabInstance: {fileID: 1429531453}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &438944048 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3658673424204373748, guid: 3d8ac291f5c29194d8ae7192e8c5627a, type: 3}
-  m_PrefabInstance: {fileID: 8012891692469096804}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &443061866
 PrefabInstance:
@@ -7721,7 +7721,7 @@ GameObject:
   m_Component:
   - component: {fileID: 527196839}
   m_Layer: 0
-  m_Name: EntryPosition
+  m_Name: ZielBibliothekInnen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7735,12 +7735,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 527196838}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.99, y: 0.72, z: -5.22}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 40.200428, y: 0.5099901, z: 181.53079}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1015923409}
+  m_Father: {fileID: 576861458}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &528062997 stripped
 Transform:
@@ -8528,6 +8528,64 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3589525839803033842, guid: eb1793e578ef3774faf0c22d0559ebed, type: 3}
   m_PrefabInstance: {fileID: 1411494960}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &576861457
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 576861458}
+  - component: {fileID: 576861459}
+  m_Layer: 0
+  m_Name: Bibliothek
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &576861458
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 576861457}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 101309608}
+  - {fileID: 878781566}
+  - {fileID: 381414370}
+  - {fileID: 527196839}
+  m_Father: {fileID: 1237167698}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &576861459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 576861457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b51ec14396ab5d548bea4b500d62f374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Teleport.TeleportRouter
+  pairs:
+  - trigger: {fileID: 381414371}
+    destination: {fileID: 101309608}
+    faceDestination: 0
+    activateArea: {fileID: 820861651}
+  - trigger: {fileID: 878781567}
+    destination: {fileID: 527196839}
+    faceDestination: 0
+    activateArea: {fileID: 1015923408}
+  areaActivator: {fileID: 1859670178}
 --- !u!4 &579776401 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1508966909852376538, guid: a4229db0b1e94984f8164525f4332942, type: 3}
@@ -12890,6 +12948,59 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 636ada168d86be444a07560b0c46b76e, type: 3}
   m_PrefabInstance: {fileID: 1045514330}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &878781565
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 878781566}
+  - component: {fileID: 878781567}
+  m_Layer: 0
+  m_Name: EingangBibliothek
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &878781566
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878781565}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 39.701, y: 0.864, z: 21.31}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 576861458}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &878781567
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878781565}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &883659464
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14975,7 +15086,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1015923409}
-  - component: {fileID: 1015923410}
   m_Layer: 0
   m_Name: BibliothekInnen
   m_TagString: Untagged
@@ -14998,8 +15108,6 @@ Transform:
   m_Children:
   - {fileID: 769061978}
   - {fileID: 1122908211}
-  - {fileID: 527196839}
-  - {fileID: 381414370}
   - {fileID: 1260204482}
   - {fileID: 139613968}
   - {fileID: 1772304181}
@@ -15008,22 +15116,6 @@ Transform:
   - {fileID: 1987132056}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1015923410
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1015923408}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b51ec14396ab5d548bea4b500d62f374, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Teleport.TeleportRouter
-  pairs:
-  - trigger: {fileID: 381414371}
-    destination: {fileID: 438944048}
-    faceDestination: 0
 --- !u!4 &1017003920 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1381321803499051906, guid: e8f15fe8542b5914bbae9309ebd5cce4, type: 3}
@@ -18370,6 +18462,8 @@ MonoBehaviour:
   - trigger: {fileID: 1411893678}
     destination: {fileID: 202994509}
     faceDestination: 0
+    activateArea: {fileID: 0}
+  areaActivator: {fileID: 0}
 --- !u!4 &1225112945
 Transform:
   m_ObjectHideFlags: 0
@@ -18540,6 +18634,40 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 636ada168d86be444a07560b0c46b76e, type: 3}
+--- !u!1 &1237167697
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1237167698}
+  m_Layer: 0
+  m_Name: Teleporter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1237167698
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1237167697}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -37.19043, y: 0.31001, z: -1.7508}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 576861458}
+  - {fileID: 1966483716}
+  - {fileID: 2001326920}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1238313889 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8662962993406794523, guid: 1c1b1d3a2e451f84f8fc830e414bfb11, type: 3}
@@ -27238,6 +27366,7 @@ GameObject:
   - component: {fileID: 1859670177}
   - component: {fileID: 1859670176}
   - component: {fileID: 1859670175}
+  - component: {fileID: 1859670178}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -27285,6 +27414,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1859670178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1859670174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be8bf06b767ce244ab9587675b1dd141, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Areas.AreaActivator
+  areaRoots:
+  - {fileID: 820861651}
+  - {fileID: 1015923408}
+  startActiveArea: {fileID: 820861651}
 --- !u!1001 &1862517163
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -28917,6 +29062,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f7d7f9b47e7d078408e207f898e35476, type: 3}
+--- !u!1 &1966483715
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1966483716}
+  m_Layer: 0
+  m_Name: Dekohalle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1966483716
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1966483715}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1237167698}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1967512070
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29496,6 +29672,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4097062373641339516, guid: 77f7a275f7ad5b4419906c60f782e9c5, type: 3}
   m_PrefabInstance: {fileID: 1802219131}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2001326919
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2001326920}
+  m_Layer: 0
+  m_Name: TestArea
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2001326920
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001326919}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1237167698}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &2002356849 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8391474015138107272, guid: d71501fabd26ea046a4e5314bd1dc651, type: 3}
@@ -31939,7 +32146,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2501157575797522301, guid: 3d8ac291f5c29194d8ae7192e8c5627a, type: 3}
       propertyPath: m_Name
-      value: Posthaus
+      value: Bibliothek
       objectReference: {fileID: 0}
     - target: {fileID: 3025914535111321031, guid: 3d8ac291f5c29194d8ae7192e8c5627a, type: 3}
       propertyPath: m_LocalScale.x
@@ -32008,10 +32215,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2501157575797522301, guid: 3d8ac291f5c29194d8ae7192e8c5627a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 411252295}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d8ac291f5c29194d8ae7192e8c5627a, type: 3}
 --- !u!1001 &8503039667005507413
 PrefabInstance:
@@ -32272,3 +32476,4 @@ SceneRoots:
   - {fileID: 2593466166917393928}
   - {fileID: 348588125}
   - {fileID: 753173032}
+  - {fileID: 1237167698}

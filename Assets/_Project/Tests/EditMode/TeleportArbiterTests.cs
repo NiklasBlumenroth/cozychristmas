@@ -52,5 +52,24 @@ namespace CozySanta.Tests.EditMode
             arbiter.NotifyExit(1);
             Assert.IsTrue(arbiter.ShouldTeleport(1));
         }
+
+        // ── TP5: Reset gibt den Quell-Trigger frei (kein OnTriggerExit beim Wegteleportieren nötig) ──
+        [Test]
+        public void Reset_FreesSourceTrigger_WithoutExitEvent()
+        {
+            var arbiter = new TeleportArbiter();
+
+            // Spieler betritt Quell-Trigger 0 → belegt; ohne Exit bliebe er hängen.
+            Assert.IsTrue(arbiter.ShouldTeleport(0));
+            Assert.IsTrue(arbiter.IsOccupied(0));
+
+            // Teleport: Belegung zurücksetzen, dann nur den am Ziel überlappenden Trigger 1 belegen.
+            arbiter.Reset();
+            arbiter.MarkOccupied(1);
+
+            Assert.IsFalse(arbiter.IsOccupied(0));      // Quelle sofort wieder frei
+            Assert.IsTrue(arbiter.ShouldTeleport(0));   // direkt erneut nutzbar
+            Assert.IsFalse(arbiter.ShouldTeleport(1));  // Ziel-Trigger weiter geschützt (kein Bounce)
+        }
     }
 }

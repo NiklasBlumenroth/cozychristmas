@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CozySanta.Core.Teleport;
+using CozySanta.Runtime.Areas;
 using CozySanta.Runtime.Player;
 using UnityEngine;
 
@@ -26,10 +27,15 @@ namespace CozySanta.Runtime.Teleport
             public Transform destination;
             [Tooltip("Wenn an: der Spieler übernimmt zusätzlich die Blickrichtung (Y-Drehung) des Ziels.")]
             public bool faceDestination = true;
+            [Tooltip("Optional: Bereichs-Root, der bei diesem Teleport aktiviert wird (alle anderen aus). " +
+                     "Leer = keine Bereichs-Umschaltung.")]
+            public GameObject activateArea;
         }
 
         [Tooltip("Liste der Teleport-Paare: pro Zeile ein Trigger-Collider und sein Ziel.")]
         [SerializeField] private List<Pair> pairs = new List<Pair>();
+        [Tooltip("Optional: schaltet beim Teleport den Ziel-Bereich aktiv (siehe 'Activate Area' je Paar).")]
+        [SerializeField] private AreaActivator areaActivator;
 
         private readonly TeleportArbiter _arbiter = new TeleportArbiter();
 
@@ -74,6 +80,12 @@ namespace CozySanta.Runtime.Teleport
 
         private void Teleport(FirstPersonController player, Pair pair)
         {
+            // Zielbereich VOR dem Versetzen aktivieren, damit Boden/Collider beim Landen schon live sind.
+            if (areaActivator != null && pair.activateArea != null)
+            {
+                areaActivator.Activate(pair.activateArea);
+            }
+
             var dest = pair.destination;
             var controller = player.GetComponent<CharacterController>();
 
@@ -89,8 +101,10 @@ namespace CozySanta.Runtime.Teleport
 
             if (controller != null) controller.enabled = true;
 
-            // Alle Trigger, die das Ziel jetzt überlappen, als belegt markieren – so wird das unmittelbare
-            // Lande-Betreten verschluckt und der Spieler nicht sofort zurückgeworfen (Bounce-Schutz).
+            // Belegung neu aufbauen: erst alles freigeben (der Quell-Trigger feuert beim Wegteleportieren
+            // KEIN OnTriggerExit, würde sonst dauerhaft belegt bleiben), dann exakt die am Ziel
+            // überlappenden Trigger als belegt markieren – so bleibt der Bounce-Schutz, ohne Hängenbleiben.
+            _arbiter.Reset();
             var playerBounds = controller != null ? controller.bounds : default;
             for (var i = 0; i < pairs.Count; i++)
             {
