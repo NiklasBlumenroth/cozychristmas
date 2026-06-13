@@ -1,3 +1,4 @@
+using CozySanta.Core.Input;
 using CozySanta.Runtime.Carry;
 using CozySanta.Runtime.Interaction;
 using CozySanta.Runtime.Progression;
@@ -25,6 +26,16 @@ namespace CozySanta.Runtime.Player
         [Header("Area-HUD (optional)")]
         [SerializeField] private AreaHudView areaHud;
 
+        [Header("Gedrückt-Halten = Aktion wiederholen")]
+        [Tooltip("Wartezeit nach dem ersten Auslösen, bevor die Auto-Wiederholung startet (Sekunden).")]
+        [SerializeField] private float holdInitialDelay = 0.4f;
+        [Tooltip("Abstand zwischen den Wiederholungen, solange gehalten wird (Sekunden).")]
+        [SerializeField] private float holdRepeatInterval = 0.18f;
+
+        private HoldRepeatTimer _takeRepeat;
+        private HoldRepeatTimer _placeRepeat;
+        private HoldRepeatTimer _dropRepeat;
+
         private void Awake()
         {
             if (controller == null) controller = GetComponent<FirstPersonController>();
@@ -36,21 +47,23 @@ namespace CozySanta.Runtime.Player
         {
             // Interaktion über die Maus: links = aufnehmen / aus Fach entnehmen, rechts = NUR
             // einsortieren (in ein fokussiertes Fach). Ablegen läuft über Taste „Q", damit Briefe
-            // nicht versehentlich neben dem Fach fallen gelassen werden.
+            // nicht versehentlich neben dem Fach fallen gelassen werden. Alle drei Aktionen lösen beim
+            // ersten Druck sofort aus und wiederholen sich beim Halten (Stapel zügig abarbeiten).
+            var dt = UnityEngine.Time.deltaTime;
             var mouse = Mouse.current;
             if (mouse != null && interaction != null)
             {
-                if (mouse.leftButton.wasPressedThisFrame)
+                if (_takeRepeat.Tick(mouse.leftButton.isPressed, dt, holdInitialDelay, holdRepeatInterval))
                     interaction.TryTake();
 
-                if (mouse.rightButton.wasPressedThisFrame)
+                if (_placeRepeat.Tick(mouse.rightButton.isPressed, dt, holdInitialDelay, holdRepeatInterval))
                     interaction.TryPlace();
             }
 
             var keyboard = Keyboard.current;
             if (keyboard != null)
             {
-                if (keyboard.qKey.wasPressedThisFrame && interaction != null)
+                if (interaction != null && _dropRepeat.Tick(keyboard.qKey.isPressed, dt, holdInitialDelay, holdRepeatInterval))
                     interaction.TryDrop();
 
                 // Blick + E: nur generische Interaktion (z. B. Schranktüren). Kein Aufnehmen/Einsortieren.

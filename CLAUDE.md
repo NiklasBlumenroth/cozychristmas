@@ -148,6 +148,12 @@ Assets/_Project/
   Router). `FirstPersonController.ResetVerticalVelocity` additiv. EditMode-Tests TP1–TP4 grün. Doku/Diagramm
   unter `specs/009-teleport-poststelle/`. Editor-Verdrahtung (Trigger/Ziele am Prefab) manuell.
 
+- **Halten-zum-Wiederholen (additiv zu F3/F4)**: Core `HoldRepeatTimer` (Decide, testbar) — aus
+  gedrückt/los + `deltaTime` entscheidet `Tick`, ob ausgelöst wird: einmal sofort beim Druck, dann
+  nach `holdInitialDelay` im Takt `holdRepeatInterval`, solange gehalten. `PlayerInputRelay` nutzt je
+  einen Timer für Linksklick (TryTake), Rechtsklick (TryPlace) und „Q" (TryDrop); `DevSpawnMenu`
+  für „R" (Spawn). Delays im Inspector einstellbar. EditMode-Tests HR1–HR5 grün.
+
 - **Spielersprung (additiv zu F2)**: Core `JumpCalculator` (Decide, testbar) — `ComputeJumpVelocity`
   (v0 = √(2·g·h)) + `StepVerticalVelocity` (Boden-Anpressdruck, Absprung, Schwerkraft-Integration);
   `FirstPersonController` um `jumpHeight` + `RequestJump()` erweitert, `PlayerInputRelay` liest die Leertaste.

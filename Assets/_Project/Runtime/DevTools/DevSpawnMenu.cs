@@ -1,3 +1,4 @@
+using CozySanta.Core.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,9 +22,15 @@ namespace CozySanta.Runtime.DevTools
         [Tooltip("Sichtbare Zeilen, bevor die Liste scrollt.")]
         [SerializeField] private int visibleRows = 5;
 
+        [Tooltip("Wartezeit, bevor die R-Taste gehalten wiederholt spawnt (Sekunden).")]
+        [SerializeField] private float holdInitialDelay = 0.4f;
+        [Tooltip("Abstand zwischen den Spawns beim Halten der R-Taste (Sekunden).")]
+        [SerializeField] private float holdRepeatInterval = 0.18f;
+
         private bool _open;
         private int _selected;
         private Vector2 _scroll;
+        private HoldRepeatTimer _spawnRepeat;
 
         private void Update()
         {
@@ -38,7 +45,8 @@ namespace CozySanta.Runtime.DevTools
                 SetOpen(!_open);
             }
 
-            if (keyboard.rKey.wasPressedThisFrame)
+            // „R" gedrückt halten = wiederholt spawnen (zügig mehrere Test-Objekte setzen).
+            if (_spawnRepeat.Tick(keyboard.rKey.isPressed, UnityEngine.Time.deltaTime, holdInitialDelay, holdRepeatInterval))
             {
                 Spawn();
             }
