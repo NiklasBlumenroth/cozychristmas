@@ -45,10 +45,12 @@ namespace CozySanta.Runtime.Items
             return AreaItemStore.Save(area.AreaName, placements);
         }
 
-        /// <summary>Lädt den gespeicherten Zustand eines Bereichs (ersetzt vorhandene Items darin).</summary>
+        /// <summary>Lädt den gespeicherten Zustand eines Bereichs (ersetzt vorhandene Items darin).
+        /// Bevorzugt den Katalog des Bereichs (pro Gebäude), sonst den globalen Fallback-Katalog.</summary>
         public int LoadArea(ItemArea area)
         {
-            if (area == null || catalog == null || !AreaItemStore.TryLoad(area.AreaName, out var data))
+            var cat = area != null && area.Catalog != null ? area.Catalog : catalog;
+            if (area == null || cat == null || !AreaItemStore.TryLoad(area.AreaName, out var data))
             {
                 return 0;
             }
@@ -58,7 +60,7 @@ namespace CozySanta.Runtime.Items
             var spawned = 0;
             foreach (var p in data.items)
             {
-                var prefab = catalog.Get(p.key);
+                var prefab = cat.Get(p.key);
                 if (prefab == null)
                 {
                     Debug.LogWarning($"[ItemPersistence] Kein Prefab im Katalog für Schlüssel '{p.key}'.");
@@ -84,6 +86,24 @@ namespace CozySanta.Runtime.Items
             }
 
             return total;
+        }
+
+        /// <summary>Zählt die vorhandenen Items je Schlüssel innerhalb des Bereichs (für HUD/Spawn-Quote).</summary>
+        public Dictionary<string, int> CountByKey(ItemArea area)
+        {
+            var result = new Dictionary<string, int>();
+            if (area == null) return result;
+
+            foreach (var id in FindObjectsByType<PrefabId>(FindObjectsSortMode.None))
+            {
+                if (id == null || string.IsNullOrEmpty(id.Key)) continue;
+                if (!area.Contains(id.transform.position)) continue;
+
+                result.TryGetValue(id.Key, out var c);
+                result[id.Key] = c + 1;
+            }
+
+            return result;
         }
 
         /// <summary>Zerstört alle aufnehmbaren Items innerhalb des Bereichs.</summary>

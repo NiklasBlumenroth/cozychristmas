@@ -20,6 +20,9 @@ namespace CozySanta.Editor
         private const string DataFolder = "Assets/_Project/Data";
         private const string CatalogPath = DataFolder + "/ItemCatalog.asset";
 
+        // Settle-Dauer (s), die das Setup-Tool an allen Buch-Prefabs setzt. Großzügig, da nur Authoring.
+        private const float SettleDuration = 3f;
+
         [MenuItem("CozySanta/Items/Buch-Persistenz einrichten (Prefabs + Katalog)")]
         public static void SetupBooks()
         {
@@ -52,10 +55,12 @@ namespace CozySanta.Editor
                 var id = root.GetComponent<PrefabId>() ?? root.AddComponent<PrefabId>();
                 id.SetKey(key);
 
-                if (root.GetComponent<SettlingBody>() == null)
-                {
-                    root.AddComponent<SettlingBody>();
-                }
+                // SettlingBody sicherstellen UND die Settle-Dauer explizit setzen, damit ein erneutes
+                // Ausführen den Wert auch an bereits ausgestatteten Prefabs aktualisiert.
+                var settling = root.GetComponent<SettlingBody>() ?? root.AddComponent<SettlingBody>();
+                var sso = new SerializedObject(settling);
+                sso.FindProperty("settleDuration").floatValue = SettleDuration;
+                sso.ApplyModifiedPropertiesWithoutUndo();
 
                 // Schattenwurf der Bücher aus: im Haufen kaum sichtbar, spart den Schatten-Pass.
                 foreach (var renderer in root.GetComponentsInChildren<MeshRenderer>(true))
@@ -97,6 +102,10 @@ namespace CozySanta.Editor
                 return;
             }
 
+            var player = Object.FindAnyObjectByType<CozySanta.Runtime.Player.FirstPersonController>();
+            var playerTf = player != null ? player.transform : null;
+            var cameraTf = Camera.main != null ? Camera.main.transform : playerTf;
+
             var host = GameObject.Find("ItemPersistence") ?? new GameObject("ItemPersistence");
             var persistence = host.GetComponent<ItemPersistence>() ?? host.AddComponent<ItemPersistence>();
             if (host.GetComponent<CozySanta.Runtime.DevTools.ItemSaveDevTool>() == null)
@@ -104,33 +113,118 @@ namespace CozySanta.Editor
                 host.AddComponent<CozySanta.Runtime.DevTools.ItemSaveDevTool>();
             }
 
-            var so = new SerializedObject(persistence);
-            so.FindProperty("catalog").objectReferenceValue = catalog;
-            so.ApplyModifiedPropertiesWithoutUndo();
+            var spawner = host.GetComponent<AreaSpawner>() ?? host.AddComponent<AreaSpawner>();
+            var hud = host.GetComponent<CozySanta.Runtime.DevTools.AreaInventoryHud>()
+                      ?? host.AddComponent<CozySanta.Runtime.DevTools.AreaInventoryHud>();
 
-            var areasAdded = AttachAreasToZones();
+            SetRef(persistence, "catalog", catalog);
+            SetRef(spawner, "persistence", persistence);
+            SetRef(spawner, "player", playerTf);
+            SetRef(spawner, "spawnOrigin", cameraTf);
+            SetRef(hud, "persistence", persistence);
+            SetRef(hud, "player", playerTf);
+
+            var areasAdded = AttachAreasToZones(catalog);
+
+            // Fallback: existiert kein Bereich mit Katalog (z. B. keine AreaZone in der Szene),
+            // eine Start-ItemArea „Bibliothek" als BoxCollider-Volumen anlegen.
+            var createdFallback = EnsureLibraryArea(catalog);
+
+            // DevSpawnMenu reagiert ebenfalls auf „R" -> deaktivieren, sonst doppeltes Spawnen.
+            var disabled = 0;
+            foreach (var dev in Object.FindObjectsByType<CozySanta.Runtime.DevTools.DevSpawnMenu>(FindObjectsSortMode.None))
+            {
+                if (dev.enabled) { dev.enabled = false; EditorUtility.SetDirty(dev); disabled++; }
+            }
+
             EditorUtility.SetDirty(host);
-            Debug.Log($"[ItemPersistence] Szenen-Objekt '{host.name}' bereit; {areasAdded} Bereich(e) aus AreaZones angelegt. " +
-                      "Dev-Menü: Taste F4 im Play-Mode.");
+            var fallbackNote = createdFallback != null
+                ? $" Start-Bereich '{createdFallback.name}' angelegt – bitte Box im Scene-View auf den Bibliotheksraum skalieren/positionieren!"
+                : "";
+            Debug.Log($"[ItemPersistence] Szenen-Objekt '{host.name}' bereit; {areasAdded} Bereich(e) aus AreaZones angelegt; " +
+                      $"{disabled} DevSpawnMenu deaktiviert.{fallbackNote} " +
+                      "R = Zufallsbuch spawnen (halten = mehrere), F6 = Inventar/Buttons, F4 = Speicher-Menü (Play-Mode).");
         }
 
-        // Hängt an jede AreaZone eine ItemArea (Bereichsname aus deren AreaTracker), falls noch keine da ist.
-        private static int AttachAreasToZones()
+        // Legt eine ItemArea „Bibliothek" an, falls noch kein Bereich einen Katalog hat. Volumen aus den
+        // Renderer-Bounds eines „Bibliothek"-Objekts (sonst Standardgröße). Rückgabe: erstelltes Objekt oder null.
+        private static GameObject EnsureLibraryArea(ItemCatalog booksCatalog)
+        {
+            foreach (var existing in Object.FindObjectsByType<ItemArea>(FindObjectsSortMode.None))
+            {
+                if (existing.Catalog != null) return null; // schon ein Bereich mit Items konfiguriert
+            }
+
+            var center = Vector3.zero;
+            var size = new Vector3(12f, 6f, 12f);
+            foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (t.name.ToLowerInvariant().Contains("biblio"))
+                {
+                    center = t.position;
+                    var renderers = t.GetComponentsInChildren<Renderer>();
+                    if (renderers.Length > 0)
+                    {
+                        var b = renderers[0].bounds;
+                        for (var i = 1; i < renderers.Length; i++) b.Encapsulate(renderers[i].bounds);
+                        center = b.center;
+                        size = b.size;
+                    }
+
+                    break;
+                }
+            }
+
+            var go = new GameObject("Bibliothek_ItemArea");
+            go.transform.position = center;
+            var box = go.AddComponent<BoxCollider>();
+            box.isTrigger = true;
+            box.center = Vector3.zero;
+            box.size = size;
+
+            var area = go.AddComponent<ItemArea>();
+            var so = new SerializedObject(area);
+            so.FindProperty("areaName").stringValue = "Bibliothek";
+            so.FindProperty("catalog").objectReferenceValue = booksCatalog;
+            so.FindProperty("maxPerVariant").intValue = 20;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return go;
+        }
+
+        // Hängt an jede AreaZone eine ItemArea (Name aus AreaTracker). Bibliotheks-Bereiche bekommen
+        // zusätzlich den Bücher-Katalog (Max 20) – andere Gebäude konfiguriert man später im Inspector.
+        private static int AttachAreasToZones(ItemCatalog booksCatalog)
         {
             var added = 0;
             foreach (var zone in Object.FindObjectsByType<CozySanta.Runtime.Areas.AreaZone>(FindObjectsSortMode.None))
             {
-                if (zone.GetComponent<ItemArea>() != null) continue;
-
-                var area = zone.gameObject.AddComponent<ItemArea>();
+                var area = zone.GetComponent<ItemArea>() ?? zone.gameObject.AddComponent<ItemArea>();
                 var name = zone.Tracker != null ? zone.Tracker.AreaName : zone.gameObject.name;
+
                 var so = new SerializedObject(area);
                 so.FindProperty("areaName").stringValue = name;
+                if (name != null && name.ToLowerInvariant().Contains("biblio"))
+                {
+                    so.FindProperty("catalog").objectReferenceValue = booksCatalog;
+                    so.FindProperty("maxPerVariant").intValue = 20;
+                }
+
                 so.ApplyModifiedPropertiesWithoutUndo();
                 added++;
             }
 
             return added;
+        }
+
+        private static void SetRef(Object target, string property, Object value)
+        {
+            var so = new SerializedObject(target);
+            var prop = so.FindProperty(property);
+            if (prop != null)
+            {
+                prop.objectReferenceValue = value;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
         }
 
         private static void EnsureFolder(string folder)

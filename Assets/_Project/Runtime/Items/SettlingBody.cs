@@ -22,8 +22,9 @@ namespace CozySanta.Runtime.Items
         [SerializeField] private float linearThreshold = 0.05f;
         [Tooltip("Winkelgeschwindigkeit (rad/s), unter der das Item als ruhig gilt.")]
         [SerializeField] private float angularThreshold = 0.2f;
-        [Tooltip("Dauer (s), die es ununterbrochen ruhig sein muss, bevor es einfriert.")]
-        [SerializeField] private float settleDuration = 0.5f;
+        [Tooltip("Dauer (s), die es ununterbrochen ruhig sein muss, bevor es einfriert. Nur relevant " +
+                 "in der Authoring-Phase (geladene Bücher starten ohnehin eingefroren) – ruhig großzügig.")]
+        [SerializeField] private float settleDuration = 3f;
 
         private Rigidbody _body;
         private SettleTimer _timer;

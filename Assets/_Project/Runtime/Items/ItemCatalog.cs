@@ -20,32 +20,45 @@ namespace CozySanta.Runtime.Items
 
         [SerializeField] private List<Entry> entries = new List<Entry>();
 
-        private Dictionary<string, GameObject> _map;
+        /// <summary>Anzahl der Katalog-Einträge (Diagnose).</summary>
+        public int EntryCount => entries != null ? entries.Count : 0;
 
-        /// <summary>Liefert das Prefab zum Schlüssel oder <c>null</c>.</summary>
+        /// <summary>Alle bekannten Schlüssel (z. B. die 96 Buch-Varianten) – für Zählung/Spawn-Quote.
+        /// Bewusst ohne Caching: bei deaktiviertem Domain-Reload würde ein einmal gecachter (leerer)
+        /// Stand sonst über Play-Sessions hinweg „kleben".</summary>
+        public IReadOnlyList<string> Keys
+        {
+            get
+            {
+                var keys = new List<string>(entries != null ? entries.Count : 0);
+                if (entries != null)
+                {
+                    foreach (var e in entries)
+                    {
+                        if (!string.IsNullOrEmpty(e.key) && !keys.Contains(e.key)) keys.Add(e.key);
+                    }
+                }
+
+                return keys;
+            }
+        }
+
+        /// <summary>Liefert das Prefab zum Schlüssel oder <c>null</c> (lineare Suche, ohne Cache).</summary>
         public GameObject Get(string key)
         {
-            if (_map == null) Build();
-            return !string.IsNullOrEmpty(key) && _map.TryGetValue(key, out var prefab) ? prefab : null;
+            if (string.IsNullOrEmpty(key) || entries == null) return null;
+            foreach (var e in entries)
+            {
+                if (e.key == key) return e.prefab;
+            }
+
+            return null;
         }
 
         /// <summary>Ersetzt alle Einträge (für Editor-/Setup-Code).</summary>
         public void SetEntries(List<Entry> list)
         {
             entries = list ?? new List<Entry>();
-            _map = null;
-        }
-
-        private void Build()
-        {
-            _map = new Dictionary<string, GameObject>();
-            foreach (var e in entries)
-            {
-                if (e.prefab != null && !string.IsNullOrEmpty(e.key))
-                {
-                    _map[e.key] = e.prefab;
-                }
-            }
         }
     }
 }

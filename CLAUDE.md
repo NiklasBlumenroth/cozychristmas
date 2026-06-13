@@ -162,6 +162,14 @@ Assets/_Project/
   `AreaTracker.AreaName` additiv öffentlich. EditMode-Tests ST1–ST5 grün. Persistierte Daten: JSON je
   Bereich (Prefab-Schlüssel + Pose). Workflow: im Play-Mode spawnen/verteilen, ruhen lassen, Bereich
   speichern → beim Start wird der Haufen kinematisch geladen.
+  Erweiterung (pro Gebäude): `ItemArea` trägt einen eigenen `ItemCatalog` + `maxPerVariant` (Bibliothek
+  = 96 Bücher × 20); `ItemPersistence.LoadArea` nutzt den Bereichs-Katalog (Fallback global) und
+  `CountByKey` zählt je Variante im Bereich. Core `SpawnQuota` (Decide, testbar, EditMode-Tests SQ1–SQ4): wählt eine
+  zufällige, noch nicht gedeckelte Variante / meldet „alle voll". Runtime `AreaSpawner` („R": spawnt im
+  betretenen Bereich ein erlaubtes Zufalls-Item mit zufälliger XYZ-Rotation; ersetzt das `DevSpawnMenu`-R
+  in diesem Bereich). Overlay `AreaInventoryHud` („F6"): Gesamtzahl + alle Varianten x/Max + Buttons
+  „Speichern" (= Start-Standard des Gebäudes) und „Reset" (alle Items des Bereichs entfernen). Editor-Setup
+  weist Bibliotheks-Bereichen den Bücher-Katalog (Max 20) zu und verdrahtet Spawner/HUD.
 
 - **Halten-zum-Wiederholen (additiv zu F3/F4)**: Core `HoldRepeatTimer` (Decide, testbar) — aus
   gedrückt/los + `deltaTime` entscheidet `Tick`, ob ausgelöst wird: einmal sofort beim Druck, dann

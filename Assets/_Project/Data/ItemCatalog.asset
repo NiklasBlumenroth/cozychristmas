@@ -1,0 +1,207 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54cc246f331e5f94a8c6bbaaf73bf768, type: 3}
+  m_Name: ItemCatalog
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Items.ItemCatalog
+  entries:
+  - key: BuchBlauFlocke
+    prefab: {fileID: 7395676271849378696, guid: eed034721cc23ea44b693450765b877b, type: 3}
+  - key: BuchBlauGeschenk
+    prefab: {fileID: 1492977286359308000, guid: 42d7178ef89c41b4caea261c3aa9bd69, type: 3}
+  - key: BuchBlauGlocke
+    prefab: {fileID: 1761190721615311313, guid: c06587626f1ec334aafabf5bae4be4e7, type: 3}
+  - key: BuchBlauHerz
+    prefab: {fileID: 3547312662235668224, guid: 831d82f72e7a8374998d600aae5e3f22, type: 3}
+  - key: BuchBlauKerze
+    prefab: {fileID: 3931099414445734719, guid: d4b56ae203ecb274aa29bae0405425e2, type: 3}
+  - key: BuchBlauKugel
+    prefab: {fileID: 7240088014528657726, guid: 0e8ff6e29aecd0f43962f31fb6781315, type: 3}
+  - key: BuchBlauLebkuchen
+    prefab: {fileID: 8255824312530609093, guid: da89a85fa22fe2e458952233ec2bf728, type: 3}
+  - key: "BuchBlauSchl\xFCssel"
+    prefab: {fileID: 1818610616736761488, guid: 4e021f8555abe9540938f90d8719f846, type: 3}
+  - key: BuchBlauSchneemann
+    prefab: {fileID: 6573460942812436238, guid: 7cd7d557dd668464b91d207849d8ad0a, type: 3}
+  - key: BuchBlauStern
+    prefab: {fileID: 8094266943817858296, guid: 4c8e15c7d288aa443863cd469ba6ddc6, type: 3}
+  - key: BuchBlauTannenbaum
+    prefab: {fileID: 2457696819566947440, guid: 073301a3d12d02442b240a3c5180059e, type: 3}
+  - key: BuchBlauZuckerstange
+    prefab: {fileID: 4138741592603562985, guid: 8d87bdc9c00d66c41beffd0a59fd4cbe, type: 3}
+  - key: BuchBraunFlocke
+    prefab: {fileID: 8725973809991303189, guid: 34255ace5d3bf0b46938fe5ad75e290b, type: 3}
+  - key: BuchBraunGeschenk
+    prefab: {fileID: 7189862763824198331, guid: aa8bd851ed9ae1f46bea514b3666a6ff, type: 3}
+  - key: BuchBraunGlocke
+    prefab: {fileID: 1189475375749510802, guid: ca920a29112246949aef49c888a12463, type: 3}
+  - key: BuchBraunHerz
+    prefab: {fileID: 3008129363360868487, guid: dec1cbc299aa99b489488780093dce86, type: 3}
+  - key: BuchBraunKerze
+    prefab: {fileID: 4505413113570549109, guid: d726c5e576cc0a64e8fda61923d6c44b, type: 3}
+  - key: BuchBraunKugel
+    prefab: {fileID: 2758610623315492164, guid: 13bf829d9639b5e4db793a2646df9336, type: 3}
+  - key: BuchBraunLebkuchen
+    prefab: {fileID: 7741557357319913785, guid: cd03bf7279c9ec14c8aee5436172da33, type: 3}
+  - key: "BuchBraunSchl\xFCssel"
+    prefab: {fileID: 2999288688717998828, guid: 4f6a1df6b7d71c840ae9209aa342daba, type: 3}
+  - key: BuchBraunSchneemann
+    prefab: {fileID: 1159623333958934914, guid: 3199c6cf2d0a9c94fafef5ee5ab53c38, type: 3}
+  - key: BuchBraunStern
+    prefab: {fileID: 8790708110991861356, guid: 7a91d1e939342b94689ba6286a4e4006, type: 3}
+  - key: BuchBraunTannenbaum
+    prefab: {fileID: 4201827495342589795, guid: 5dad2d28dc43ffb4eb8965fb94784d55, type: 3}
+  - key: BuchBraunZuckerstange
+    prefab: {fileID: 711878192254132474, guid: 83b43833de6cfe846a679ce17f305034, type: 3}
+  - key: BuchGelbFlocke
+    prefab: {fileID: 5835904045166181284, guid: 85086004f22076d439639263fc3d620d, type: 3}
+  - key: BuchGelbGeschenk
+    prefab: {fileID: 613033891134103109, guid: 46099b7ba436f3d419621ee742e1ab34, type: 3}
+  - key: BuchGelbGlocke
+    prefab: {fileID: 8712953885429085752, guid: 278556bdf6c99de41a251cd669a350a5, type: 3}
+  - key: BuchGelbHerz
+    prefab: {fileID: 8999003661579751710, guid: 1bad68f21c18a014aace11c2631e77c2, type: 3}
+  - key: BuchGelbKerze
+    prefab: {fileID: 3018740107628835288, guid: 443e810263eef884a937d4d5e07148a4, type: 3}
+  - key: BuchGelbKugel
+    prefab: {fileID: 8403943608006526095, guid: 6715babccf25e2045b775ce619be9b3d, type: 3}
+  - key: BuchGelbLebkuchen
+    prefab: {fileID: 8209234031186489700, guid: 2ec48f725b953ff47961d6beebc01594, type: 3}
+  - key: "BuchGelbSchl\xFCssel"
+    prefab: {fileID: 2812992592086695004, guid: c2c444a4f2778454f8f4d31f66abe0e3, type: 3}
+  - key: BuchGelbSchneemann
+    prefab: {fileID: 8998375289048699937, guid: b822ff0a5fc35a34f8b3e180c4eba25d, type: 3}
+  - key: BuchGelbStern
+    prefab: {fileID: 5528674082356555186, guid: e7f7ac9132bbde8438daa6506d7fd806, type: 3}
+  - key: BuchGelbTannenbaum
+    prefab: {fileID: 2148513699545936829, guid: 7dfaf99dff53ed84faac05b35adb009b, type: 3}
+  - key: BuchGelbZuckerstange
+    prefab: {fileID: 4309980644517189330, guid: 52362240ecca20c408f629781cf50e9e, type: 3}
+  - key: "BuchGr\xFCnFlocke"
+    prefab: {fileID: 3558088684329809210, guid: 604cd769b7cf2a942832ad0ea685622e, type: 3}
+  - key: "BuchGr\xFCnGeschenk"
+    prefab: {fileID: 5044528764743468621, guid: cc4660940a86b264a8215360912f852e, type: 3}
+  - key: "BuchGr\xFCnGlocke"
+    prefab: {fileID: 2841754443536704239, guid: ffa7db837252eb24198122e458b12621, type: 3}
+  - key: "BuchGr\xFCnHerz"
+    prefab: {fileID: 3926994722099883696, guid: ca2161a286ad27a46a0663104638503c, type: 3}
+  - key: "BuchGr\xFCnKerze"
+    prefab: {fileID: 6504216720658132859, guid: 4848c7af019c73e40879ba657716dfe2, type: 3}
+  - key: "BuchGr\xFCnKugel"
+    prefab: {fileID: 6616612090323492223, guid: 2fc7d58dbfb2cc9408715d3a4f68697f, type: 3}
+  - key: "BuchGr\xFCnLebkuchen"
+    prefab: {fileID: 5019532727446019300, guid: 7f1337a435d01d0458d8a84c0add30ea, type: 3}
+  - key: "BuchGr\xFCnSchl\xFCssel"
+    prefab: {fileID: 2195871092706624583, guid: d627c1f0b1d8b8545b775ecacbd12de8, type: 3}
+  - key: "BuchGr\xFCnSchneemann"
+    prefab: {fileID: 5028000572971657554, guid: dd5419ea314616a49a5970d2ffa1d9d4, type: 3}
+  - key: "BuchGr\xFCnStern"
+    prefab: {fileID: 2893052946012891649, guid: 9c53101b695bb2e4894d446a27776142, type: 3}
+  - key: "BuchGr\xFCnTannenbaum"
+    prefab: {fileID: 8528880002369292732, guid: 6e0511e85e1d3094dad093bc2b0a7d40, type: 3}
+  - key: "BuchGr\xFCnZuckerstange"
+    prefab: {fileID: 3314787672091630242, guid: b11efcf8ca1f3b24dba3847931f3c71e, type: 3}
+  - key: "BuchHellGr\xFCnFlocke"
+    prefab: {fileID: 7933926926632172233, guid: ea975e4624c627a41bc646289f0ba2c6, type: 3}
+  - key: "BuchHellGr\xFCnGeschenk"
+    prefab: {fileID: 6207461873493111449, guid: a7e1887d03ab63749b7f2bc4946b281a, type: 3}
+  - key: "BuchHellGr\xFCnGlocke"
+    prefab: {fileID: 2325939223290482867, guid: b18a0988bb85a6e4f997d8a26c421ab0, type: 3}
+  - key: "BuchHellGr\xFCnHerz"
+    prefab: {fileID: 632237534219405958, guid: ce45bb390a0f5fc409c3754cbb25246a, type: 3}
+  - key: "BuchHellGr\xFCnKerze"
+    prefab: {fileID: 6593133588035441763, guid: 56528930e64e8194da7870e46d00c3a2, type: 3}
+  - key: "BuchHellGr\xFCnKugel"
+    prefab: {fileID: 4000175379564895220, guid: 6790ad4a1dfda0a42ab380786489be2d, type: 3}
+  - key: "BuchHellGr\xFCnLebkuchen"
+    prefab: {fileID: 3414413855205449984, guid: 7a5b568384736ad49875b2db718eec7f, type: 3}
+  - key: "BuchHellGr\xFCnSchl\xFCssel"
+    prefab: {fileID: 5199533127757372588, guid: 999e1e9e9da7b3c4eb199c48347e09c7, type: 3}
+  - key: "BuchHellGr\xFCnSchneemann"
+    prefab: {fileID: 7321486965396154221, guid: eea00420a58295c48b9451597ee5cda6, type: 3}
+  - key: "BuchHellGr\xFCnStern"
+    prefab: {fileID: 3788130253229220732, guid: 823a9dfd049c6764f9b222c65b423c47, type: 3}
+  - key: "BuchHellGr\xFCnTannenbaum"
+    prefab: {fileID: 2537466296127460457, guid: 9dbc193684bf563428bfcdae314c8ab0, type: 3}
+  - key: "BuchHellGr\xFCnZuckerstange"
+    prefab: {fileID: 4470569326574718162, guid: f88132ae7c39d2a4f95a9810b0a8fe0b, type: 3}
+  - key: BuchPinkFlocke
+    prefab: {fileID: 6459818641410202258, guid: c95cd28f8c2e24448880f73db444d68a, type: 3}
+  - key: BuchPinkGeschenk
+    prefab: {fileID: 121219457976243746, guid: e1463068b3efefe4eb081c68c166c4d7, type: 3}
+  - key: BuchPinkGlocke
+    prefab: {fileID: 7448059994824291107, guid: 276bc79dd05874047bfdcb99d78f2c04, type: 3}
+  - key: BuchPinkHerz
+    prefab: {fileID: 4987880239136870553, guid: b4cae1f90f9240446a24fc092796ab34, type: 3}
+  - key: BuchPinkKerze
+    prefab: {fileID: 4197862956261075336, guid: f385aa3844316b54aac27a3529488de8, type: 3}
+  - key: BuchPinkKugel
+    prefab: {fileID: 1595200059926051396, guid: dada6368cc8136b48ad4304060ff01af, type: 3}
+  - key: BuchPinkLebkuchen
+    prefab: {fileID: 3353099769943125136, guid: fd59d7646f628f3499d19681c5a1f4b8, type: 3}
+  - key: "BuchPinkSchl\xFCssel"
+    prefab: {fileID: 8848010140404441243, guid: ed411525da10ca843976354975297a98, type: 3}
+  - key: BuchPinkSchneemann
+    prefab: {fileID: 346117312440133766, guid: e868e58f22ade454cb4fae5c26b4f84b, type: 3}
+  - key: BuchPinkStern
+    prefab: {fileID: 1813907008411223939, guid: 0f107b4cfde433d43b6a75f9261284aa, type: 3}
+  - key: BuchPinkTannenbaum
+    prefab: {fileID: 7314426164502264084, guid: fed66896933b12643ac311042fcc9be7, type: 3}
+  - key: BuchPinkZuckerstange
+    prefab: {fileID: 5582880598649571260, guid: 5f6b5aa7245f4904b8ff3723373575f6, type: 3}
+  - key: BuchRotFlocke
+    prefab: {fileID: 1740260215147207439, guid: d49fabedf59892f4c9d7cc8853a0bb76, type: 3}
+  - key: BuchRotGeschenk
+    prefab: {fileID: 553275928509327240, guid: 159f8578ea5c54344b1b81e78e8f5350, type: 3}
+  - key: BuchRotGlocke
+    prefab: {fileID: 5697089774495629481, guid: d24fc76c1f8bfe5469be0e544dda9be4, type: 3}
+  - key: BuchRotHerz
+    prefab: {fileID: 8330421387152250711, guid: 121bd9d07e55c4e489967f73adf1e48c, type: 3}
+  - key: BuchRotKerze
+    prefab: {fileID: 62165394162743679, guid: 3fdc41bb872216143b3b3d9d71b0e20e, type: 3}
+  - key: BuchRotKugel
+    prefab: {fileID: 4420754362110077737, guid: 5400d45e0fcc1ab4393a39c5e161ae0a, type: 3}
+  - key: BuchRotLebkuchen
+    prefab: {fileID: 6317979955142693787, guid: 8ebb32410c5260a44b89cf60d2b32628, type: 3}
+  - key: "BuchRotSchl\xFCssel"
+    prefab: {fileID: 904784004358083781, guid: 576dab2929f29e146a257b5b7ae8f151, type: 3}
+  - key: BuchRotSchneemann
+    prefab: {fileID: 5281232668468227189, guid: 149b2ad4247d92a49a05de0787eb0e16, type: 3}
+  - key: BuchRotStern
+    prefab: {fileID: 6433459600808249015, guid: c0fcc31acd33bb849baa03c6bf3f3a45, type: 3}
+  - key: BuchRotTannenbaum
+    prefab: {fileID: 1055890022745544540, guid: 87aabb52fc5f84440a986ff5f7d16e91, type: 3}
+  - key: BuchRotZuckerstange
+    prefab: {fileID: 9030561682954269451, guid: 2e78d933536218643ba8bcd117afc250, type: 3}
+  - key: BuchSchwarzFlocke
+    prefab: {fileID: 8367884112405106611, guid: c595d2ef2bd88ab478d9c8cbfc021695, type: 3}
+  - key: BuchSchwarzGeschenk
+    prefab: {fileID: 3310278491901767022, guid: 6cbd669e7173cd54f9051778e9322293, type: 3}
+  - key: BuchSchwarzGlocke
+    prefab: {fileID: 3444095274293948011, guid: 51269166ee64c904eb843a6f0ff73cd6, type: 3}
+  - key: BuchSchwarzHerz
+    prefab: {fileID: 4120097020380840026, guid: 1cd3f6c08a99d3d4fb14a9f3029a3fc9, type: 3}
+  - key: BuchSchwarzKerze
+    prefab: {fileID: 4551302526790419861, guid: bc0f9395038915f43a00013be26a5365, type: 3}
+  - key: BuchSchwarzKugel
+    prefab: {fileID: 2574719199566206850, guid: 1bae4637096c3dc40bf9da2a9ba351ac, type: 3}
+  - key: BuchSchwarzLebkuchen
+    prefab: {fileID: 1840531664744607923, guid: 17b980cc5986fcf4d830851a6bcc5ea3, type: 3}
+  - key: "BuchSchwarzSchl\xFCssel"
+    prefab: {fileID: 5509863952223706245, guid: 2647a2ca9d67dea4487f537a3326d83f, type: 3}
+  - key: BuchSchwarzSchneemann
+    prefab: {fileID: 7398486785765769524, guid: 663e99b7238969b4284b005b826ff817, type: 3}
+  - key: BuchSchwarzStern
+    prefab: {fileID: 2900825920800867748, guid: aea54ec78d0c554469a6e3e7ce61e528, type: 3}
+  - key: BuchSchwarzTannenbaum
+    prefab: {fileID: 1625191387421792883, guid: c36481a77127f25469e733f9c7814683, type: 3}
+  - key: BuchSchwarzZuckerstange
+    prefab: {fileID: 5127326108586666200, guid: b321e5a1021f0a54a8742b21786713cd, type: 3}

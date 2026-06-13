@@ -67,6 +67,13 @@ namespace CozySanta.Runtime.Player
 
         private void ApplyLook()
         {
+            // Nur umschauen, wenn der Cursor gesperrt ist. Gibt ein Menü/Overlay den Cursor frei
+            // (z. B. ESC im Item-Inventar), pausiert der Maus-Blick, statt hinter der UI weiterzudrehen.
+            if (Cursor.lockState != CursorLockMode.Locked)
+            {
+                return;
+            }
+
             // Yaw dreht den Körper, Pitch (begrenzt) die Kamera.
             transform.Rotate(Vector3.up, _lookInput.x * lookSensitivity, Space.Self);
             _pitch = LookMath.ClampPitch(_pitch, -_lookInput.y * lookSensitivity, minPitch, maxPitch);

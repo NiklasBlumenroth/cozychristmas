@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BuchPinkFlocke
       objectReference: {fileID: 0}
+    - target: {fileID: 2347709022789875872, guid: e2b3ac70ecfc1e94baa0c78e7af9b7a8, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -68,6 +72,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e2b3ac70ecfc1e94baa0c78e7af9b7a8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5898161162006427026}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e2b3ac70ecfc1e94baa0c78e7af9b7a8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3191027111488012250}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e2b3ac70ecfc1e94baa0c78e7af9b7a8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6939407538300008130}
   m_SourcePrefab: {fileID: 100100000, guid: e2b3ac70ecfc1e94baa0c78e7af9b7a8, type: 3}
 --- !u!1 &6459818641410202258 stripped
 GameObject:
@@ -151,3 +161,31 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.29000008, y: 0.08000002, z: 0.4}
   m_Center: {x: -0.004999988, y: 0.04, z: -0.000000004013394}
+--- !u!114 &3191027111488012250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6459818641410202258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2486b93c9088404ba3be0e06c1b284b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Items.PrefabId
+  key: BuchPinkFlocke
+--- !u!114 &6939407538300008130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6459818641410202258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dc08ba70a9fa7a4f9669fa8e8e1375c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Items.SettlingBody
+  linearThreshold: 0.05
+  angularThreshold: 0.2
+  settleDuration: 0.5
