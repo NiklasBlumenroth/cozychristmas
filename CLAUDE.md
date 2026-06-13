@@ -148,6 +148,21 @@ Assets/_Project/
   Router). `FirstPersonController.ResetVerticalVelocity` additiv. EditMode-Tests TP1–TP4 grün. Doku/Diagramm
   unter `specs/009-teleport-poststelle/`. Editor-Verdrahtung (Trigger/Ziele am Prefab) manuell.
 
+- **Item-Persistenz & Ruhezustand (additiv zu F3/F7)**: Core `SettleTimer` (Decide, testbar) —
+  meldet „ruhend", sobald lineare/Winkel-Geschwindigkeit lang genug unter Schwelle liegen. Runtime
+  `SettlingBody` (Apply: friert das Item bei Ruhe ein → `isKinematic=true` + Controller aus, Collider
+  bleibt an → aufhebbar; `BeginSettling` weckt es beim Ablegen, von `PlayerCarry.Drop` aufgerufen),
+  `PrefabId` (Wiedererkennungs-Schlüssel), `ItemArea` (benannter Bereich über Collider-Bounds, z. B.
+  „Bibliothek"), `ItemCatalog` (Schlüssel→Prefab), `AreaItemData`/`AreaItemStore` (JSON pro Bereich
+  unter `StreamingAssets`, `items_<Bereich>.json`), `ItemPersistence` (Speichern/Laden je Bereich,
+  Auto-Laden beim Start → geladene Items starten ruhend, kein Settle-Spike). Dev-Menü
+  `ItemSaveDevTool` (IMGUI, „F4": Bereichsliste mit Speichern/Laden). Editor-Setup
+  „CozySanta/Items/…" stattet die 96 Buch-Prefabs mit `PrefabId`+`SettlingBody` aus, schaltet ihren
+  Schattenwurf ab und baut den Katalog; zweiter Befehl legt Szenen-Objekte + Bereiche aus AreaZones an.
+  `AreaTracker.AreaName` additiv öffentlich. EditMode-Tests ST1–ST5 grün. Persistierte Daten: JSON je
+  Bereich (Prefab-Schlüssel + Pose). Workflow: im Play-Mode spawnen/verteilen, ruhen lassen, Bereich
+  speichern → beim Start wird der Haufen kinematisch geladen.
+
 - **Halten-zum-Wiederholen (additiv zu F3/F4)**: Core `HoldRepeatTimer` (Decide, testbar) — aus
   gedrückt/los + `deltaTime` entscheidet `Tick`, ob ausgelöst wird: einmal sofort beim Druck, dann
   nach `holdInitialDelay` im Takt `holdRepeatInterval`, solange gehalten. `PlayerInputRelay` nutzt je

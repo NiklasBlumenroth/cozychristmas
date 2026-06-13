@@ -130,6 +130,13 @@ namespace CozySanta.Runtime.Carry
                 component.transform.SetPositionAndRotation(
                     origin.position + (origin.forward * dropDistance), Quaternion.identity);
                 SetCarriedPhysics(component, carried: false);
+
+                // Abgelegtes Item wieder in die Simulation wecken, damit es fällt und danach erneut
+                // einschläft (ruhend = kinematisch, aber aufhebbar). Nur relevant für Items mit Ruhe-Controller.
+                if (component.TryGetComponent<CozySanta.Runtime.Items.SettlingBody>(out var settling))
+                {
+                    settling.BeginSettling();
+                }
             }
 
             RelayoutHands();

@@ -73,6 +73,9 @@ namespace CozySanta.Runtime.Progression
         /// <summary>Für Tests und Diagnose.</summary>
         public AreaProgress Progress => _progress;
 
+        /// <summary>Anzeigename des Bereichs (z. B. für die Item-Persistenz pro Bereich).</summary>
+        public string AreaName => areaName;
+
         /// <summary>Wird vom <see cref="AreaManager"/> beim Betreten/Verlassen der zugehörigen Zone
         /// gesetzt: nur die gerade aktive Area beschreibt das (geteilte) HUD-Panel. Fortschritt
         /// (Sortieren/Schmelzen) wird unabhängig davon weiter gebucht.</summary>
