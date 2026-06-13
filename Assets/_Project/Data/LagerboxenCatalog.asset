@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54cc246f331e5f94a8c6bbaaf73bf768, type: 3}
+  m_Name: LagerboxenCatalog
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Items.ItemCatalog
+  entries:
+  - key: Crate_01_Flocke_Schwarz
+    prefab: {fileID: 1123506721884602114, guid: e03ab7c26b4ee25468bc14c77e68bed3, type: 3}
+  - key: Crate_01_Flocke_Weiss
+    prefab: {fileID: 2805434938658018605, guid: 17d6b745f0617134ea49bf95d0a2fa44, type: 3}
+  - key: Crate_01_Geschenk_Schwarz
+    prefab: {fileID: 3978039950182938368, guid: bcc16446942529049bad13fffc453676, type: 3}
+  - key: Crate_01_Geschenk_Weiss
+    prefab: {fileID: 509462238877104103, guid: f84ddd1b6d787d94aa5aa43560f96439, type: 3}
+  - key: Crate_01_Glocke_Schwarz
+    prefab: {fileID: 5668929871699080940, guid: dd0c5b0424229e142920dd837a023fef, type: 3}
+  - key: Crate_01_Glocke_Weiss
+    prefab: {fileID: 1294183392645057445, guid: 87243d8531468834283b565f943fcbb1, type: 3}
+  - key: Crate_01_Herz_Schwarz
+    prefab: {fileID: 3656753739282305891, guid: 3c069f19c49e2aa44a0ce68ce655b217, type: 3}
+  - key: Crate_01_Herz_Weiss
+    prefab: {fileID: 5863326500661184937, guid: 1d0782d894569a848984faf401e2ec80, type: 3}
+  - key: Crate_01_Kerze_Schwarz
+    prefab: {fileID: 8662880664556587040, guid: 60137a8affdffce4cbc8a1113f94152f, type: 3}
+  - key: Crate_01_Kerze_Weiss
+    prefab: {fileID: 6727380529578865011, guid: d01e3252c3400b7459fc33f6da0f03b2, type: 3}
+  - key: Crate_01_Kugel_Schwarz
+    prefab: {fileID: 6984339372181543853, guid: 09bcfd11662a28941b77a13316efaeb3, type: 3}
+  - key: Crate_01_Kugel_Weiss
+    prefab: {fileID: 1916690746625624491, guid: 49c56b03669f7fa4699b2ddcb7435136, type: 3}
+  - key: Crate_01_Lebkuchen_Schwarz
+    prefab: {fileID: 8513730854715803895, guid: a5789a88695db1449aa7a5d88de9f6ac, type: 3}
+  - key: Crate_01_Lebkuchen_Weiss
+    prefab: {fileID: 7952569455606845901, guid: c641ee3b131497441bf61c1de689f61d, type: 3}
+  - key: Crate_01_Schluessel_Schwarz
+    prefab: {fileID: 6290623233374358140, guid: 6a8915dfbdba4f54e8888f2603c2945f, type: 3}
+  - key: Crate_01_Schluessel_Weiss
+    prefab: {fileID: 2558132489277429154, guid: c6c216e6d54525a40a341bb7d0b17d43, type: 3}
+  - key: Crate_01_Schneemann_Schwarz
+    prefab: {fileID: 1534933552458946467, guid: 0d4380d1355ae41448e0526d7cb7c758, type: 3}
+  - key: Crate_01_Schneemann_Weiss
+    prefab: {fileID: 560770032827148785, guid: 3fff5ab0429c77e40acc1343e613d78b, type: 3}
+  - key: Crate_01_Stern_Schwarz
+    prefab: {fileID: 953721460447307227, guid: b779577f8210a174586dc34a0d989175, type: 3}
+  - key: Crate_01_Stern_Weiss
+    prefab: {fileID: 3639475174986446784, guid: a594cd484ec1e5440964edc39b44db89, type: 3}
+  - key: Crate_01_Tannenbaum_Schwarz
+    prefab: {fileID: 8239902212622703620, guid: cd53028f922e9c24ca3ef204d5c8a6a7, type: 3}
+  - key: Crate_01_Tannenbaum_Weiss
+    prefab: {fileID: 2980438546995597833, guid: 1094b6addb2898b498c37f7eae9bb84d, type: 3}
+  - key: Crate_01_Zuckerstange_Schwarz
+    prefab: {fileID: 8574277506506645085, guid: df65ffb36c5d21d4eaf97cb56b3a9bbf, type: 3}
+  - key: Crate_01_Zuckerstange_Weiss
+    prefab: {fileID: 8016482724785311932, guid: 1e56e7a90101a2947bd6606e3268eb71, type: 3}
+  - key: crateDark_Flocke_Schwarz
+    prefab: {fileID: 4328965172378966096, guid: 40c7d9c5f69e99e47b62de47e502d14f, type: 3}
+  - key: crateDark_Flocke_Weiss
+    prefab: {fileID: 1962285403675062980, guid: b5016b1a3bfa2394d9337eba2c8fa967, type: 3}
+  - key: crateDark_Geschenk_Schwarz
+    prefab: {fileID: 859138764252466008, guid: 9d77ea98b9521544b8afbd5742033194, type: 3}
+  - key: crateDark_Geschenk_Weiss
+    prefab: {fileID: 8216060754276648920, guid: cd3145a59e11dac408acd53e9bad8082, type: 3}
+  - key: crateDark_Glocke_Schwarz
+    prefab: {fileID: 5358481051178031020, guid: a71ab227a36d7384a858d3af5ee669d8, type: 3}
+  - key: crateDark_Glocke_Weiss
+    prefab: {fileID: 7822772535352437094, guid: 4e83e91c83c9f9247ac2e9d4da7e8a7a, type: 3}
+  - key: crateDark_Herz_Schwarz
+    prefab: {fileID: 1273634731584580081, guid: 5ad4fab78451ccb42ac0b6c2efac62b7, type: 3}
+  - key: crateDark_Herz_Weiss
+    prefab: {fileID: 2002501147844020816, guid: e8ffc31ca4d021c41bd1cf549d2bcc2c, type: 3}
+  - key: crateDark_Kerze_Schwarz
+    prefab: {fileID: 878855104313032603, guid: 6572a3f3bd6cdb34abaef020aa721ea9, type: 3}
+  - key: crateDark_Kerze_Weiss
+    prefab: {fileID: 4510484371583190543, guid: a053970ec371a7b499fa7a2db097bc9a, type: 3}
+  - key: crateDark_Kugel_Schwarz
+    prefab: {fileID: 4152679503460660865, guid: b9ffce79ca7137e49a03f6fa9a9f89d4, type: 3}
+  - key: crateDark_Kugel_Weiss
+    prefab: {fileID: 7625893883927568669, guid: cf290c53b7d141d40921eadb5eb61e56, type: 3}
+  - key: crateDark_Lebkuchen_Schwarz
+    prefab: {fileID: 4712574872598730762, guid: 70f4b32fcb574e14a91f8c9aed9dc144, type: 3}
+  - key: crateDark_Lebkuchen_Weiss
+    prefab: {fileID: 1690870988686338490, guid: 4b9786ecac3fd824c92ba114dfddd482, type: 3}
+  - key: crateDark_Schluessel_Schwarz
+    prefab: {fileID: 3820970607206394831, guid: 27177193e58c09049b4794ca2f9b4fbe, type: 3}
+  - key: crateDark_Schluessel_Weiss
+    prefab: {fileID: 3441226228313612647, guid: bd979cda719776641b2f82a56f6b5190, type: 3}
+  - key: crateDark_Schneemann_Schwarz
+    prefab: {fileID: 6831142086011003989, guid: 6865c0f9970a05d4789e99d9b25ba183, type: 3}
+  - key: crateDark_Schneemann_Weiss
+    prefab: {fileID: 6422137753802528933, guid: 2afb7ee1ad191be438a8bbbe30f8c033, type: 3}
+  - key: crateDark_Stern_Schwarz
+    prefab: {fileID: 5059104229377925898, guid: dae9e288db8d30b438ab665beedb6ed4, type: 3}
+  - key: crateDark_Stern_Weiss
+    prefab: {fileID: 4056274528194948898, guid: cdca000a6baa28b41af6e59dd95ad788, type: 3}
+  - key: crateDark_Tannenbaum_Schwarz
+    prefab: {fileID: 6634820152876606129, guid: bbbd067dbab9e3f449f9090dea3fd8ed, type: 3}
+  - key: crateDark_Tannenbaum_Weiss
+    prefab: {fileID: 4857705944079031612, guid: 825dd6dd759ebc54bb2a7b227cfdd7ab, type: 3}
+  - key: crateDark_Zuckerstange_Schwarz
+    prefab: {fileID: 8360885379482242089, guid: 57743d37091532543bc64f01c212f5be, type: 3}
+  - key: crateDark_Zuckerstange_Weiss
+    prefab: {fileID: 984121039436190570, guid: d7881a389b5311f4f8afec0bd6a9dd5b, type: 3}

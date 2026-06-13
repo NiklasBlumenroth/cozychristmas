@@ -21,13 +21,15 @@ namespace CozySanta.Runtime.Sorting
     /// Generischer 3D-Slot-Container (Apply-Schicht). Erzeugt aus <see cref="gridSize"/> ein Raster
     /// aus Spalten (x), Reihen (y) und Tiefe (z) und je Spalte einen <see cref="SlotColumn"/>-Collider
     /// als Fadenkreuz-Ziel. Einlegen füllt den HINTERSTEN freien Slot der anvisierten Spalte, Entnehmen
-    /// nimmt den VORDERSTEN belegten – so lassen sich auch Lager-Kisten hintereinander stapeln. Akzeptiert
-    /// nur passende Objekte (<see cref="acceptedFacets"/>). Zähl-/Abschlusslogik liegt in <see cref="SortTarget"/>.
+    /// nimmt den VORDERSTEN belegten – so lassen sich auch Lager-Kisten hintereinander stapeln. JEDES Item
+    /// ist einlegbar; <see cref="acceptedFacets"/> dient nur der Validierung – <see cref="SortTarget"/> zählt
+    /// korrekt/falsch und schließt erst ab, wenn genug korrekte und keine falschen Objekte enthalten sind.
     /// </summary>
     public sealed partial class SortTargetInteractable : MonoBehaviour, IInteractable
     {
         [Header("Sortierregel (editor-authored)")]
-        [Tooltip("Akzeptierte Facetten dieses Fachs – nur dazu passende Objekte können eingelegt werden.")]
+        [Tooltip("Soll-Code dieses Fachs. Jedes Item ist einlegbar; der Code dient nur der Validierung " +
+                 "(korrekt/falsch) und dem Abschluss.")]
         [SerializeField] private string[] acceptedFacets = new string[0];
         [Tooltip("Soll-Menge korrekter Objekte für den Abschluss.")]
         [SerializeField] private int requiredCount = 25;
@@ -112,9 +114,11 @@ namespace CozySanta.Runtime.Sorting
             }
 
             var key = top.TryGetComponent<ISortable>(out var sortable) ? sortable.Key : default;
-            if (!_target.Classify(key) || !TryGetFillCell(x, y, out var cx, out var cy, out var cz))
+            // Jedes Item ist einlegbar; der Code (acceptedFacets) dient nur der Validierung:
+            // SortTarget zählt korrekt/falsch und schließt nur ab, wenn genug korrekte und keine falschen drin sind.
+            if (!TryGetFillCell(x, y, out var cx, out var cy, out var cz))
             {
-                return; // nicht passend oder Fach voll
+                return; // Fach voll
             }
 
             if (!carry.TryHandOverTop(out var pickup) || pickup is not Component component)

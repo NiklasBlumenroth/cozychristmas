@@ -262,7 +262,8 @@ namespace CozySanta.Runtime.Sorting
             position = default;
             rotation = default;
             scaleMultiplier = (placedScale > 0f && !Mathf.Approximately(placedScale, 1f)) ? placedScale : 1f;
-            if (_target == null || _target.IsClosed || !_target.Classify(key) || !InRange(x, y))
+            // Ghost für jedes getragene Item zeigen (Einlegen ist nicht mehr code-gesperrt; Code = nur Validierung).
+            if (_target == null || _target.IsClosed || !InRange(x, y))
             {
                 return false;
             }

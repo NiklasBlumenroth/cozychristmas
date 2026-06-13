@@ -162,15 +162,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.x
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.y
-      value: 90
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.z
-      value: 90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: requiredCount
@@ -368,15 +368,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.x
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.y
-      value: 90
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.z
-      value: 90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: requiredCount
@@ -681,15 +681,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.x
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.y
-      value: 90
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.z
-      value: 90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: requiredCount
@@ -887,15 +887,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.x
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.y
-      value: 90
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.z
-      value: 90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: requiredCount

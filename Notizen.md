@@ -78,44 +78,38 @@ graue Prototypen.
 
 
 
+Wenn das Modell im Spiel ist: Leuchten & Nutzung im cozy Stil
 
-Assets generieren:
-Gemeinsamer Stil- + Technik-Block (vor jeden Prompt setzen)
+Das Modell ist nur die Hülle — die Magie machst du in Unity über Material, Licht und Partikel. So bleibt es cozy und liest sich klar:
 
-cozy stylized 3D Santa's workshop interior building kit piece, whimsical handcrafted
-low-poly game art, soft warm festive palette, realistic sensible materials only
-(timber, plaster, stone, iron). Single isolated modular asset, centered, fully visible,
-flat-on orthographic, seamless tileable edges, clean straight square borders.
-Pure white background, flat even studio lighting, no cast shadows, no people, no text.
+1. Der Funke = Emission, kein Modell-Detail
 
-Die Kit-Teile (für ALLE Gebäude gleich)
+- Gib der Kristallkugel ein eigenes Material mit Emission (warmes Gold, z. B. #FFB347 → #FFD27F).
+- Lege die Emission auf eine Animation/Kurve, die sanft pulsiert („atmet") — Geschwindigkeit ~0.5–1 Hz. Das wirkt lebendig, nicht technisch.
+- In URP: Bloom im Post-Processing anschalten → der Funke glüht weich über seine Kanten hinaus. Das ist der wichtigste Cozy-Trick.
 
-1. Boden – Holzdiele
-   [Stil-Block] A square wooden plank floor tile, warm aged timber boards, subtle grain,
-   slightly worn cozy look, tileable on all four edges, top-down flat view.
+2. Echtes Licht für die Welt
 
-2. Wand – schlicht
-   [Stil-Block] A straight interior wall panel segment, lower timber wainscot, upper
-   warm plaster, simple wood corner studs, flat front view, tileable left/right edges.
+- Eine Point Light im Kuppel-Inneren, warm getönt, weiche Reichweite → wirft sanftes Licht auf Hände/Objekte in der Nähe.
+- Optional eine Spot Light nach vorne als der eigentliche Schmelz-Kegel (deckt sich mit LampCone). Intensität/Winkel kannst du direkt an die Skill-Werte koppeln.
 
-3. Wand – mit Fenster
-   [Stil-Block] A straight interior wall segment with one cozy square window, wooden frame
-   and muntins, warm glowing glass, timber wainscot below, plaster above, flat front view,
-   tileable left/right edges.
+3. Mechaniken sichtbar koppeln (an deinen bestehenden Code)
 
-4. Wand – mit Türöffnung
-   [Stil-Block] A straight interior wall segment with a wooden doorway opening (arched top),
-   timber frame, wainscot and plaster, flat front view, tileable left/right edges.
+- Akku (LampBattery): Emission-Farbe + Lichtintensität per Skript am Ladestand interpolieren. Voll → warmes Gold & hell; leer → kühles Blau & matt. Das Glasröhrchen-Material gleich mitfärben.
+- Schmelzen aktiv (MeltController, Taste F): beim Halten Funke heller + Spot-Intensität hoch, beim Loslassen sanft zurück (Lerp über ~0.2 s, nie hart umschalten — Härte killt „cozy").
+- Aufladen (Ladestation): Emission langsam von blau zurück nach gold faden lassen → fühlbares „Auftanken".
 
-5. Decke – mit Balken
-   [Stil-Block] A square ceiling tile with exposed dark timber rafter beams and warm plaster
-   between, rustic workshop look, bottom-up flat view, tileable on all four edges.
+4. Partikel & Feedback (sparsam!)
 
-6. Eck-/Stützpfeiler
-   [Stil-Block] A vertical corner support post, sturdy dark timber beam with simple iron
-   brackets, standalone, front view, matching the wall height.
+- Am Funke: ganz feine, langsam aufsteigende Glitzer-/Glut-Partikel — wenige, klein, warm. Passt zum Glitzer eurer SnowMelt-Optik.
+- Am Schmelzpunkt: kleiner warmer Lichtfleck + aufsteigender Dampf dort, wo der Schnee verschwindet.
 
-7. Sockelleiste / Zierleiste (optional)
-   [Stil-Block] A simple wooden skirting board / baseboard trim strip, warm timber,
-   straight long piece, front view, tileable along its length.
+Cozy-Grundregeln, die alles zusammenhalten
+
+- Warm > kalt, weich > scharf: runde Lichtabfälle, sanfte Übergänge, nichts blinkt hart.
+- Bewegung lebt: das leichte Pulsieren des Funkens ist der Unterschied zwischen „Requisite" und „lebendiger magischer Lampe".
+- Bloom ist dein Freund, aber dezent — sonst wird's kitschig statt cozy.
+
+Praktisch: Im Material-Setup brauchst du also 2 Materialien (Metall/Glas-Hülle + emittierende Kugel), 1–2 Lichter und 2 kleine Partikelsysteme. Den Rest steuert ein kleines Skript, das an LampBattery/MeltController hängt und  
+Emission + Lichtintensität interpoliert.
 

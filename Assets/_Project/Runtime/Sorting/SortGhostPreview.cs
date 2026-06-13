@@ -97,6 +97,13 @@ namespace CozySanta.Runtime.Sorting
         // damit der Ghost nicht aufnehmbar/sortierbar ist und die Interaktions-Probe ihn ignoriert.
         private static void StripToVisual(GameObject go)
         {
+            // Skripte ZUERST entfernen: ein RequireComponent (z. B. SettlingBody → Rigidbody) verhindert
+            // sonst das anschließende Entfernen des Rigidbodys ("Can't remove Rigidbody because … depends on it").
+            foreach (var behaviour in go.GetComponentsInChildren<MonoBehaviour>(includeInactive: true))
+            {
+                Object.Destroy(behaviour);
+            }
+
             foreach (var collider in go.GetComponentsInChildren<Collider>(includeInactive: true))
             {
                 Object.Destroy(collider);
@@ -105,11 +112,6 @@ namespace CozySanta.Runtime.Sorting
             foreach (var body in go.GetComponentsInChildren<Rigidbody>(includeInactive: true))
             {
                 Object.Destroy(body);
-            }
-
-            foreach (var behaviour in go.GetComponentsInChildren<MonoBehaviour>(includeInactive: true))
-            {
-                Object.Destroy(behaviour);
             }
         }
 
