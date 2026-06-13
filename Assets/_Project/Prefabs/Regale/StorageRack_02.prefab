@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: StorageRack_02
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: af16b100b00f5ac4c84407d089218e09, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -168,6 +172,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
+      propertyPath: placedScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: cellSpacing.x
       value: 0.6
       objectReference: {fileID: 0}
@@ -260,6 +268,10 @@ PrefabInstance:
     - target: {fileID: 5727689110177851214, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
+      propertyPath: placedScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: cellSpacing.x
@@ -356,6 +368,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
+      propertyPath: placedScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: cellSpacing.x
       value: 0.6
       objectReference: {fileID: 0}
@@ -448,6 +464,10 @@ PrefabInstance:
     - target: {fileID: 5727689110177851214, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
+      propertyPath: placedScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: cellSpacing.x
