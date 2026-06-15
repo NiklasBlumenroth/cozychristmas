@@ -31,6 +31,10 @@ namespace CozySanta.Runtime.Snow
         /// <summary>Akku-Ladestand 0..1 (Andockpunkt für eine spätere HUD-Anzeige, F7).</summary>
         public float BatteryFraction => _battery != null ? _battery.Fraction : 0f;
 
+        /// <summary>True, solange aktiv geschmolzen wird (F gedrückt UND Akku nicht leer).
+        /// Andockpunkt für die Lampen-Optik (<c>LampVisuals</c>).</summary>
+        public bool IsMelting { get; private set; }
+
         [Tooltip("Empfohlen: Wurzel-Transform der Schnee-Region, die dieser Task zählt. Es werden nur " +
                  "die SnowPatches UNTER dieser Wurzel aggregiert. Leer = ganze Szene (sehr großer Nenner!).")]
         [SerializeField] private Transform coverageRoot;
@@ -108,7 +112,8 @@ namespace CozySanta.Runtime.Snow
             var hasHit = TryAimAtSnow(origin, out var world, out var aimed);
 
             // Akku läuft immer wenn F gedrückt, unabhängig ob Schnee getroffen wird
-            if (melting && _battery.CanMelt)
+            IsMelting = melting && _battery.CanMelt;
+            if (IsMelting)
             {
                 _battery.Drain(drainPerSecond * dt);
                 if (hasHit)

@@ -182,6 +182,17 @@ Assets/_Project/
   `FirstPersonController` um `jumpHeight` + `RequestJump()` erweitert, `PlayerInputRelay` liest die Leertaste.
   EditMode-Tests J1–J5 grün.
 
+- **Lampen-Optik (additiv zu F5)**: Core `LampVisualMath` (Decide, testbar) — reine Mathe für die Optik:
+  `Pulse` (Atmen 0..1), `Warmth` (Warm↔Kalt-Smoothstep aus Akku), `TargetLevel` (akku-skalierter Ziel-Pegel
+  idle/aktiv), `SmoothTowards` (frame-rate-unabhängige Glättung). Runtime `LampVisuals` (Apply): liest
+  `MeltController.BatteryFraction` + neues `MeltController.IsMelting` und setzt live Emission des Funke-Renderers
+  (MaterialPropertyBlock `_EmissionColor`), Kern-/Kegel-Lichtstärke und Funkel-Partikelrate — voll = warmes Gold
+  & hell, leer = kühles Blau & matt, beim Schmelzen heller + mehr Funken, sanftes Pulsieren. Editor-Setup
+  „CozySanta/Setup Lampe (Material, Lichter, Partikel)" erzeugt Materialien (`M_LampGehaeuse`, `M_LampFunke` mit
+  HDR-Emission), baut ein Rig unter der Kamera (Platzhalter-Funke + Point/Spot-Light + Partikel) und verdrahtet
+  `LampVisuals` mit dem `MeltController`. KI-Mesh wird später unter „Lampe" gehängt, Funke-Renderer auf das echte
+  Kugel-Mesh umgesetzt. Bloom = manueller URP-2-Klick-Schritt (HDR-Emission liegt > 1). EditMode-Tests LV1–LV5 grün.
+
 ## Status / MVP-Fokus
 
 Erster Sektor (Eingangsbereich + Poststelle, optional Dekorationsfabrik) als
