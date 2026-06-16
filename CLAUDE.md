@@ -147,6 +147,10 @@ Assets/_Project/
   Ziel-Blickrichtung) + auto-angehängter `TeleportTriggerForwarder` (leitet `OnTriggerEnter/Exit` an den
   Router). `FirstPersonController.ResetVerticalVelocity` additiv. EditMode-Tests TP1–TP4 grün. Doku/Diagramm
   unter `specs/009-teleport-poststelle/`. Editor-Verdrahtung (Trigger/Ziele am Prefab) manuell.
+  Trage-Sperre (additiv): `TeleportRouter` hält eine `PlayerCarry`-Referenz (Auto-Suche beim Start);
+  solange der Spieler etwas trägt (`CarriedCount > 0`), wird in `HandleEnter` NICHT teleportiert –
+  Gebäude lassen sich weder verlassen noch betreten, während man Objekte hält (Arbiter bleibt
+  unberührt → nach dem Ablegen löst erneutes Betreten den Teleport regulär aus).
 
 - **Item-Persistenz & Ruhezustand (additiv zu F3/F7)**: Core `SettleTimer` (Decide, testbar) —
   meldet „ruhend", sobald lineare/Winkel-Geschwindigkeit lang genug unter Schwelle liegen. Runtime
@@ -170,6 +174,12 @@ Assets/_Project/
   in diesem Bereich). Overlay `AreaInventoryHud` („F6"): Gesamtzahl + alle Varianten x/Max + Buttons
   „Speichern" (= Start-Standard des Gebäudes) und „Reset" (alle Items des Bereichs entfernen). Editor-Setup
   weist Bibliotheks-Bereichen den Bücher-Katalog (Max 20) zu und verdrahtet Spawner/HUD.
+  Gebäude-Parenting (additiv, Leistung): `ItemArea` trägt optional einen `ItemParent` (Gebäude-Root,
+  den der `AreaActivator` beim Verlassen per `SetActive(false)` deaktiviert). `ItemPersistence.LoadArea`
+  und `AreaSpawner.TrySpawn` hängen geladene/gespawnte Items unter `area.ItemParent` (Fallback: globaler
+  `spawnParent`) → die Items eines Gebäudes werden mit dem Gebäude mit-deaktiviert (kein Rendern/Culling/
+  Broadphase außerhalb). Speichern/Reset/Spawn nur im aktiven (betretenen) Gebäude nutzen, da
+  `FindObjectsByType<PrefabId>` inaktive Objekte ausschließt.
 
 - **Halten-zum-Wiederholen (additiv zu F3/F4)**: Core `HoldRepeatTimer` (Decide, testbar) — aus
   gedrückt/los + `deltaTime` entscheidet `Tick`, ob ausgelöst wird: einmal sofort beim Druck, dann

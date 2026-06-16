@@ -12,7 +12,8 @@ namespace CozySanta.Runtime.Items
     public sealed class ItemPersistence : MonoBehaviour
     {
         [SerializeField] private ItemCatalog catalog;
-        [Tooltip("Optionaler Eltern-Transform für geladene Items (Ordnung in der Hierarchie).")]
+        [Tooltip("Globaler Fallback-Eltern-Transform für geladene Items. Hat der Bereich einen eigenen " +
+                 "ItemParent (Gebäude-Root), wird dieser bevorzugt – so deaktivieren sich die Items mit dem Gebäude.")]
         [SerializeField] private Transform spawnParent;
         [Tooltip("Beim Szenenstart alle Bereiche automatisch laden.")]
         [SerializeField] private bool loadOnStart = true;
@@ -57,6 +58,10 @@ namespace CozySanta.Runtime.Items
 
             ClearArea(area);
 
+            // Bevorzugt der Bereichs-Parent (Gebäude-Root, vom AreaActivator geschaltet) -> Items werden
+            // mit dem Gebäude mit-deaktiviert; sonst globaler Fallback.
+            var parent = area.ItemParent != null ? area.ItemParent : spawnParent;
+
             var spawned = 0;
             foreach (var p in data.items)
             {
@@ -67,7 +72,7 @@ namespace CozySanta.Runtime.Items
                     continue;
                 }
 
-                var go = Instantiate(prefab, p.position, p.rotation, spawnParent);
+                var go = Instantiate(prefab, p.position, p.rotation, parent);
                 // Geladene Items starten sofort ruhend (kinematisch) -> kein Settle-Spike.
                 if (go.TryGetComponent<SettlingBody>(out var settling)) settling.EnterRest();
                 spawned++;

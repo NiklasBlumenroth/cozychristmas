@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CozySanta.Core.Teleport;
 using CozySanta.Runtime.Areas;
+using CozySanta.Runtime.Carry;
 using CozySanta.Runtime.Player;
 using UnityEngine;
 
@@ -36,11 +37,17 @@ namespace CozySanta.Runtime.Teleport
         [SerializeField] private List<Pair> pairs = new List<Pair>();
         [Tooltip("Optional: schaltet beim Teleport den Ziel-Bereich aktiv (siehe 'Activate Area' je Paar).")]
         [SerializeField] private AreaActivator areaActivator;
+        [Tooltip("Tragesystem des Spielers. Solange etwas in der Hand ist, wird NICHT teleportiert – " +
+                 "man kann ein Gebäude weder verlassen noch betreten, während man Objekte trägt. " +
+                 "Leer = wird beim Start automatisch gesucht.")]
+        [SerializeField] private PlayerCarry playerCarry;
 
         private readonly TeleportArbiter _arbiter = new TeleportArbiter();
 
         private void Awake()
         {
+            if (playerCarry == null) playerCarry = FindAnyObjectByType<PlayerCarry>();
+
             for (var i = 0; i < pairs.Count; i++)
             {
                 var pair = pairs[i];
@@ -66,6 +73,9 @@ namespace CozySanta.Runtime.Teleport
         {
             var player = other.GetComponentInParent<FirstPersonController>();
             if (player == null) return;
+            // Mit vollen Händen kein Teleport: Objekte sollen im Gebäude bleiben. Der Arbiter wird bewusst
+            // NICHT belegt – nach dem Ablegen löst erneutes Betreten des Triggers den Teleport regulär aus.
+            if (IsCarrying()) return;
             if (!_arbiter.ShouldTeleport(index)) return;
 
             Teleport(player, pairs[index]);
@@ -77,6 +87,9 @@ namespace CozySanta.Runtime.Teleport
             if (other.GetComponentInParent<FirstPersonController>() == null) return;
             _arbiter.NotifyExit(index);
         }
+
+        /// <summary>True, wenn der Spieler aktuell etwas in den Händen trägt (links oder rechts).</summary>
+        private bool IsCarrying() => playerCarry != null && playerCarry.CarriedCount > 0;
 
         private void Teleport(FirstPersonController player, Pair pair)
         {

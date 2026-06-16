@@ -20,7 +20,8 @@ namespace CozySanta.Runtime.Items
         [SerializeField] private Transform player;
         [Tooltip("Ursprung für den Spawn (z. B. die Kamera). Fallback: dieses Transform.")]
         [SerializeField] private Transform spawnOrigin;
-        [Tooltip("Optionaler Eltern-Transform für gespawnte Items.")]
+        [Tooltip("Globaler Fallback-Eltern-Transform für gespawnte Items. Hat der Bereich einen eigenen " +
+                 "ItemParent (Gebäude-Root), wird dieser bevorzugt – so deaktivieren sich Items mit dem Gebäude.")]
         [SerializeField] private Transform spawnParent;
         [SerializeField] private float distance = 1.2f;
         [SerializeField] private float heightOffset = 0.3f;
@@ -97,7 +98,9 @@ namespace CozySanta.Runtime.Items
             var scatter = Random.insideUnitCircle * scatterRadius;
             var position = origin.position + (origin.forward * distance) + (Vector3.up * heightOffset)
                            + new Vector3(scatter.x, 0f, scatter.y);
-            Instantiate(prefab, position, Random.rotationUniform, spawnParent);
+            // Bevorzugt der Bereichs-Parent (Gebäude-Root) -> gespawnte Items deaktivieren sich mit dem Gebäude.
+            var parent = area.ItemParent != null ? area.ItemParent : spawnParent;
+            Instantiate(prefab, position, Random.rotationUniform, parent);
             return true;
         }
 

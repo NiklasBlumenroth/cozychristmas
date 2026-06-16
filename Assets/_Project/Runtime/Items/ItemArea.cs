@@ -20,6 +20,11 @@ namespace CozySanta.Runtime.Items
         [Tooltip("Höchstzahl je Variante in diesem Bereich (z. B. 20 pro Buch).")]
         [SerializeField] private int maxPerVariant = 20;
 
+        [Tooltip("Optionaler Eltern-Transform für die Items dieses Bereichs – i. d. R. der Gebäude-Root, " +
+                 "den der AreaActivator beim Verlassen deaktiviert. So werden geladene/gespawnte Items " +
+                 "mit dem Gebäude mit-deaktiviert. Leer = globaler Fallback-Parent des Spawners.")]
+        [SerializeField] private Transform itemParent;
+
         private Collider[] _colliders;
 
         public string AreaName => areaName;
@@ -29,6 +34,9 @@ namespace CozySanta.Runtime.Items
 
         /// <summary>Höchstzahl je Variante in diesem Bereich.</summary>
         public int MaxPerVariant => maxPerVariant;
+
+        /// <summary>Eltern-Transform für die Items dieses Bereichs (i. d. R. der Gebäude-Root). Kann null sein.</summary>
+        public Transform ItemParent => itemParent;
 
         /// <summary>Konfiguriert Katalog + Höchstzahl (für Editor-/Setup-Code).</summary>
         public void Configure(ItemCatalog itemCatalog, int max)
