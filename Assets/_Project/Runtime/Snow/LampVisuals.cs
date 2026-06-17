@@ -13,6 +13,12 @@ namespace CozySanta.Runtime.Snow
     {
         [SerializeField] private MeltController lamp;
 
+        [Header("Helligkeit (Master-Regler)")]
+        [Tooltip("Gemeinsamer Multiplikator für Emission UND Lichtstärke – passiv wie aktiv. " +
+                 "Hochziehen macht die Lampe insgesamt heller (live im Play-Mode änderbar). 1 = Grundwert.")]
+        [Range(0.1f, 8f)]
+        [SerializeField] private float brightness = 1f;
+
         [Header("Funke (Emission)")]
         [SerializeField] private Renderer orbRenderer;
         [SerializeField] private Color warmColor = new Color(1f, 0.70f, 0.30f);
@@ -70,7 +76,7 @@ namespace CozySanta.Runtime.Snow
                 LampVisualMath.Pulse(UnityEngine.Time.time, pulseFrequency));
 
             var glowTarget = Mathf.Max(coldFloor,
-                LampVisualMath.TargetLevel(frac, melting, idleEmission, activeEmission));
+                LampVisualMath.TargetLevel(frac, melting, idleEmission, activeEmission)) * brightness;
             _glow = LampVisualMath.SmoothTowards(_glow, glowTarget, smoothSpeed, dt);
 
             if (orbRenderer != null)
@@ -81,7 +87,7 @@ namespace CozySanta.Runtime.Snow
             }
 
             var lightTarget = Mathf.Max(coldFloor * 0.5f,
-                LampVisualMath.TargetLevel(frac, melting, idleLightIntensity, activeLightIntensity));
+                LampVisualMath.TargetLevel(frac, melting, idleLightIntensity, activeLightIntensity)) * brightness;
             _light = LampVisualMath.SmoothTowards(_light, lightTarget, smoothSpeed, dt);
 
             if (coreLight != null)
