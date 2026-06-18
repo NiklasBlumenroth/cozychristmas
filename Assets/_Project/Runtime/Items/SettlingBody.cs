@@ -1,4 +1,5 @@
 using CozySanta.Core.Items;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace CozySanta.Runtime.Items
@@ -26,6 +27,8 @@ namespace CozySanta.Runtime.Items
                  "in der Authoring-Phase (geladene Bücher starten ohnehin eingefroren) – ruhig großzügig.")]
         [SerializeField] private float settleDuration = 3f;
 
+        private static readonly ProfilerMarker s_fixedUpdate = new ProfilerMarker("SettlingBody.FixedUpdate");
+
         private Rigidbody _body;
         private SettleTimer _timer;
 
@@ -35,15 +38,18 @@ namespace CozySanta.Runtime.Items
 
         private void FixedUpdate()
         {
-            var body = Body;
-            // Kinematisch = getragen oder bereits ruhend -> nichts zu tun.
-            if (body.isKinematic) return;
-
-            var lin = body.linearVelocity.magnitude;
-            var ang = body.angularVelocity.magnitude;
-            if (_timer.Tick(lin, ang, UnityEngine.Time.fixedDeltaTime, linearThreshold, angularThreshold, settleDuration))
+            using (s_fixedUpdate.Auto())
             {
-                EnterRest();
+                var body = Body;
+                // Kinematisch = getragen oder bereits ruhend -> nichts zu tun.
+                if (body.isKinematic) return;
+
+                var lin = body.linearVelocity.magnitude;
+                var ang = body.angularVelocity.magnitude;
+                if (_timer.Tick(lin, ang, UnityEngine.Time.fixedDeltaTime, linearThreshold, angularThreshold, settleDuration))
+                {
+                    EnterRest();
+                }
             }
         }
 
