@@ -49,5 +49,36 @@ namespace CozySanta.Tests.EditMode
             Assert.IsTrue(SpawnQuota.TryPick(Keys, counts, 20, 0.0, out var key));
             Assert.AreEqual("B", key); // A ist voll -> erste spawnbare ist B
         }
+
+        // SQ5: Variantenspezifische Höchstzahl – „A" hat ein höheres Limit und bleibt spawnbar,
+        // obwohl es über dem Default liegt; „B"/„C" sind beim Default voll.
+        [Test]
+        public void PerKeyMax_OverridesDefault()
+        {
+            var counts = new Dictionary<string, int> { { "A", 30 }, { "B", 20 }, { "C", 20 } };
+            var maxByKey = new Dictionary<string, int> { { "A", 75 } }; // A: 75, Rest: Default 20
+            Assert.IsFalse(SpawnQuota.IsFull(Keys, counts, maxByKey, 20));
+            Assert.IsTrue(SpawnQuota.TryPick(Keys, counts, maxByKey, 20, 0.0, out var key));
+            Assert.AreEqual("A", key); // nur A ist noch unter seinem (höheren) Limit
+        }
+
+        // SQ6: Mit Overrides alle voll -> IsFull true, kein Pick (A bei 75, B/C bei Default 20).
+        [Test]
+        public void PerKeyMax_AllFull()
+        {
+            var counts = new Dictionary<string, int> { { "A", 75 }, { "B", 20 }, { "C", 20 } };
+            var maxByKey = new Dictionary<string, int> { { "A", 75 } };
+            Assert.IsTrue(SpawnQuota.IsFull(Keys, counts, maxByKey, 20));
+            Assert.IsFalse(SpawnQuota.TryPick(Keys, counts, maxByKey, 20, 0.5, out _));
+        }
+
+        // SQ7: Override 0 (oder fehlend) fällt auf den Default zurück.
+        [Test]
+        public void PerKeyMax_ZeroFallsBackToDefault()
+        {
+            var counts = new Dictionary<string, int> { { "A", 20 } };
+            var maxByKey = new Dictionary<string, int> { { "A", 0 } }; // 0 = kein Override -> Default 20
+            Assert.IsTrue(SpawnQuota.IsFull(new List<string> { "A" }, counts, maxByKey, 20));
+        }
     }
 }

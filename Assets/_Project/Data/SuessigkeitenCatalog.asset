@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54cc246f331e5f94a8c6bbaaf73bf768, type: 3}
+  m_Name: SuessigkeitenCatalog
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Items.ItemCatalog
+  entries:
+  - key: coockie_braun_blau
+    prefab: {fileID: 3621131820101576130, guid: 81b7f51a22fde5f4a917b30420a8b63d, type: 3}
+    maxPerVariant: 75
+  - key: "coockie_braun_gr\xFCn"
+    prefab: {fileID: 5073321987578059770, guid: a8c09d697aa65f246990db25249e69ad, type: 3}
+    maxPerVariant: 75
+  - key: coockie_braun_pink
+    prefab: {fileID: 5352499779736856401, guid: c1f49c1fff24c0b499493f43a6a5d609, type: 3}
+    maxPerVariant: 75
+  - key: "coockie_braun_wei\xDF"
+    prefab: {fileID: 803460500969350633, guid: ab8f1f73b5579d24790f52551e1c027a, type: 3}
+    maxPerVariant: 75
+  - key: gingerbread_bunt
+    prefab: {fileID: 1346874637626581675, guid: 8338a92cca21cd8479a9f825ff7451a2, type: 3}
+    maxPerVariant: 42
+  - key: gingerbred_black
+    prefab: {fileID: 7264455714672348558, guid: 3f169d8df08bac044b5a8c2aba372595, type: 3}
+    maxPerVariant: 42
+  - key: gingerbred_blue
+    prefab: {fileID: 2060371763095123805, guid: dc684fff55afd96469972fa66e052325, type: 3}
+    maxPerVariant: 42
+  - key: gingerbred_green
+    prefab: {fileID: 2594495096535618304, guid: 345f1b20f1c5e86448049e99f3010d4e, type: 3}
+    maxPerVariant: 42
+  - key: gingerbred_grey
+    prefab: {fileID: 3258798029410446859, guid: 497c6d25195deb8408e9f849a64a6634, type: 3}
+    maxPerVariant: 42
+  - key: gingerbred_orange
+    prefab: {fileID: 6588120026036738264, guid: d53f310fc0eaf7c42a3b8587c36591c1, type: 3}
+    maxPerVariant: 42
+  - key: gingerbred_pink
+    prefab: {fileID: 94094750745835422, guid: 2ceaf0680a051dd4cb626c852469d2d9, type: 3}
+    maxPerVariant: 42
+  - key: gingerbred_red
+    prefab: {fileID: 609684422040505552, guid: f4bd52c67e50dab46aef5978d24035a9, type: 3}
+    maxPerVariant: 42
+  - key: zuckerstange_blau
+    prefab: {fileID: 1071107026144266509, guid: ef488a1deb5caba47960ac4f840729cb, type: 3}
+    maxPerVariant: 42
+  - key: zuckerstange_grey
+    prefab: {fileID: 5695870096313392026, guid: 6855ff9e8da59714799b313411f17869, type: 3}
+    maxPerVariant: 42
+  - key: "zuckerstange_gr\xFCn"
+    prefab: {fileID: 2107074377737742277, guid: 3bb17122bb5db684e8f1511d1bfcff3b, type: 3}
+    maxPerVariant: 42
+  - key: zuckerstange_orange
+    prefab: {fileID: 5938509141982374022, guid: 97d39b62b501e394994eef45e351aaaf, type: 3}
+    maxPerVariant: 42
+  - key: zuckerstange_pink
+    prefab: {fileID: 4220710715444253247, guid: afb0c2fd41429f24ca6a7145a200a96e, type: 3}
+    maxPerVariant: 42
+  - key: "zuckerstange_pink_gr\xFCn"
+    prefab: {fileID: 9220828425743429532, guid: d8922cd6b80f5c6428f73915fd6d6758, type: 3}
+    maxPerVariant: 42
+  - key: zuckerstange_rot
+    prefab: {fileID: 7730716258475585394, guid: 06bd9a5d58627384abe2d27e674328d1, type: 3}
+    maxPerVariant: 42
+  - key: zuckerstange_schwarz
+    prefab: {fileID: 5760890562715046347, guid: a29f7c30e448edf4fbbccaa4713097de, type: 3}
+    maxPerVariant: 42

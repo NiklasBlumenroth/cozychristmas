@@ -122,8 +122,7 @@ namespace CozySanta.Runtime.Interaction
             if (_focused is SlotColumn column && column.Owner != null
                 && carry != null && carry.CarriedCount > 0 && carry.TryPeekTopComponent(out var top))
             {
-                var key = top.TryGetComponent<ISortable>(out var sortable) ? sortable.Key : default;
-                if (column.Owner.TryGetGhostCellPose(column.X, column.Y, key, out var pos, out var rot, out var scaleMul))
+                if (column.Owner.TryGetGhostCellPose(column.X, column.Y, top, out var pos, out var rot, out var scaleMul))
                 {
                     _ghostPreview.Show(top, column.Owner.transform, pos, rot, scaleMul);
                     return;

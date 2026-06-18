@@ -203,6 +203,39 @@ Assets/_Project/
   `LampVisuals` mit dem `MeltController`. KI-Mesh wird später unter „Lampe" gehängt, Funke-Renderer auf das echte
   Kugel-Mesh umgesetzt. Bloom = manueller URP-2-Klick-Schritt (HDR-Emission liegt > 1). EditMode-Tests LV1–LV5 grün.
 
+- **Bäckerei-Sortierobjekte (additiv zu F3/F4 + Item-Persistenz)**: Die 20 Süßigkeiten-Prefabs unter
+  `Prefabs/Süßigkeiten` (8 Zuckerstangen, 8 Lebkuchen, 4 Kekse) werden zu Sortierobjekten gemacht.
+  Editor-Setup `CozySanta/Bäckerei/Süßigkeiten als Sortierobjekte einrichten (Prefabs + Katalog)`
+  (`BakerySweetItemSetup`) gibt jedem Prefab `Rigidbody` (Masse 1), `PickupInteractable`, `Sortable`
+  mit SortKey `[Art, Farbe]` (z. B. `[Zuckerstange, Rot]`; zweifarbig `pink_grün` → ein Farbwert
+  `Pink_Grün`), einen lokal-raumkorrekt gefitteten `BoxCollider`, `PrefabId` + `SettlingBody`, schaltet
+  den Schattenwurf ab und baut den `SuessigkeitenCatalog.asset` (für die Bäckerei-`ItemArea`/Spawn).
+  Zweiter Befehl `CozySanta/Bäckerei/Fächer & Crates belegen (Szene)` (`BakerySortAssignmentSetup`)
+  liest die SortKeys aus den Prefabs und schreibt sie in die `SortTargetInteractable`-Fächer unter
+  `BäckereiInnen`: die ersten 4 Warenregale → Zuckerstangen, die anderen 4 → Lebkuchen (8 Farben auf
+  je 16 Fächer = jede Farbe doppelt), Crates → je eine Keks-Variante (1:1). Soll-Mengen/Raster bleiben
+  unangetastet (bereits eingestellt: Regal 7×3=21, Crate 5×5×3=75). Editor-Authoring-Tools (keine neue
+  Core-Fachlogik → dokumentierte Nicht-Unit-Ausnahme analog `BookPrefabSetup`).
+  Variantenspezifische Spawn-Höchstzahlen (additiv): `ItemCatalog.Entry` trägt optional `maxPerVariant`
+  (0 = Bereichs-Default der `ItemArea`); `ItemCatalog.MaxByKey()` baut die Übersteuerungs-Map. Core
+  `SpawnQuota.TryPick`/`IsFull` haben Overloads mit `maxByKey` + `defaultMax` (alte Signaturen delegieren,
+  bleiben grün). `AreaSpawner` + `AreaInventoryHud` nutzen die Map. `BakerySweetItemSetup` setzt im Katalog
+  Kekse = 75, Zuckerstangen/Lebkuchen = 42 (2×21) je Variante. EditMode-Tests SQ5–SQ7 ergänzt.
+  Einlage-Dreh-Offset pro Item (additiv): Runtime `SortPlacementRotation` (Euler-Offset) am Item; das Fach
+  wendet ihn in `CellRotation(itemOffset)` GLEICH auf Ghost (`TryGetGhostCellPose`) und tatsächliche Einlage
+  (`PlaceVisual`) an – so liegt ein „schief" orientiertes Mesh (Zuckerstangen, Kekse) in JEDEM Fach korrekt,
+  ohne die Fächer item-spezifisch zu machen (jedes Item bleibt in jedes Fach legbar). `BakerySweetItemSetup`
+  hängt die Komponente an alle Süßigkeiten (Euler je Art: `ZuckerstangePlacedEuler`/`KeksPlacedEuler`,
+  Lebkuchen 0). Edit-Mode-Gizmo (grau = Grund, grün = mit Offset) + Dev-Tool `SortPlacementRotationDevTool`
+  (Tasten I/K J/L U/O drehen den Offset des GETRAGENEN Items live im Fach-Ghost, P = loggen) zum Ermitteln
+  der Winkel; gefundene Werte in die `…PlacedEuler`-Konstanten eintragen und den Einricht-Befehl erneut ausführen.
+  Einlege-Sperre nach Art (additiv, opt-in): Core `SortPlacementRule.IsPlaceable(SortKey, allowedArts)` (leer =
+  jedes Item einlegbar → Standardverhalten überall sonst unberührt). `SortTargetInteractable` hat ein Feld
+  `placeableArts`; `PlaceInColumn` und `TryGetGhostCellPose` sperren das Einlegen UND den Ghost, wenn die Art
+  (erste Facette) nicht gelistet ist (acceptedFacets/korrekt-falsch bleibt unberührt). `BakerySortAssignmentSetup`
+  setzt es (Variante A): Crates = `["Keks"]`, Warenregale = `["Zuckerstange","Lebkuchen"]` → Kekse nur in Crates,
+  Zuckerstangen/Lebkuchen nur in den Regalen (untereinander im Regal weiter vertauschbar). EditMode-Tests SP1–SP4.
+
 ## Status / MVP-Fokus
 
 Erster Sektor (Eingangsbereich + Poststelle, optional Dekorationsfabrik) als

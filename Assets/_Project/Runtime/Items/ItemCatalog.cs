@@ -16,6 +16,9 @@ namespace CozySanta.Runtime.Items
         {
             public string key;
             public GameObject prefab;
+
+            [Tooltip("Variantenspezifische Höchstzahl beim Spawnen (0 = die maxPerVariant der ItemArea nutzen).")]
+            public int maxPerVariant;
         }
 
         [SerializeField] private List<Entry> entries = new List<Entry>();
@@ -41,6 +44,23 @@ namespace CozySanta.Runtime.Items
 
                 return keys;
             }
+        }
+
+        /// <summary>Variantenspezifische Höchstzahlen (nur Einträge mit positivem <c>maxPerVariant</c>);
+        /// Schlüssel ohne Eintrag nutzen den Bereichs-Default. Frisch gebaut (kein Cache, analog zu
+        /// <see cref="Keys"/>).</summary>
+        public IReadOnlyDictionary<string, int> MaxByKey()
+        {
+            var map = new Dictionary<string, int>();
+            if (entries != null)
+            {
+                foreach (var e in entries)
+                {
+                    if (!string.IsNullOrEmpty(e.key) && e.maxPerVariant > 0) map[e.key] = e.maxPerVariant;
+                }
+            }
+
+            return map;
         }
 
         /// <summary>Liefert das Prefab zum Schlüssel oder <c>null</c> (lineare Suche, ohne Cache).</summary>

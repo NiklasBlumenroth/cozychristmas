@@ -145,11 +145,17 @@ namespace CozySanta.Runtime.DevTools
             GUILayout.BeginArea(rect, GUI.skin.box);
 
             var catalog = _area.Catalog;
-            var max = _area.MaxPerVariant;
-            var variants = catalog != null ? catalog.Keys.Count : 0;
+            var defaultMax = _area.MaxPerVariant;
+            var maxByKey = catalog != null ? catalog.MaxByKey() : null;
+            var capacity = 0;
+            if (catalog != null)
+            {
+                foreach (var k in catalog.Keys) capacity += MaxFor(maxByKey, k, defaultMax);
+            }
+
             var hint = _interact ? "Klick außerhalb = zurück" : "ESC = bedienen";
             GUILayout.Label($"Bereich: {_area.AreaName}   ({hint})", _header);
-            GUILayout.Label($"Gesamt: {_total} / {variants * max}", _header);
+            GUILayout.Label($"Gesamt: {_total} / {capacity}", _header);
 
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Speichern", _button))
@@ -174,12 +180,16 @@ namespace CozySanta.Runtime.DevTools
                 foreach (var key in catalog.Keys)
                 {
                     _counts.TryGetValue(key, out var c);
-                    GUILayout.Label($"{key}: {c}/{max}", _label);
+                    GUILayout.Label($"{key}: {c}/{MaxFor(maxByKey, key, defaultMax)}", _label);
                 }
             }
 
             GUILayout.EndScrollView();
             GUILayout.EndArea();
         }
+
+        // Variantenspezifische Höchstzahl (positiver Override) oder Bereichs-Default.
+        private static int MaxFor(IReadOnlyDictionary<string, int> maxByKey, string key, int defaultMax)
+            => maxByKey != null && maxByKey.TryGetValue(key, out var m) && m > 0 ? m : defaultMax;
     }
 }

@@ -1,0 +1,209 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &1296118782949825172
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -10.366605
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.10499978
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 289.46463
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_Name
+      value: "zuckerstange_gr\xFCn"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3838219378272890257, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects:
+    - {fileID: -8700617353114198275, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+    - {fileID: 65702495048144492, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8230161698165595572}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8526029180145029912}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1879546719207985411}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 848644959356800107}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3398398312045914413}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6792181759397470949}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 566504032518184991}
+  m_SourcePrefab: {fileID: 100100000, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+--- !u!1 &2107074377737742277 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: cb272b4475afcaa4f9f9ac9cf37562a9, type: 3}
+  m_PrefabInstance: {fileID: 1296118782949825172}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &8230161698165595572
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107074377737742277}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &8526029180145029912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107074377737742277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6d1dae674f183d45a5d6f62a71908b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Carry.PickupInteractable
+  promptText: Aufnehmen
+  weight: 0.3
+--- !u!114 &1879546719207985411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107074377737742277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a7c8bae04bfa1d42bdcf1912767b24f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Sorting.Sortable
+  facets:
+  - Zuckerstange
+  - "Gr\xFCn"
+--- !u!65 &848644959356800107
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107074377737742277}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.31985998, y: 0.5843326, z: 0.11492455}
+  m_Center: {x: 0.000080019236, y: -0.055746317, z: 0.000000018626451}
+--- !u!114 &3398398312045914413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107074377737742277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2486b93c9088404ba3be0e06c1b284b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Items.PrefabId
+  key: "zuckerstange_gr\xFCn"
+--- !u!114 &6792181759397470949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107074377737742277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dc08ba70a9fa7a4f9669fa8e8e1375c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Items.SettlingBody
+  linearThreshold: 0.05
+  angularThreshold: 0.2
+  settleDuration: 3
+--- !u!114 &566504032518184991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107074377737742277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc4e0dd9ec0c5104baf418e3bae7f77f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Sorting.SortPlacementRotation
+  placedEuler: {x: 0, y: 90, z: -90}

@@ -80,10 +80,12 @@ namespace CozySanta.Runtime.Items
             }
 
             var counts = persistence.CountByKey(area);
-            if (!SpawnQuota.TryPick(area.Catalog.Keys, counts, area.MaxPerVariant, Random.value, out var key))
+            var maxByKey = area.Catalog.MaxByKey();
+            if (!SpawnQuota.TryPick(area.Catalog.Keys, counts, maxByKey, area.MaxPerVariant, Random.value, out var key))
             {
                 LogReason($"'{area.AreaName}': alle {area.Catalog.Keys.Count} Varianten voll " +
-                          $"(Katalog '{area.Catalog.name}', Einträge {area.Catalog.EntryCount}, Max {area.MaxPerVariant}).");
+                          $"(Katalog '{area.Catalog.name}', Einträge {area.Catalog.EntryCount}, " +
+                          $"Default-Max {area.MaxPerVariant}, Varianten-Overrides {maxByKey.Count}).");
                 return false;
             }
 

@@ -198,7 +198,16 @@ namespace CozySanta.Runtime.Sorting
 
         // Reihenrichtung folgt der Anker-Rotation; die Einlage-Orientierung wird zusätzlich um
         // placedEuler gedreht (entkoppelt von der Rasterrichtung).
-        private Quaternion CellRotation() => ReferenceRotation() * Quaternion.Euler(placedEuler);
+        private Quaternion CellRotation() => CellRotation(Quaternion.identity);
+
+        // Wie CellRotation, plus item-eigener Offset (SortPlacementRotation) – so liegt ein Mesh mit
+        // „schiefer" Grund-Ausrichtung in JEDEM Fach korrekt (Ghost + tatsächliche Pose identisch).
+        private Quaternion CellRotation(Quaternion itemOffset)
+            => ReferenceRotation() * Quaternion.Euler(placedEuler) * itemOffset;
+
+        // Liest den optionalen item-eigenen Dreh-Offset (Identität, wenn keine Komponente vorhanden).
+        private static Quaternion ItemPlacementOffset(Component item)
+            => item != null && item.TryGetComponent<SortPlacementRotation>(out var r) ? r.Offset : Quaternion.identity;
 
         // Größe des Spalten-Colliders: x,y = Querschnitt, z = über alle Tiefen-Slots gespannt.
         // Fällt auf cellSpacing zurück, wenn colliderSize (0,0,0) ist.
@@ -212,7 +221,7 @@ namespace CozySanta.Runtime.Sorting
         private void PlaceVisual(Component component, int x, int y, int z)
         {
             component.transform.SetParent(transform, worldPositionStays: false);
-            component.transform.SetPositionAndRotation(CellWorldPos(x, y, z), CellRotation());
+            component.transform.SetPositionAndRotation(CellWorldPos(x, y, z), CellRotation(ItemPlacementOffset(component)));
             ApplyPlacedScale(component);
 
             // Eingelegte Objekte sind reine Visuals: Collider aus (Ziel ist der Spalten-Collider), kinematisch.
@@ -254,16 +263,24 @@ namespace CozySanta.Runtime.Sorting
             component.transform.localScale = _originalScale[id] * placedScale;
         }
 
-        /// <summary>Ghost-Pose für Spalte (x,y): hinterster freier Slot. False, wenn der getragene
-        /// <paramref name="key"/> nicht passt, die Spalte voll oder das Fach gesperrt ist.</summary>
-        public bool TryGetGhostCellPose(int x, int y, SortKey key,
+        /// <summary>Ghost-Pose für Spalte (x,y): hinterster freier Slot. <paramref name="item"/> ist das
+        /// getragene Objekt – dessen optionaler <see cref="SortPlacementRotation"/>-Offset fließt in die
+        /// Rotation ein, damit der Ghost exakt der späteren Einlage-Pose entspricht. False, wenn die Spalte
+        /// voll oder das Fach gesperrt ist.</summary>
+        public bool TryGetGhostCellPose(int x, int y, Component item,
             out Vector3 position, out Quaternion rotation, out float scaleMultiplier)
         {
             position = default;
             rotation = default;
             scaleMultiplier = (placedScale > 0f && !Mathf.Approximately(placedScale, 1f)) ? placedScale : 1f;
-            // Ghost für jedes getragene Item zeigen (Einlegen ist nicht mehr code-gesperrt; Code = nur Validierung).
             if (_target == null || _target.IsClosed || !InRange(x, y))
+            {
+                return false;
+            }
+
+            // Kein Ghost, wenn die optionale Art-Sperre (placeableArts) das Item ausschließt.
+            var key = item != null && item.TryGetComponent<ISortable>(out var sortable) ? sortable.Key : default;
+            if (!SortPlacementRule.IsPlaceable(key, placeableArts))
             {
                 return false;
             }
@@ -274,7 +291,7 @@ namespace CozySanta.Runtime.Sorting
             }
 
             position = CellWorldPos(cx, cy, cz);
-            rotation = CellRotation();
+            rotation = CellRotation(ItemPlacementOffset(item));
             return true;
         }
 

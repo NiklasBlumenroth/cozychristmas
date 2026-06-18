@@ -33,6 +33,9 @@ namespace CozySanta.Runtime.Sorting
         [SerializeField] private string[] acceptedFacets = new string[0];
         [Tooltip("Soll-Menge korrekter Objekte für den Abschluss.")]
         [SerializeField] private int requiredCount = 25;
+        [Tooltip("Optionale Einlege-Sperre nach Art (erste Facette): nur Items, deren Art hier gelistet ist, " +
+                 "dürfen eingelegt werden. Leer = jedes Item einlegbar (Standard). Beeinflusst NICHT korrekt/falsch.")]
+        [SerializeField] private string[] placeableArts = new string[0];
         [Tooltip("PerColumn: jede (x,y)-Spalte einzeln anvisieren (nur Tiefe automatisch). " +
                  "Container: pro x-Spalte ein Behälter – x wählst du durchs Zielen, y (Höhe) und z (Tiefe) " +
                  "füllen automatisch (unten→oben, hinten→vorne).")]
@@ -114,8 +117,14 @@ namespace CozySanta.Runtime.Sorting
             }
 
             var key = top.TryGetComponent<ISortable>(out var sortable) ? sortable.Key : default;
-            // Jedes Item ist einlegbar; der Code (acceptedFacets) dient nur der Validierung:
-            // SortTarget zählt korrekt/falsch und schließt nur ab, wenn genug korrekte und keine falschen drin sind.
+            // Optionale grobe Einlege-Sperre nach Art (placeableArts). Leer = jedes Item einlegbar.
+            // acceptedFacets bleibt davon unberührt (zählt weiter korrekt/falsch) und schließt nur ab,
+            // wenn genug korrekte und keine falschen drin sind.
+            if (!SortPlacementRule.IsPlaceable(key, placeableArts))
+            {
+                return;
+            }
+
             if (!TryGetFillCell(x, y, out var cx, out var cy, out var cz))
             {
                 return; // Fach voll

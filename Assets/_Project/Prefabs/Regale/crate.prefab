@@ -163,6 +163,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
       propertyPath: placedEuler.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
+      propertyPath: placedEuler.z
       value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 8687564482499374288, guid: f1939ebbb131ff14abb32391e3629140, type: 3}
