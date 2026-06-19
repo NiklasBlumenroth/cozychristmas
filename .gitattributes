@@ -1,0 +1,45 @@
+# Zeilenenden deterministisch halten (verhindert die Git-for-Windows
+# autocrlf=true Falle, die Unity-YAML-Dateien beim Klonen zerschiesst).
+#
+# Universalregel: git erkennt Text automatisch (NUL-Byte-Heuristik) und checkt
+# Textdateien mit LF aus. WICHTIG: keine Endung pauschal auf "text" zwingen –
+# manche .asset (TerrainData, TD_*) sind BINAER (Heightmap-Rohdaten); ein
+# erzwungenes eol=lf wuerde sie beim Commit beschaedigen. text=auto laesst
+# Binaerdateien korrekt unangetastet.
+* text=auto eol=lf
+
+# C#-Quellcode mit passendem Diff-Treiber
+*.cs  text eol=lf diff=csharp
+
+# Bekannte Binaerformate explizit markieren (Schutz, falls Auto-Erkennung
+# einer Datei mal danebenliegt – verhindert jede EOL-Konvertierung).
+*.fbx        binary
+*.FBX        binary
+*.blend      binary
+*.blend1     binary
+*.png        binary
+*.PNG        binary
+*.jpg        binary
+*.jpeg       binary
+*.JPEG       binary
+*.tif        binary
+*.tiff       binary
+*.tga        binary
+*.psd        binary
+*.gif        binary
+*.exr        binary
+*.hdr        binary
+*.cubemap    binary
+*.wav        binary
+*.mp3        binary
+*.ogg        binary
+*.ttf        binary
+*.otf        binary
+*.dll        binary
+*.unitypackage binary
+
+# Binaere Unity-Assets (Terrain-Heightmaps u. a.) niemals als Text behandeln.
+TerrainData_*.asset binary
+TD_*.asset          binary
+LightingData.asset  binary
+NavMesh.asset        binary
