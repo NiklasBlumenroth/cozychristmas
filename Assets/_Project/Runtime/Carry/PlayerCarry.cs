@@ -16,6 +16,8 @@ namespace CozySanta.Runtime.Carry
         [SerializeField] private Transform rightHandAnchor;  // Kind des Spielerkörpers: Stapel, feste Höhe
         [SerializeField] private float stackSpacing = 0.35f;
         [SerializeField] private float dropDistance = 1.2f;
+        [Tooltip("Dauer (Sekunden) der weichen Flugbewegung beim Aufnehmen/Ablegen/Umstapeln.")]
+        [SerializeField] private float flightDuration = 1f;
 
         private CarryStack _stack;
         private readonly Dictionary<int, IPickup> _objects = new Dictionary<int, IPickup>();
@@ -127,22 +129,48 @@ namespace CozySanta.Runtime.Carry
                 _objects.Remove(item.Id);
                 component.transform.SetParent(null, worldPositionStays: true);
                 var origin = leftHandAnchor != null ? leftHandAnchor : transform;
-                component.transform.SetPositionAndRotation(
-                    origin.position + (origin.forward * dropDistance), Quaternion.identity);
-                SetCarriedPhysics(component, carried: false);
+                var target = origin.position + (origin.forward * dropDistance);
 
-                // Abgelegtes Item wieder in die Simulation wecken, damit es fällt und danach erneut
-                // einschläft (ruhend = kinematisch, aber aufhebbar). Nur relevant für Items mit Ruhe-Controller.
-                if (component.TryGetComponent<CozySanta.Runtime.Items.SettlingBody>(out var settling))
-                {
-                    settling.BeginSettling();
-                }
+                // Weiche Flugbewegung zum Ablegepunkt MIT Kollision (SweepTest): blockt eine Wand die Bahn,
+                // wird das Objekt am Hindernis fallen gelassen statt hindurchteleportiert. Collider an,
+                // währenddessen kinematisch bewegt; Physik/Settle erst bei der Landung (OnDropLanded).
+                SetDropFlightPhysics(component);
+                CarriedItemFlight.For(component).BeginToWorld(target, Quaternion.identity, flightDuration,
+                    sweep: true, onLanded: () => OnDropLanded(component));
             }
 
             RelayoutHands();
         }
 
-        /// <summary>Ordnet getragene Objekte neu an: oberstes nach links, übrige nach oben gestapelt rechts.</summary>
+        // Landung des Ablege-Flugs: reguläre Physik (fällt + schläft wieder ein). Nur für Items mit Ruhe-Controller.
+        private static void OnDropLanded(Component component)
+        {
+            SetCarriedPhysics(component, carried: false);
+            if (component.TryGetComponent<CozySanta.Runtime.Items.SettlingBody>(out var settling))
+            {
+                settling.BeginSettling();
+            }
+        }
+
+        // Physik während des Ablege-Flugs: Collider AN (für den SweepTest entlang der Bahn), aber kinematisch
+        // bewegt und schwerelos – das echte Fallen beginnt erst bei der Landung.
+        private static void SetDropFlightPhysics(Component component)
+        {
+            foreach (var collider in component.GetComponentsInChildren<Collider>(includeInactive: true))
+            {
+                collider.enabled = true;
+            }
+
+            if (component.TryGetComponent<Rigidbody>(out var body))
+            {
+                body.isKinematic = true;
+                body.useGravity = false;
+            }
+        }
+
+        /// <summary>Ordnet getragene Objekte neu an: oberstes weich nach links, übrige nach oben gestapelt
+        /// rechts. Statt hart zu snappen wird jedes Item per <see cref="CarriedItemFlight"/> collider-los an
+        /// seine (ggf. neue) Hand-Pose geflogen; Items, die bereits dort sind, bewegen sich nicht sichtbar.</summary>
         private void RelayoutHands()
         {
             var items = _stack.Items;
@@ -156,15 +184,13 @@ namespace CozySanta.Runtime.Carry
                 var isTop = i == items.Count - 1;
                 if (isTop && leftHandAnchor != null)
                 {
-                    component.transform.SetParent(leftHandAnchor, worldPositionStays: false);
-                    component.transform.localPosition = Vector3.zero;
-                    component.transform.localRotation = Quaternion.identity;
+                    CarriedItemFlight.For(component)
+                        .BeginToAnchor(leftHandAnchor, Vector3.zero, Quaternion.identity, flightDuration);
                 }
                 else if (rightHandAnchor != null)
                 {
-                    component.transform.SetParent(rightHandAnchor, worldPositionStays: false);
-                    component.transform.localPosition = Vector3.up * (stackSpacing * i);
-                    component.transform.localRotation = Quaternion.identity;
+                    CarriedItemFlight.For(component)
+                        .BeginToAnchor(rightHandAnchor, Vector3.up * (stackSpacing * i), Quaternion.identity, flightDuration);
                 }
             }
         }

@@ -53,6 +53,8 @@ namespace CozySanta.Runtime.Sorting
         [SerializeField] private Transform slotAnchor;
         [Tooltip("Größenfaktor für eingelegte Objekte im Fach (1 = Originalgröße).")]
         [SerializeField] private float placedScale = 1f;
+        [Tooltip("Dauer (Sekunden) der weichen Flugbewegung beim Einsortieren (aus der Hand in den Slot).")]
+        [SerializeField] private float flightDuration = 1f;
         [Tooltip("Zusätzliche Drehung (Euler-Winkel) der EINGELEGTEN Objekte relativ zur Anker-Ausrichtung. " +
                  "Ändert nur die Orientierung der Objekte/Ghosts, nicht die Reihenrichtung des Rasters.")]
         [SerializeField] private Vector3 placedEuler = Vector3.zero;

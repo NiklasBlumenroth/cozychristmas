@@ -220,11 +220,16 @@ namespace CozySanta.Runtime.Sorting
 
         private void PlaceVisual(Component component, int x, int y, int z)
         {
+            // Welt-Pose aus der Hand merken = Flug-Start. Umparenten mit worldPositionStays:false (behält die
+            // bisherige Scale-Semantik: das Item erbt die Fach-Skalierung) und Welt-Pose direkt zurücksetzen.
+            var startPos = component.transform.position;
+            var startRot = component.transform.rotation;
             component.transform.SetParent(transform, worldPositionStays: false);
-            component.transform.SetPositionAndRotation(CellWorldPos(x, y, z), CellRotation(ItemPlacementOffset(component)));
+            component.transform.SetPositionAndRotation(startPos, startRot);
             ApplyPlacedScale(component);
 
-            // Eingelegte Objekte sind reine Visuals: Collider aus (Ziel ist der Spalten-Collider), kinematisch.
+            // Eingelegte Objekte sind reine Visuals: Collider aus (collider-loser Flug, Ziel ist sicher),
+            // kinematisch. Physik bleibt so auch nach der Landung im Slot.
             foreach (var collider in component.GetComponentsInChildren<Collider>(includeInactive: true))
             {
                 collider.enabled = false;
@@ -235,6 +240,13 @@ namespace CozySanta.Runtime.Sorting
                 body.isKinematic = true;
                 body.useGravity = false;
             }
+
+            // Weiche Flugbewegung aus der Hand in die Slot-Pose (Position UND Rotation, inkl. item-eigenem
+            // SortPlacementRotation-Offset). Feste Weltpose, ohne Sweep – der Slot ist eine sichere Zielposition.
+            var pos = CellWorldPos(x, y, z);
+            var rot = CellRotation(ItemPlacementOffset(component));
+            CozySanta.Runtime.Carry.CarriedItemFlight.For(component)
+                .BeginToWorld(pos, rot, flightDuration, sweep: false, onLanded: null);
         }
 
         private void RestoreVisual(Component component, int id)
