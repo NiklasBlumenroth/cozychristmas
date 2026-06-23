@@ -112,6 +112,10 @@ namespace CozySanta.Runtime.Carry
 
             _objects[item.Id] = pickup;
             SetCarriedPhysics(component, carried: true);
+            // Aus dem instanzierten Gebäude-Draw abmelden (falls registriert), damit das getragene Item
+            // über seinen eigenen Renderer wieder sichtbar wird.
+            component.GetComponentInParent<CozySanta.Runtime.Rendering.InstancedItemRenderer>(includeInactive: true)?
+                .Unregister(component.transform);
             RelayoutHands();
             return true;
         }

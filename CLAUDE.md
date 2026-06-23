@@ -236,6 +236,22 @@ Assets/_Project/
   setzt es (Variante A): Crates = `["Keks"]`, Warenregale = `["Zuckerstange","Lebkuchen"]` → Kekse nur in Crates,
   Zuckerstangen/Lebkuchen nur in den Regalen (untereinander im Regal weiter vertauschbar). EditMode-Tests SP1–SP4.
 
+- **F10 (Core/Runtime grün, Unity-Compile maßgeblich)**: Instanziertes Rendern ruhender Items —
+  Performance-Fix gegen den Playtest-FPS-Einbruch (geladene Item-Massen = ~14k der ~18k Draw Calls,
+  jedes Item ein eigener `MeshRenderer`; URP-SRP-Batcher fasst die Anzahl nicht zusammen). Da die Items
+  Duplikate sind, kollabiert `Graphics.RenderMeshInstanced` jede (Mesh, Material)-Gruppe auf einen Draw.
+  Core `InstanceSlots` (dichte Slot-Verwaltung, Swap-with-last, `ChunkRanges` für die 1023er-Grenze;
+  rein, EditMode-Tests IS1–IS5). Runtime `InstancedItemRenderer` (partial `…cs`/`…Draw.cs`, je Gebäude
+  auf `ItemArea.ItemParent`): cacht beim Ruhen die Weltmatrizen je (Mesh, Submesh, Material, Schatten,
+  Layer)-Gruppe, schaltet den Einzel-Renderer ab (Collider bleibt → aufhebbar) und zeichnet je Gruppe je
+  Chunk; Kompaktierung räumt zerstörte Items (Reset/ClearArea). Andockpunkte additiv: `SettlingBody.EnterRest`
+  → `Register`, `PlayerCarry.TryPickup` → `Unregister`; der `AreaActivator` deaktiviert den Root beim
+  Verlassen → Draws laufen nur im betretenen Gebäude. Editor-Setup
+  „CozySanta/Performance/Instanced Item Rendering einrichten". In Fächer einsortierte Items + bewegte
+  Gebäude-Roots: Out-of-Scope v1. Doku/Diagramm unter `specs/010-instanced-item-rendering/`.
+  Begleitende Perf-Tools (Editor): „CozySanta/Performance/GPU-Instancing auf allen Materialien aktivieren"
+  und „Occlusion 1/2" (statische Geometrie markieren + Culling backen).
+
 ## Status / MVP-Fokus
 
 Erster Sektor (Eingangsbereich + Poststelle, optional Dekorationsfabrik) als

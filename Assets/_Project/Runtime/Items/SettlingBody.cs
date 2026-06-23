@@ -66,6 +66,11 @@ namespace CozySanta.Runtime.Items
             }
 
             enabled = false;
+
+            // Ruhendes Item für den instanzierten Gebäude-Draw anmelden (falls vorhanden): ersetzt den
+            // Einzel-Renderer durch einen gebündelten Instanz-Draw → drastisch weniger Draw Calls.
+            GetComponentInParent<CozySanta.Runtime.Rendering.InstancedItemRenderer>(includeInactive: true)?
+                .Register(transform);
         }
 
         /// <summary>Weckt das Item wieder in die dynamische Simulation (z. B. nach dem Ablegen),

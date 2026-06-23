@@ -1,0 +1,40 @@
+@startuml instanced-rendering
+title Instanziertes Item-Rendering – Ruhen / Tragen / Zeichnen
+
+state "Item einzeln gerendert\n(eigener MeshRenderer an)" as SINGLE
+state "Item instanziert\n(MeshRenderer aus, Matrix im Gebäude-Draw)" as INSTANCED
+
+[*] --> SINGLE : geladen / gespawnt / getragen
+
+SINGLE --> INSTANCED : SettlingBody.EnterRest()\nRegister(itemRoot):\nWeltmatrix cachen, Renderer aus
+INSTANCED --> SINGLE : PlayerCarry.TryPickup()\nUnregister(itemRoot):\nSlot raus, Renderer an
+INSTANCED --> [*] : Destroy (ClearArea/Reset)\nKompaktierung entfernt Slot
+
+note right of INSTANCED
+  Pro (Mesh, Submesh, Material,
+  Schatten, Layer)-Gruppe ein Draw:
+  InstanceSlots hält die Indizes dicht
+  (Swap-with-last), die Runtime führt
+  parallele Matrix4x4[]/Transform[].
+end note
+
+@enduml
+
+' --- Sequenz: ein Frame im betretenen Gebäude ---
+@startuml instanced-rendering-frame
+title Ein Frame: InstancedItemRenderer.Update (nur im aktiven Gebäude)
+
+participant "InstancedItemRenderer\n(am ItemParent, Apply)" as R
+participant "InstanceSlots\n(Core/Decide)" as S
+participant "Graphics" as G
+
+R -> R : CompactDestroyed()\n(Owner==null → RemoveAt)
+loop je Gruppe mit Count>0
+    R -> S : ChunkRanges(Count, 1023)
+    S --> R : (start, count) je Chunk
+    loop je Chunk
+        R -> G : RenderMeshInstanced(rp, mesh, submesh,\nMatrices, count, start)
+    end
+end
+note right of R : AreaActivator deaktiviert den Root\nbeim Verlassen → Update läuft nicht\n→ keine Draws außerhalb
+@enduml
