@@ -3,17 +3,26 @@ using UnityEngine;
 namespace CozySanta.Runtime.Sorting
 {
     /// <summary>
-    /// Optionaler item-eigener Dreh-Offset fürs Einsortieren. Wird ein Objekt in ein Fach gelegt – oder
-    /// als durchscheinender Ghost vorgeschaut –, dreht das Fach es zusätzlich um diesen Euler-Winkel,
-    /// relativ zur Fach-/Slot-Ausrichtung. Damit lässt sich ein Mesh mit „schiefer" Grund-Ausrichtung
-    /// (z. B. die Zuckerstangen, deren FBX anders liegt als die Lebkuchen) in JEDEM Fach korrekt hinlegen,
-    /// ohne die Fächer item-spezifisch zu machen – jedes Item bleibt in jedes Fach legbar. Ghost und
-    /// tatsächliche Pose nutzen denselben Offset. Ohne diese Komponente = kein Offset.
+    /// Optionale item-eigene Einlage-Justage fürs Sortieren (Dreh-Offset, Größenfaktor und Positions-Offset).
+    /// Wird ein Objekt in ein Fach gelegt – oder als durchscheinender Ghost vorgeschaut –, dreht/skaliert/
+    /// versetzt das Fach es zusätzlich um diese Werte, relativ zur Fach-/Slot-Ausrichtung. Damit lässt sich
+    /// ein Mesh mit „schiefer" Grund-Ausrichtung (z. B. Zuckerstangen) korrekt hinlegen UND ein Item, das in
+    /// der Höhe nicht ins Fach passt, pro Item verkleinern und sauber auf den Fachboden setzen – ohne die
+    /// Fächer item-spezifisch zu machen (jedes Item bleibt in jedes Fach legbar). Ghost und tatsächliche
+    /// Pose nutzen dieselben Werte. Ohne diese Komponente = keine Justage.
     /// </summary>
     public sealed class SortPlacementRotation : MonoBehaviour
     {
         [Tooltip("Zusätzliche Drehung (Euler-Winkel) beim Einlegen/Ghost, relativ zur Fach-Ausrichtung.")]
         [SerializeField] private Vector3 placedEuler;
+
+        [Tooltip("Größenfaktor beim Einlegen/Ghost (1 = unverändert). Wird auf den Fach-Wert multipliziert – " +
+                 "für Items, die in der Höhe nicht ins Fach passen, hier verkleinern.")]
+        [SerializeField] private float placedScale = 1f;
+
+        [Tooltip("Positions-Offset beim Einlegen/Ghost entlang der Fach-/Anker-Achsen (Meter). Vor allem Y, " +
+                 "um ein (verkleinertes) Item sauber auf den Fachboden zu setzen.")]
+        [SerializeField] private Vector3 placedOffset;
 
         /// <summary>Der Dreh-Offset als Quaternion (Identität bei 0).</summary>
         public Quaternion Offset => Quaternion.Euler(placedEuler);
@@ -23,6 +32,20 @@ namespace CozySanta.Runtime.Sorting
         {
             get => placedEuler;
             set => placedEuler = value;
+        }
+
+        /// <summary>Größenfaktor des Items im Fach (≥ 0.01; 1 = unverändert).</summary>
+        public float PlacedScale
+        {
+            get => placedScale;
+            set => placedScale = Mathf.Max(0.01f, value);
+        }
+
+        /// <summary>Positions-Offset (Anker-lokal, Meter) für Einlage/Ghost.</summary>
+        public Vector3 PlacedOffset
+        {
+            get => placedOffset;
+            set => placedOffset = value;
         }
 
 #if UNITY_EDITOR

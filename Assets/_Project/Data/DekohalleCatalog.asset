@@ -15,55 +15,55 @@ MonoBehaviour:
   entries:
   - key: bell
     prefab: {fileID: 833784522317445560, guid: 2df685ea02c8d2246ab1877b974214b6, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: bell_decorated
     prefab: {fileID: 4304185817619824510, guid: a51f752daf3b63f44a1b97aba5359820, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: mistletoe_A
     prefab: {fileID: 7963117132444926851, guid: 19091f98e19654441a7f55fa318476c4, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: mistletoe_B
     prefab: {fileID: 1109116320349480938, guid: 4c348e26a40183f4f9ae5eedefe3a4f8, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: Snow Globe 3
     prefab: {fileID: 4960790257836748082, guid: 544a1ff28d97eff478abebb406b2f408, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: snowman_A
     prefab: {fileID: 3442778632268209172, guid: 144ee4ffc20009147b6a365fda9845da, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: snowman_B
     prefab: {fileID: 3166210827002592678, guid: 539eb40ec06097d42a2160afc7f75e84, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: wreath
     prefab: {fileID: 7291767813031634365, guid: fe3c887cb9563ec438e0141514a5d2cb, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: Xmas Tree (blank)
     prefab: {fileID: 5620681943996173351, guid: 6b786662e104d2849b0ab83abee0a613, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: Xmas Tree Star Blau
     prefab: {fileID: 7910910848852596814, guid: 894e80b2adabbe04c8492517a095284e, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: "Xmas Tree Star Gr\xFCn"
     prefab: {fileID: 2180988258130612492, guid: 920450f0c2d1b1647a050d8fb9744f61, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: Xmas Tree Star Orange
     prefab: {fileID: 3706278515852889387, guid: 59bc551c5dce4b447a8389b79c1f849b, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: Xmas Tree Star Pink
     prefab: {fileID: 8922287007799867063, guid: 5988c72abd72a4c42b2e4d73d1cb8624, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: Xmas Tree Star Rosa
     prefab: {fileID: 8919701396562997064, guid: f1c9036818277a24f8f7539f5abef159, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: Xmas Tree Star Rot
     prefab: {fileID: 415221576576908495, guid: d654d5eea4bddf645866b9ad1172ed89, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: Xmas Tree Star Silber
     prefab: {fileID: 7975961943509261744, guid: ab8eece1a5a3e224998b0b6d1d926365, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: Xmas Tree Star
     prefab: {fileID: 8058735697614917939, guid: e678347e88990e243865e202d68f6f64, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35
   - key: Xmas Tree
     prefab: {fileID: 3907117906571066774, guid: 6462c6af99fe5e141bee132594f9ca66, type: 3}
-    maxPerVariant: 20
+    maxPerVariant: 35

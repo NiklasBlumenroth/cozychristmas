@@ -209,6 +209,20 @@ namespace CozySanta.Runtime.Sorting
         private static Quaternion ItemPlacementOffset(Component item)
             => item != null && item.TryGetComponent<SortPlacementRotation>(out var r) ? r.Offset : Quaternion.identity;
 
+        // Liest den optionalen item-eigenen Größenfaktor (1, wenn keine Komponente / ungültig).
+        private static float ItemPlacementScale(Component item)
+            => item != null && item.TryGetComponent<SortPlacementRotation>(out var r) && r.PlacedScale > 0f
+                ? r.PlacedScale
+                : 1f;
+
+        // Liest den optionalen item-eigenen Positions-Offset (Anker-lokal); 0, wenn keine Komponente.
+        private static Vector3 ItemPlacementPositionOffset(Component item)
+            => item != null && item.TryGetComponent<SortPlacementRotation>(out var r) ? r.PlacedOffset : Vector3.zero;
+
+        // Kombinierter Größenfaktor: Fach-Wert × item-eigener Faktor (beide ≤ 0 -> 1).
+        private float CombinedScale(Component item)
+            => (placedScale > 0f ? placedScale : 1f) * ItemPlacementScale(item);
+
         // Größe des Spalten-Colliders: x,y = Querschnitt, z = über alle Tiefen-Slots gespannt.
         // Fällt auf cellSpacing zurück, wenn colliderSize (0,0,0) ist.
         private Vector3 ColumnColliderSize(int depth)
@@ -226,7 +240,7 @@ namespace CozySanta.Runtime.Sorting
             var startRot = component.transform.rotation;
             component.transform.SetParent(transform, worldPositionStays: false);
             component.transform.SetPositionAndRotation(startPos, startRot);
-            ApplyPlacedScale(component);
+            ApplyPlacedScale(component, ItemPlacementScale(component));
 
             // Eingelegte Objekte sind reine Visuals: Collider aus (collider-loser Flug, Ziel ist sicher),
             // kinematisch. Physik bleibt so auch nach der Landung im Slot.
@@ -243,7 +257,7 @@ namespace CozySanta.Runtime.Sorting
 
             // Weiche Flugbewegung aus der Hand in die Slot-Pose (Position UND Rotation, inkl. item-eigenem
             // SortPlacementRotation-Offset). Feste Weltpose, ohne Sweep – der Slot ist eine sichere Zielposition.
-            var pos = CellWorldPos(x, y, z);
+            var pos = CellWorldPos(x, y, z) + ReferenceRotation() * ItemPlacementPositionOffset(component);
             var rot = CellRotation(ItemPlacementOffset(component));
             CozySanta.Runtime.Carry.CarriedItemFlight.For(component)
                 .BeginToWorld(pos, rot, flightDuration, sweep: false, onLanded: null);
@@ -259,9 +273,10 @@ namespace CozySanta.Runtime.Sorting
             // Collider/Physik werden von PlayerCarry.TryPickup (carried) wieder gesetzt.
         }
 
-        private void ApplyPlacedScale(Component component)
+        private void ApplyPlacedScale(Component component, float itemScale)
         {
-            if (!(placedScale > 0f) || Mathf.Approximately(placedScale, 1f))
+            var total = (placedScale > 0f ? placedScale : 1f) * (itemScale > 0f ? itemScale : 1f);
+            if (Mathf.Approximately(total, 1f))
             {
                 return;
             }
@@ -272,7 +287,7 @@ namespace CozySanta.Runtime.Sorting
                 _originalScale[id] = component.transform.localScale;
             }
 
-            component.transform.localScale = _originalScale[id] * placedScale;
+            component.transform.localScale = _originalScale[id] * total;
         }
 
         /// <summary>Ghost-Pose für Spalte (x,y): hinterster freier Slot. <paramref name="item"/> ist das
@@ -284,7 +299,7 @@ namespace CozySanta.Runtime.Sorting
         {
             position = default;
             rotation = default;
-            scaleMultiplier = (placedScale > 0f && !Mathf.Approximately(placedScale, 1f)) ? placedScale : 1f;
+            scaleMultiplier = CombinedScale(item);
             if (_target == null || _target.IsClosed || !InRange(x, y))
             {
                 return false;
@@ -302,7 +317,7 @@ namespace CozySanta.Runtime.Sorting
                 return false;
             }
 
-            position = CellWorldPos(cx, cy, cz);
+            position = CellWorldPos(cx, cy, cz) + ReferenceRotation() * ItemPlacementPositionOffset(item);
             rotation = CellRotation(ItemPlacementOffset(item));
             return true;
         }

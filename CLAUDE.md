@@ -252,6 +252,30 @@ Assets/_Project/
   Begleitende Perf-Tools (Editor): „CozySanta/Performance/GPU-Instancing auf allen Materialien aktivieren"
   und „Occlusion 1/2" (statische Geometrie markieren + Culling backen).
 
+- **Einlage-Justage erweitert (additiv zu Sortieren)**: `SortPlacementRotation` trägt zusätzlich
+  `PlacedScale` (Größenfaktor pro Item, multipliziert auf den Fach-Wert) und `PlacedOffset`
+  (Positions-Offset, v. a. Höhe) — fürs Hinlegen von Items, die in der Höhe nicht ins Fach passen.
+  `SortTargetInteractable` wendet beides identisch auf Ghost + Einlage an (`ItemPlacementScale`/
+  `ItemPlacementPositionOffset`, `CombinedScale`). `SortPlacementRotationDevTool` erweitert: `,`/`.` =
+  Größe, Bild↑/↓ = Höhe (zusätzlich zu I/K J/L U/O = drehen). `DekohalleSortItemSetup` reduziert auf
+  „macht Katalog-Items drehbar" (hängt `SortPlacementRotation` an + ein DevTool in die Szene).
+
+- **Dekohalle-Fächer-Belegung (Editor, Szene)**: `DekohalleSortAssignmentSetup`
+  („CozySanta/Dekohalle/Fächer in Regalen belegen") weist den 18 `gabinet`-Regalen unter `DekoInnen`
+  der Reihe nach je eine Deko-Variante aus dem Katalog zu und vereinheitlicht alle Fächer eines Regals
+  auf diese SortKey (liest die Facetten aus den Prefabs; nur `acceptedFacets`, Raster/Mengen unberührt).
+
+- **Nachthimmel (additiv, Optik)**: prozeduraler Skybox-Shader `CozySanta/NightSky` (Nacht-Verlauf,
+  zweilagiger Sternenhimmel mit Funkeln + Glüh-Halo, Vollmond mit Halo/Kratern, dezente Milchstraße —
+  texturfrei). Editor-Setup „CozySanta/Umgebung/Nachthimmel einrichten" erzeugt `M_NightSky`, setzt es
+  als Skybox, stellt Nacht-Ambient ein, richtet das Directional Light als Mondlicht aus und setzt die
+  Kamera auf Background-Type Skybox. Reine Optik (dokumentierte Nicht-Unit-Ausnahme analog SnowMelt).
+
+- **Hocke (additiv zu F2)**: Core `CrouchMotion` (Decide, testbar) — `StepHeight` (sanftes Anfahren
+  Steh-/Hockhöhe), `CenterY` (Füße bleiben am Boden) und `EyeHeight` (Kamera senkt mit).
+  `FirstPersonController` um `SetCrouch(bool)` + `ApplyCrouch` (CharacterController-Höhe/-Mitte + Kamera)
+  erweitert, `PlayerInputRelay` liest Shift gehalten. EditMode-Tests CR1–CR5.
+
 ## Status / MVP-Fokus
 
 Erster Sektor (Eingangsbereich + Poststelle, optional Dekorationsfabrik) als

@@ -73,6 +73,10 @@ namespace CozySanta.Runtime.Player
                 if (keyboard.spaceKey.wasPressedThisFrame && controller != null)
                     controller.RequestJump();
 
+                // Hocke: gehalten = in die Hocke, losgelassen = aufstehen (Shift links/rechts).
+                if (controller != null)
+                    controller.SetCrouch(keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed);
+
                 if (keyboard.xKey.wasPressedThisFrame && skillMenu != null)
                     ToggleSkillMenu();
             }

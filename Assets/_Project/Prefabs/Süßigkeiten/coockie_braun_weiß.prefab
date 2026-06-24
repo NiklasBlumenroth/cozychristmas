@@ -95,9 +95,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f7e420f4304a4394b8b084a1e2f979c4, type: 3}
       insertIndex: -1
       addedObject: {fileID: -8624840929144771112}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f7e420f4304a4394b8b084a1e2f979c4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: -2963980511054351842}
   m_SourcePrefab: {fileID: 100100000, guid: f7e420f4304a4394b8b084a1e2f979c4, type: 3}
 --- !u!1 &803460500969350633 stripped
 GameObject:
@@ -222,19 +219,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Sorting.SortPlacementRotation
   placedEuler: {x: 0, y: 0, z: 0}
---- !u!114 &-2963980511054351842
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 803460500969350633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0eb34a991da633943af22ac41d8976ea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.DevTools.SortPlacementRotationDevTool
-  carry: {fileID: 0}
-  stepDegrees: 90
-  fineStepDegrees: 5
-  fontSize: 16
+  placedScale: 1
+  placedOffset: {x: 0, y: 0, z: 0}

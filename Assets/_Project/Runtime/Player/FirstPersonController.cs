@@ -22,15 +22,28 @@ namespace CozySanta.Runtime.Player
         [SerializeField] private float gravity = -9.81f;
         [SerializeField] private float jumpHeight = 1.1f;
 
+        [Header("Hocke (Shift halten)")]
+        [Tooltip("Körperhöhe in der Hocke (Meter).")]
+        [SerializeField] private float crouchHeight = 1.1f;
+        [Tooltip("Übergangsgeschwindigkeit Stehen↔Hocke (Höhe pro Sekunde).")]
+        [SerializeField] private float crouchSpeed = 8f;
+
         private CharacterController _controller;
         private float _pitch;
         private float _verticalVelocity;
         private bool _jumpRequested;
+        private bool _crouchHeld;
+        private float _standHeight;
+        private float _standCenterY;
+        private float _standEyeHeight;
         private Vector2 _moveInput;
         private Vector2 _lookInput;
 
         public void SetMoveInput(Vector2 value) => _moveInput = value;
         public void SetLookInput(Vector2 value) => _lookInput = value;
+
+        /// <summary>Hocke ein/aus (pro Frame): true, solange die Hocktaste gehalten wird.</summary>
+        public void SetCrouch(bool held) => _crouchHeld = held;
 
         /// <summary>Fordert einen Sprung an; wird im nächsten <see cref="ApplyMove"/> verbraucht.</summary>
         public void RequestJump() => _jumpRequested = true;
@@ -45,6 +58,10 @@ namespace CozySanta.Runtime.Player
         private void Awake()
         {
             _controller = GetComponent<CharacterController>();
+            // Steh-Referenzwerte merken (Hocke fährt relativ dazu, Füße bleiben am Boden).
+            _standHeight = _controller.height;
+            _standCenterY = _controller.center.y;
+            _standEyeHeight = cameraPivot != null ? cameraPivot.localPosition.y : _standHeight;
         }
 
         private void OnEnable()
@@ -58,6 +75,7 @@ namespace CozySanta.Runtime.Player
         private void Update()
         {
             ApplyLook();
+            ApplyCrouch(UnityEngine.Time.deltaTime);
             ApplyMove(UnityEngine.Time.deltaTime);
 
             // Maus-Delta ist ein Pro-Frame-Wert: nach dem Anwenden zurücksetzen, damit die Sicht
@@ -80,6 +98,28 @@ namespace CozySanta.Runtime.Player
             if (cameraPivot != null)
             {
                 cameraPivot.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
+            }
+        }
+
+        private void ApplyCrouch(float deltaTime)
+        {
+            var height = CrouchMotion.StepHeight(
+                _controller.height, _standHeight, crouchHeight, _crouchHeld, crouchSpeed, deltaTime);
+            if (Mathf.Approximately(height, _controller.height))
+            {
+                return; // keine Änderung -> Controller/Kamera nicht unnötig schreiben
+            }
+
+            _controller.height = height;
+            var center = _controller.center;
+            center.y = CrouchMotion.CenterY(_standCenterY, _standHeight, height);
+            _controller.center = center;
+
+            if (cameraPivot != null)
+            {
+                var eye = cameraPivot.localPosition;
+                eye.y = CrouchMotion.EyeHeight(height, _standHeight, _standEyeHeight);
+                cameraPivot.localPosition = eye;
             }
         }
 
