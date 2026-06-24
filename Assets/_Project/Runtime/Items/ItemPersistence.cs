@@ -72,7 +72,10 @@ namespace CozySanta.Runtime.Items
                     continue;
                 }
 
-                var go = Instantiate(prefab, p.position, p.rotation, parent);
+                // Erst ohne Parent instanziieren (Welt-Scale = Prefab-Scale), dann mit worldPositionStays
+                // einhängen: gleicht einen Parent-Scale (z. B. DekoHalle-Root 0.1) aus -> Item bleibt prefab-groß.
+                var go = Instantiate(prefab, p.position, p.rotation);
+                go.transform.SetParent(parent, worldPositionStays: true);
                 // Geladene Items starten sofort ruhend (kinematisch) -> kein Settle-Spike.
                 if (go.TryGetComponent<SettlingBody>(out var settling)) settling.EnterRest();
                 spawned++;

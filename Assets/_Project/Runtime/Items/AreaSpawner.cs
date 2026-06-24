@@ -102,7 +102,10 @@ namespace CozySanta.Runtime.Items
                            + new Vector3(scatter.x, 0f, scatter.y);
             // Bevorzugt der Bereichs-Parent (Gebäude-Root) -> gespawnte Items deaktivieren sich mit dem Gebäude.
             var parent = area.ItemParent != null ? area.ItemParent : spawnParent;
-            Instantiate(prefab, position, Random.rotationUniform, parent);
+            // Erst ohne Parent instanziieren (Welt-Scale = Prefab-Scale), dann mit worldPositionStays
+            // einhängen: gleicht einen Parent-Scale (z. B. DekoHalle-Root 0.1) aus -> Item bleibt prefab-groß.
+            var instance = Instantiate(prefab, position, Random.rotationUniform);
+            instance.transform.SetParent(parent, worldPositionStays: true);
             return true;
         }
 
