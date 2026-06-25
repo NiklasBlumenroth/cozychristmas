@@ -114,3 +114,10 @@ Praktisch: Im Material-Setup brauchst du also 2 Materialien (Metall/Glas-Hülle 
 Emission + Lichtintensität interpoliert.
 
 
+1. Unity kompilieren lassen.
+2. Menü „Misch-Girlande (Rot+Grün) …" ausführen → Material + Prefab entstehen im Christmas-pack-Ordner.
+3. Garland_LightMix in die Szene ziehen.
+4. Am GarlandLightMix-Material justieren, bis der Wechsel pro Birnchen sitzt:
+   - Wechsel-Achse (Objektraum) — die Richtung, in der die Girlande verläuft (Standard (0,1,0); bei waagerechter Girlande z. B. (1,0,0)).
+   - Wechsel-Frequenz — höher = engere Rot/Grün-Wechsel.
+   - Phase / Übergangs-Weichheit für Feinschliff.
