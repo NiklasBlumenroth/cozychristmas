@@ -100,6 +100,11 @@ namespace CozySanta.Editor
                 if (sortable == null) sortable = root.AddComponent<Sortable>();
                 SetStringArray(sortable, "facets", new[] { key }); // eine Sorte je Container = Prefab-Name
 
+                // Fach-Einlage-Justage (Dreh/Größe/Höhe) – Feintuning via SortPlacementRotationDevTool.
+                // Nur anhängen, falls fehlt; bereits gesetzte Werte bleiben erhalten.
+                if (root.GetComponent<SortPlacementRotation>() == null)
+                    root.AddComponent<SortPlacementRotation>();
+
                 FitBoxCollider(root, key);
 
                 var id = root.GetComponent<PrefabId>();

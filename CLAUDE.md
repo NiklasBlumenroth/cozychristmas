@@ -298,8 +298,11 @@ Assets/_Project/
   bleiben. Regal-Belegung der Toys: `GeschenkehalleSortAssignmentSetup`
   („CozySanta/Geschenkehalle/Regale belegen") weist den `gabinet`-Regalen unter `GeschenkehalleInnen` der
   Reihe nach je eine Toy-Sorte zu (nur Nicht-`Truhengeschenke`-Varianten; proportional, Standard 2 benachbarte
-  Regale je Toy; nur `acceptedFacets`, Raster/Mengen unberührt). Doku/Diagramm unter
-  `specs/011-geschenkehalle-truhen/`.
+  Regale je Toy; nur `acceptedFacets`, Raster/Mengen unberührt). Fach-Einlage-Justage:
+  `GeschenkItemSetup` hängt den Items zusätzlich `SortPlacementRotation` an; `GeschenkSortItemSetup`
+  („CozySanta/Geschenkehalle/Geschenke drehbar machen") fügt sie nachträglich an alle Katalog-Items an
+  + legt ein `SortPlacementRotationDevTool` in die Szene (Item tragen, im Fach-Ghost justieren). Doku/
+  Diagramm unter `specs/011-geschenkehalle-truhen/`.
 
 ## Status / MVP-Fokus
 
