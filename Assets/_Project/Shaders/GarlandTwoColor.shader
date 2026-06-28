@@ -60,7 +60,9 @@ Shader "CozySanta/GarlandTwoColor"
                 float pick = smoothstep(0.5 - _Softness, 0.5 + _Softness, t);
                 fixed3 lightCol = lerp(_ColorA.rgb, _ColorB.rgb, pick);
 
-                return fixed4(baseC + mask * lightCol, 1);
+                // An den Birnchen (mask=1) die helle Albedo durch die Lichtfarbe ERSETZEN, nicht
+                // addieren – sonst clamped Weiß + HDR-Farbe wieder auf Weiß.
+                return fixed4(lerp(baseC, lightCol, mask), 1);
             }
             ENDCG
         }
