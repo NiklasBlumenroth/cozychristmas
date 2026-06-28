@@ -38,7 +38,8 @@ Truhen-Geschenke 100, variantenspezifisch im Katalog) und das Sortierziel (Regal
 | Runtime | `AreaTracker.ChestGroup` | bindet jede verriegelte Truhe → `BookSort(taskId, +1)`; Auto-Soll-Menge = Anzahl Truhen |
 | Input | `PlayerInputRelay` | diskreter Rechtsklick auf fokussierte `GiftChest` → `Interact()` |
 | Editor | `GeschenkItemSetup` | beide Ordner → Sortierobjekte (Rigidbody/Pickup/Sortable/Collider/PrefabId/SettlingBody) + EIN gemeinsamer Katalog (Max je Variante) |
-| Editor | `GiftChestSetup` | Truhen-Instanzen → `GiftChest` + Innenvolumen + Deckel/Röhre verdrahten + Sorte aus Katalog (nur Truhen-Ordner-Varianten, Reihenfolge) |
+| Editor | `GiftChestSetup` | Truhen unter `GeschenkehalleInnen` → `GiftChest` + Innenvolumen + Deckel/Röhre + Sorte aus Katalog (nur Truhen-Ordner-Varianten, 1:1) |
+| Editor | `GeschenkehalleSortAssignmentSetup` | `gabinet`-Regale unter `GeschenkehalleInnen` → je eine Toy-Sorte (nur Nicht-Truhen-Varianten, ~2 Regale je Toy) |
 
 - **Decide/Apply getrennt**: Validierungsregel in Core (testbar), Seiteneffekte (Deckel, Destroy,
   Auswurf) in Runtime.
@@ -66,12 +67,17 @@ Authoring (dokumentierte Nicht-Unit-Ausnahme analog `BookPrefabSetup`/`BakerySwe
    - „CozySanta/Geschenkehalle/Geschenke als Sortierobjekte einrichten (Prefabs + Katalog)"
      (Items im Ordner `Backups` werden ignoriert: Regal-Scan ist nicht-rekursiv, Truhen-Scan nur
      unter `Truhengeschenke/`.)
-   - In der Hierarchie die Geschenkehalle-Truhen (oder ihren gemeinsamen Eltern-Root) **selektieren**,
-     dann „CozySanta/Geschenkehalle/Truhen einrichten (GiftChest + Innenvolumen + Sorte)". Die Zuweisung
-     ist **1:1** (kein Modulo) – die Truhenzahl sollte der Variantenzahl entsprechen, sonst bleiben
-     überzählige Truhen/Varianten offen (Tool warnt).
-4. Am Geschenkehalle-`AreaTracker` eine Truhen-Gruppe (root = gemeinsamer Eltern der Truhen,
-   taskId) hinzufügen; den gemeinsamen `GeschenkehalleCatalog` der Geschenkehalle-`ItemArea` zuweisen.
+   - „CozySanta/Geschenkehalle/Truhen einrichten (GiftChest + Innenvolumen + Sorte)" – scopt auf den
+     Szenen-Root `GeschenkehalleInnen` (nur Truhen darunter). Zuweisung **1:1** (kein Modulo) – die Anzahl
+     Sort-Truhen unter `GeschenkehalleInnen` sollte der Variantenzahl entsprechen, sonst bleiben überzählige
+     Truhen/Varianten offen (Tool warnt).
+   - „CozySanta/Geschenkehalle/Regale belegen (Toys → Regale, Szene)" – weist den `gabinet`-Regalen unter
+     `GeschenkehalleInnen` die Toy-Sorten zu (setzt voraus, dass die Regale `SortTargetInteractable`-Fächer haben).
+4. Am Geschenkehalle-`AreaTracker` eine Truhen-Gruppe (root = `GeschenkehalleInnen`, taskId) hinzufügen;
+   den gemeinsamen `GeschenkehalleCatalog` der Geschenkehalle-`ItemArea` zuweisen.
+
+> Alle Container-Tools (Truhen + Regale) erwarten einen Szenen-Root **`GeschenkehalleInnen`**, unter dem die
+> Sort-Truhen und Regale liegen (analog `DekoInnen`).
 5. Pro Truhe: Innenvolumen-Größe und Deckel-Öffnungswinkel feintunen.
 
 ## Out of Scope (v1)

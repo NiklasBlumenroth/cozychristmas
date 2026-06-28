@@ -293,10 +293,13 @@ Assets/_Project/
   Truhen-Geschenke 100). `GiftChestSetup` („CozySanta/Geschenkehalle/Truhen einrichten") erkennt Truhen am
   Child `chest_top`, hängt `GiftChest` an, legt ein `InsideVolume`-Trigger an, verdrahtet Deckel +
   `RöhrenPosition` und weist 1:1 (kein Modulo) je eine Truhen-Sorte zu (filtert aus dem gemeinsamen Katalog
-  die Prefabs im `Truhengeschenke`-Ordner). Arbeitet auswahlbasiert (nur selektierte Truhen bzw. unter
-  selektierten Roots; ohne Auswahl Fallback auf alle Truhen der Szene mit Warnung), damit Deko-Truhen anderer
-  Hallen unberührt bleiben. Regal-Zuweisung der Toys = bestehendes `SortTargetInteractable`-System
-  (separat, wie Dekohalle/Bäckerei). Doku/Diagramm unter `specs/011-geschenkehalle-truhen/`.
+  die Prefabs im `Truhengeschenke`-Ordner). Scopt auf den Szenen-Root `GeschenkehalleInnen` (wie
+  Dekohalle/DekoInnen; Fallback: Hierarchie-Auswahl mit Warnung), damit Deko-Truhen anderer Hallen unberührt
+  bleiben. Regal-Belegung der Toys: `GeschenkehalleSortAssignmentSetup`
+  („CozySanta/Geschenkehalle/Regale belegen") weist den `gabinet`-Regalen unter `GeschenkehalleInnen` der
+  Reihe nach je eine Toy-Sorte zu (nur Nicht-`Truhengeschenke`-Varianten; proportional, Standard 2 benachbarte
+  Regale je Toy; nur `acceptedFacets`, Raster/Mengen unberührt). Doku/Diagramm unter
+  `specs/011-geschenkehalle-truhen/`.
 
 ## Status / MVP-Fokus
 

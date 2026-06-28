@@ -24,6 +24,7 @@ namespace CozySanta.Editor
         private const string CatalogPath = GeschenkItemSetup.CatalogPath;
         private const string LidChildName = "chest_top";
         private const string EjectTargetName = "RöhrenPosition";
+        private const string HallRoot = "GeschenkehalleInnen";
         private const int DefaultRequired = 100;
 
         [MenuItem("CozySanta/Geschenkehalle/Truhen einrichten (GiftChest + Innenvolumen + Sorte)")]
@@ -48,23 +49,29 @@ namespace CozySanta.Editor
             if (eject == null)
                 Debug.LogWarning($"[Truhen] Kein '{EjectTargetName}' in der Szene gefunden – Auswurfpunkt bleibt leer.");
 
-            // Auswahlbasiert: nur die in der Hierarchie SELEKTIERTEN Truhen (bzw. Truhen unter selektierten
-            // Roots) werden eingerichtet. So bleiben Deko-Truhen anderer Hallen unberührt. Ohne Auswahl
-            // werden alle Truhen der Szene genommen (mit Warnung) – nur fallbackweise.
-            var fromSelection = true;
-            var chests = CollectSelectedChests();
-            if (chests.Count == 0)
+            // Scope: nur Truhen unter 'GeschenkehalleInnen' (wie Dekohalle/DekoInnen). So bleiben Deko-Truhen
+            // anderer Hallen unberührt. Fallback: aktuelle Hierarchie-Auswahl (mit Warnung).
+            var root = FindByName(HallRoot);
+            List<Transform> chests;
+            string source;
+            if (root != null)
             {
-                fromSelection = false;
-                chests = FindAllChests();
-                Debug.LogWarning("[Truhen] Keine Truhen in der Auswahl – verwende ALLE Truhen der Szene. " +
-                                 "Besser: nur die Geschenkehalle-Truhen (oder ihren Eltern-Root) selektieren, " +
-                                 "damit Deko-Truhen anderer Hallen nicht erfasst werden.");
+                chests = CollectChestsUnder(root);
+                source = HallRoot;
             }
+            else
+            {
+                chests = CollectSelectedChests();
+                source = "Auswahl";
+                Debug.LogWarning($"[Truhen] Kein '{HallRoot}' in der Szene gefunden – verwende die Hierarchie-" +
+                                 "Auswahl. Lege einen Root 'GeschenkehalleInnen' über die Sort-Truhen an oder " +
+                                 "selektiere sie vor dem Ausführen.");
+            }
+
             chests = chests.OrderBy(NumberOf).ThenBy(t => t.name).ToList();
             if (chests.Count == 0)
             {
-                Debug.LogError("[Truhen] Keine Truhen (chest mit Child 'chest_top') gefunden.");
+                Debug.LogError($"[Truhen] Keine Truhen (chest mit Child 'chest_top') unter '{source}' gefunden.");
                 return;
             }
 
@@ -95,9 +102,9 @@ namespace CozySanta.Editor
                                      : $"{variants.Count - pairs} Variante(n) haben KEINE Truhe."));
             }
 
-            Debug.Log($"[Truhen] {pairs} Truhe(n) eingerichtet (Quelle: {(fromSelection ? "Auswahl" : "ganze Szene")}). " +
+            Debug.Log($"[Truhen] {pairs} Truhe(n) eingerichtet (Quelle: {source}). " +
                       "Szene speichern (Strg+S). Danach am Geschenkehalle-AreaTracker eine Truhen-Gruppe " +
-                      $"(root = gemeinsamer Eltern, taskId) hinzufügen.\n{log}");
+                      $"(root = {HallRoot}, taskId) hinzufügen.\n{log}");
         }
 
         private static void ConfigureChest(Transform chest, string[] facets, int required, Transform eject)
@@ -197,28 +204,25 @@ namespace CozySanta.Editor
             return result;
         }
 
-        // Truhen aus der Hierarchie-Auswahl: jede selektierte Truhe selbst + alle Truhen unter selektierten Roots.
-        private static List<Transform> CollectSelectedChests()
+        // Alle Truhen (Transform mit Child „chest_top") unterhalb eines Roots.
+        private static List<Transform> CollectChestsUnder(Transform root)
         {
             var result = new List<Transform>();
-            foreach (var root in Selection.transforms)
+            foreach (var t in root.GetComponentsInChildren<Transform>(includeInactive: true))
             {
-                foreach (var t in root.GetComponentsInChildren<Transform>(includeInactive: true))
-                {
-                    if (FindChild(t, LidChildName) != null && !result.Contains(t)) result.Add(t);
-                }
+                if (FindChild(t, LidChildName) != null && !result.Contains(t)) result.Add(t);
             }
 
             return result;
         }
 
-        // Alle Truhen der Szene = Transforms mit einem direkten Child namens „chest_top" (Fallback).
-        private static List<Transform> FindAllChests()
+        // Fallback: Truhen aus der Hierarchie-Auswahl (jede selektierte Truhe + Truhen unter selektierten Roots).
+        private static List<Transform> CollectSelectedChests()
         {
             var result = new List<Transform>();
-            foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (var root in Selection.transforms)
             {
-                if (FindChild(t, LidChildName) != null) result.Add(t);
+                result.AddRange(CollectChestsUnder(root).Where(c => !result.Contains(c)));
             }
 
             return result;
