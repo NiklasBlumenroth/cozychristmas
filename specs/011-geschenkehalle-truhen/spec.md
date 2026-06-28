@@ -64,7 +64,12 @@ Authoring (dokumentierte Nicht-Unit-Ausnahme analog `BookPrefabSetup`/`BakerySwe
 2. Truhen (20) und Regale platzieren; `RöhrenPosition` existiert bereits.
 3. Setup ausführen:
    - „CozySanta/Geschenkehalle/Geschenke als Sortierobjekte einrichten (Prefabs + Katalog)"
-   - „CozySanta/Geschenkehalle/Truhen einrichten (GiftChest + Innenvolumen + Sorte)"
+     (Items im Ordner `Backups` werden ignoriert: Regal-Scan ist nicht-rekursiv, Truhen-Scan nur
+     unter `Truhengeschenke/`.)
+   - In der Hierarchie die Geschenkehalle-Truhen (oder ihren gemeinsamen Eltern-Root) **selektieren**,
+     dann „CozySanta/Geschenkehalle/Truhen einrichten (GiftChest + Innenvolumen + Sorte)". Die Zuweisung
+     ist **1:1** (kein Modulo) – die Truhenzahl sollte der Variantenzahl entsprechen, sonst bleiben
+     überzählige Truhen/Varianten offen (Tool warnt).
 4. Am Geschenkehalle-`AreaTracker` eine Truhen-Gruppe (root = gemeinsamer Eltern der Truhen,
    taskId) hinzufügen; den gemeinsamen `GeschenkehalleCatalog` der Geschenkehalle-`ItemArea` zuweisen.
 5. Pro Truhe: Innenvolumen-Größe und Deckel-Öffnungswinkel feintunen.

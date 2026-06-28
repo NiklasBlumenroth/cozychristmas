@@ -48,10 +48,23 @@ namespace CozySanta.Editor
             if (eject == null)
                 Debug.LogWarning($"[Truhen] Kein '{EjectTargetName}' in der Szene gefunden – Auswurfpunkt bleibt leer.");
 
-            var chests = FindChests().OrderBy(NumberOf).ThenBy(t => t.name).ToList();
+            // Auswahlbasiert: nur die in der Hierarchie SELEKTIERTEN Truhen (bzw. Truhen unter selektierten
+            // Roots) werden eingerichtet. So bleiben Deko-Truhen anderer Hallen unberührt. Ohne Auswahl
+            // werden alle Truhen der Szene genommen (mit Warnung) – nur fallbackweise.
+            var fromSelection = true;
+            var chests = CollectSelectedChests();
             if (chests.Count == 0)
             {
-                Debug.LogError("[Truhen] Keine Truhen (chest mit Child 'chest_top') in der offenen Szene gefunden.");
+                fromSelection = false;
+                chests = FindAllChests();
+                Debug.LogWarning("[Truhen] Keine Truhen in der Auswahl – verwende ALLE Truhen der Szene. " +
+                                 "Besser: nur die Geschenkehalle-Truhen (oder ihren Eltern-Root) selektieren, " +
+                                 "damit Deko-Truhen anderer Hallen nicht erfasst werden.");
+            }
+            chests = chests.OrderBy(NumberOf).ThenBy(t => t.name).ToList();
+            if (chests.Count == 0)
+            {
+                Debug.LogError("[Truhen] Keine Truhen (chest mit Child 'chest_top') gefunden.");
                 return;
             }
 
@@ -59,9 +72,11 @@ namespace CozySanta.Editor
             var group = Undo.GetCurrentGroup();
             var log = new StringBuilder();
 
-            for (var i = 0; i < chests.Count; i++)
+            // 1:1-Zuweisung (KEIN Modulo): jede Sorte genau einmal. Überzählige Truhen/Varianten bleiben offen.
+            var pairs = Mathf.Min(chests.Count, variants.Count);
+            for (var i = 0; i < pairs; i++)
             {
-                var facets = variants[i % variants.Count];
+                var facets = variants[i];
                 var max = MaxFor(catalog, facets);
                 ConfigureChest(chests[i], facets, max, eject);
                 log.AppendLine($"  {chests[i].name} -> [{string.Join(", ", facets)}] (Soll {max})");
@@ -72,14 +87,17 @@ namespace CozySanta.Editor
 
             if (chests.Count != variants.Count)
             {
-                Debug.LogWarning($"[Truhen] {chests.Count} Truhen, aber {variants.Count} Katalog-Varianten. " +
-                                 (chests.Count < variants.Count
-                                     ? $"Die letzten {variants.Count - chests.Count} Variante(n) haben keine Truhe."
-                                     : "Überzählige Truhen wiederholen Varianten (modulo)."));
+                Debug.LogWarning($"[Truhen] {chests.Count} Truhen, aber {variants.Count} Truhen-Varianten – " +
+                                 $"{pairs} 1:1 zugewiesen. " +
+                                 (chests.Count > variants.Count
+                                     ? $"{chests.Count - pairs} Truhe(n) bleiben OHNE Sorte (kein GiftChest). " +
+                                       "Truhenzahl auf die Variantenzahl bringen oder nur passende selektieren."
+                                     : $"{variants.Count - pairs} Variante(n) haben KEINE Truhe."));
             }
 
-            Debug.Log($"[Truhen] {chests.Count} Truhe(n) eingerichtet. Szene speichern (Strg+S). Danach am " +
-                      $"Geschenkehalle-AreaTracker eine Truhen-Gruppe (root = gemeinsamer Eltern, taskId) hinzufügen.\n{log}");
+            Debug.Log($"[Truhen] {pairs} Truhe(n) eingerichtet (Quelle: {(fromSelection ? "Auswahl" : "ganze Szene")}). " +
+                      "Szene speichern (Strg+S). Danach am Geschenkehalle-AreaTracker eine Truhen-Gruppe " +
+                      $"(root = gemeinsamer Eltern, taskId) hinzufügen.\n{log}");
         }
 
         private static void ConfigureChest(Transform chest, string[] facets, int required, Transform eject)
@@ -179,8 +197,23 @@ namespace CozySanta.Editor
             return result;
         }
 
-        // Alle Truhen = Transforms mit einem direkten Child namens „chest_top".
-        private static List<Transform> FindChests()
+        // Truhen aus der Hierarchie-Auswahl: jede selektierte Truhe selbst + alle Truhen unter selektierten Roots.
+        private static List<Transform> CollectSelectedChests()
+        {
+            var result = new List<Transform>();
+            foreach (var root in Selection.transforms)
+            {
+                foreach (var t in root.GetComponentsInChildren<Transform>(includeInactive: true))
+                {
+                    if (FindChild(t, LidChildName) != null && !result.Contains(t)) result.Add(t);
+                }
+            }
+
+            return result;
+        }
+
+        // Alle Truhen der Szene = Transforms mit einem direkten Child namens „chest_top" (Fallback).
+        private static List<Transform> FindAllChests()
         {
             var result = new List<Transform>();
             foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None))
