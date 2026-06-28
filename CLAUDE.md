@@ -276,6 +276,25 @@ Assets/_Project/
   `FirstPersonController` um `SetCrouch(bool)` + `ApplyCrouch` (CharacterController-Höhe/-Mitte + Kamera)
   erweitert, `PlayerInputRelay` liest Shift gehalten. EditMode-Tests CR1–CR5.
 
+- **F11 (Core/Runtime grün, Unity-Compile maßgeblich)**: Geschenkehalle-Truhen — Sortieren durch
+  physisches Einwerfen + Deckel schließen. Core `GiftChestValidation.Decide` (rein, testbar): alles-oder-
+  nichts gegen genau einen `SortKey`, Annahme-Anzahl, Verriegeln bei Soll-Menge; EditMode-Tests GC1–GC6.
+  Runtime `GiftChest` (partial `…cs`/`…Validate.cs`, `IInteractable`): Rechtsklick öffnet/schließt den
+  Deckel (`chest_top`, Slerp, Öffnungswinkel > 90°); beim Schließen sammelt `Physics.OverlapBox` über das
+  Trigger-Innenvolumen alle `Sortable`-Items → alle korrekt = verschwinden (`Unregister` + `Destroy`) +
+  Zählstand; ein falsches = gesamter Inhalt fliegt zur `RöhrenPosition` (`BeginSettling`). Erreicht der
+  Zählstand `required` (100), verriegelt die Truhe dauerhaft (`onLocked`). `PlayerInputRelay` routet den
+  diskreten Rechtsklick auf eine fokussierte `GiftChest`. `AreaTracker` additiv um `ChestGroup` (Truhen
+  unter root → `BookSort` +1 je Verriegelung, Auto-Soll = Anzahl Truhen). Editor: `GeschenkItemSetup`
+  („CozySanta/Geschenkehalle/Geschenke als Sortierobjekte einrichten") stattet beide Ordner aus
+  (`Prefabs/Geschenke` → Toys/Regale, `…/Truhengeschenke` → Truhen) mit Rigidbody/Pickup/Sortable
+  (SortKey = Prefab-Name)/BoxCollider/PrefabId/SettlingBody, Schatten aus, und baut zwei Kataloge
+  (`GeschenkeRegalCatalog` Max 70, `TruhengeschenkeCatalog` Max 100). `GiftChestSetup`
+  („CozySanta/Geschenkehalle/Truhen einrichten") erkennt Truhen am Child `chest_top`, hängt `GiftChest` an,
+  legt ein `InsideVolume`-Trigger an, verdrahtet Deckel + `RöhrenPosition` und weist der Reihe nach je eine
+  Sorte aus dem Katalog zu. Regal-Zuweisung der Toys = bestehendes `SortTargetInteractable`-System (separat,
+  wie Dekohalle/Bäckerei). Doku/Diagramm unter `specs/011-geschenkehalle-truhen/`.
+
 ## Status / MVP-Fokus
 
 Erster Sektor (Eingangsbereich + Poststelle, optional Dekorationsfabrik) als

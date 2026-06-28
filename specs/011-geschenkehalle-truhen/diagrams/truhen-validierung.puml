@@ -1,0 +1,54 @@
+@startuml truhen-validierung
+' Truhen-Schließvorgang: Inhalt sammeln -> validieren (alles-oder-nichts) -> annehmen/auswerfen
+' Testkandidaten: GC1 leer, GC2 alle korrekt, GC3 ein falsches weist alles ab,
+'                 GC4/GC5 verriegeln bei/über Soll-Menge, GC6 kein required
+skinparam activity {
+    BackgroundColor LightYellow
+    BorderColor DarkGoldenRod
+}
+
+start
+
+:Rechtsklick auf fokussierte Truhe (PlayerInputRelay);
+
+if (Truhe verriegelt oder Deckel in Bewegung?) then (ja)
+  stop
+else (nein)
+endif
+
+if (Deckel offen?) then (nein)
+  :Open() – Deckel zum Öffnungswinkel slerpen;
+  stop
+else (ja)
+endif
+
+:CollectContained() – Physics.OverlapBox\nüber Innenvolumen -> eindeutige Sortable;
+
+if (Inhalt leer?) then (ja)
+  :CloseLid(thenLock=false);
+  stop
+else (nein)
+endif
+
+:GiftChestValidation.Decide(keys, accepted,\nalreadyAccepted, required);
+
+if (alle Items = akzeptierte Sorte?) then (nein / Reject)
+  :Eject() je Item ->\nUnregister + zur RöhrenPosition + BeginSettling;
+  :CloseLid(thenLock=false);
+  note right: alles-oder-nichts:\nein falsches wirft ALLES aus
+  stop
+else (ja / AllCorrect)
+  :Accept() je Item ->\nUnregister + Destroy (verschwindet);
+  :acceptedCount += AcceptCount;\nonItemsAccepted(AcceptCount);
+endif
+
+if (acceptedCount >= required? (Decision.Locks)) then (ja)
+  :CloseLid(thenLock=true)\n-> _locked, onLocked() -> AreaTracker BookSort +1;
+  note right: Truhe abgeschlossen
+else (nein)
+  :CloseLid(thenLock=false);
+endif
+
+stop
+
+@enduml

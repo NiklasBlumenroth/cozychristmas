@@ -40,6 +40,16 @@ namespace CozySanta.Runtime.Progression
             public bool      autoRequired = true;
         }
 
+        [Serializable]
+        public sealed class ChestGroup
+        {
+            [Tooltip("Alle GiftChest (Truhen) unterhalb von 'root' buchen beim Verriegeln +1 auf diese Task-ID.")]
+            public string    taskId = "";
+            public Transform root;
+            [Tooltip("Setzt die Soll-Menge der Aufgabe automatisch = Anzahl gefundener Truhen.")]
+            public bool      autoRequired = true;
+        }
+
         [Header("Area-Konfiguration")]
         [SerializeField] private string      areaName = "Area";
         [SerializeField] private int         areaXp   = 100;
@@ -50,6 +60,9 @@ namespace CozySanta.Runtime.Progression
 
         [Header("Sort-Gruppen (alle Fächer unter root → eine Task-ID)")]
         [SerializeField] private SortGroup[] sortGroups = new SortGroup[0];
+
+        [Header("Truhen-Gruppen (alle Truhen unter root → eine Task-ID)")]
+        [SerializeField] private ChestGroup[] chestGroups = new ChestGroup[0];
 
         [Header("Melt-Anbindung")]
         [SerializeField] private string        meltTaskId = "";
@@ -95,14 +108,15 @@ namespace CozySanta.Runtime.Progression
             if (meltRoot != null)
                 _meltPatches = meltRoot.GetComponentsInChildren<SnowPatch>(includeInactive: true);
 
-            // Sort-Gruppen einsammeln: alle Fächer unter root, dedupliziert je Task-ID.
+            // Sort-/Truhen-Gruppen einsammeln: alle Fächer/Truhen unter root, dedupliziert je Task-ID.
             var grouped = CollectSortGroups();
+            var chests  = CollectChestGroups();
 
             var tasks = new AreaTask[taskEntries.Length];
             for (var i = 0; i < taskEntries.Length; i++)
             {
                 var e = taskEntries[i];
-                var required = AutoRequired(e.taskId, grouped) ?? e.required;
+                var required = AutoRequired(e.taskId, grouped) ?? AutoChestRequired(e.taskId, chests) ?? e.required;
                 tasks[i] = new AreaTask(e.taskId, e.taskType, e.description, required);
             }
             _progress = new AreaProgress(new AreaDefinition(areaName, tasks, areaXp));
@@ -125,6 +139,47 @@ namespace CozySanta.Runtime.Progression
                     if (fach != null) fach.AddCompletionListener(() => _progress.BookSort(id));
                 }
             }
+
+            // Truhen-Bindings: jede verriegelte Truhe bucht +1 auf ihre Task-ID.
+            foreach (var kv in chests)
+            {
+                var id = kv.Key;
+                foreach (var chest in kv.Value)
+                {
+                    if (chest != null) chest.AddLockListener(() => _progress.BookSort(id));
+                }
+            }
+        }
+
+        private Dictionary<string, HashSet<GiftChest>> CollectChestGroups()
+        {
+            var grouped = new Dictionary<string, HashSet<GiftChest>>();
+            foreach (var g in chestGroups)
+            {
+                if (g == null || g.root == null || string.IsNullOrEmpty(g.taskId)) continue;
+                if (!grouped.TryGetValue(g.taskId, out var set))
+                {
+                    set = new HashSet<GiftChest>();
+                    grouped[g.taskId] = set;
+                }
+                foreach (var chest in g.root.GetComponentsInChildren<GiftChest>(includeInactive: true))
+                {
+                    set.Add(chest);
+                }
+            }
+            return grouped;
+        }
+
+        /// <summary>Auto-Soll-Menge (Anzahl Truhen) für eine Task-ID mit autoRequired-Truhen-Gruppe; sonst null.</summary>
+        private float? AutoChestRequired(string taskId, Dictionary<string, HashSet<GiftChest>> grouped)
+        {
+            var wants = false;
+            foreach (var g in chestGroups)
+            {
+                if (g != null && g.autoRequired && g.taskId == taskId && g.root != null) wants = true;
+            }
+            if (!wants || !grouped.TryGetValue(taskId, out var set) || set.Count == 0) return null;
+            return set.Count;
         }
 
         private Dictionary<string, HashSet<SortTargetInteractable>> CollectSortGroups()
