@@ -14,40 +14,41 @@ namespace CozySanta.Editor
     /// (analog <see cref="BakerySweetItemSetup"/>): <see cref="Rigidbody"/> (Masse 1), <see cref="PickupInteractable"/>,
     /// <see cref="Sortable"/> mit einem einzigen Facetten-Wert = Prefab-Name (eine Sorte je Container),
     /// an die Mesh-Bounds gefitteter <see cref="BoxCollider"/>, <see cref="PrefabId"/> + <see cref="SettlingBody"/>,
-    /// Schattenwurf aus. Baut zwei Kataloge:
-    /// <list type="bullet">
-    /// <item><c>GeschenkeRegalCatalog</c> – die „Toys" aus <c>Geschenke/</c> (für die Regale), Max 70/Variante.</item>
-    /// <item><c>TruhengeschenkeCatalog</c> – die Boxen aus <c>Geschenke/Truhengeschenke/</c> (für die Truhen), Max 100/Variante.</item>
-    /// </list>
-    /// Reiner Editor-/Asset-Schritt (Constitution V: dokumentierte Nicht-Unit-Ausnahme analog BookPrefabSetup).
+    /// Schattenwurf aus. Baut EINEN gemeinsamen Katalog <c>GeschenkehalleCatalog</c> für den einen
+    /// Geschenkehalle-Bereich (beide Arten werden dort verteilt/gespawnt): die „Toys" aus <c>Geschenke/</c>
+    /// mit Max 70/Variante, die Boxen aus <c>Geschenke/Truhengeschenke/</c> mit Max 100/Variante
+    /// (variantenspezifisch über <see cref="ItemCatalog.Entry.maxPerVariant"/>). Das Truhen-Setup zieht
+    /// sich daraus nur die Truhen-Varianten (per Prefab-Pfad). Reiner Editor-/Asset-Schritt
+    /// (Constitution V: dokumentierte Nicht-Unit-Ausnahme analog BookPrefabSetup).
     /// </summary>
     public static class GeschenkItemSetup
     {
         private const string RegalFolder = "Assets/_Project/Prefabs/Geschenke";
-        private const string TruhenFolder = "Assets/_Project/Prefabs/Geschenke/Truhengeschenke";
+        public const string TruhenFolder = "Assets/_Project/Prefabs/Geschenke/Truhengeschenke";
         private const string DataFolder = "Assets/_Project/Data";
-        private const string RegalCatalogPath = DataFolder + "/GeschenkeRegalCatalog.asset";
-        private const string TruhenCatalogPath = DataFolder + "/TruhengeschenkeCatalog.asset";
+        public const string CatalogPath = DataFolder + "/GeschenkehalleCatalog.asset";
 
-        private const int MaxRegal = 70;   // 2 Regale je Geschenkart
+        private const int MaxRegal = 70;   // 2 Regale je Toy-Geschenkart
         private const int MaxTruhe = 100;  // 100 je Truhen-Geschenkart
         private const float SettleDuration = 3f;
 
-        [MenuItem("CozySanta/Geschenkehalle/Geschenke als Sortierobjekte einrichten (Prefabs + Kataloge)")]
+        [MenuItem("CozySanta/Geschenkehalle/Geschenke als Sortierobjekte einrichten (Prefabs + Katalog)")]
         public static void SetupGifts()
         {
             // Truhen-Items zuerst stempeln+sammeln, danach die Regal-Items NUR aus dem obersten Ordner
-            // (ohne den Unterordner Truhengeschenke), damit sich die Kataloge nicht überschneiden.
+            // (ohne den Unterordner Truhengeschenke). Beide landen in EINEM Katalog (eine Geschenkehalle),
+            // jeweils mit eigener Höchstzahl pro Variante.
             var truhen = StampFolder(TruhenFolder, MaxTruhe, recursive: true, exclude: null);
             var regal = StampFolder(RegalFolder, MaxRegal, recursive: false, exclude: TruhenFolder);
 
-            BuildCatalog(TruhenCatalogPath, truhen);
-            BuildCatalog(RegalCatalogPath, regal);
+            var all = new List<ItemCatalog.Entry>(regal);
+            all.AddRange(truhen);
+            BuildCatalog(CatalogPath, all);
             AssetDatabase.SaveAssets();
 
-            Debug.Log($"[Geschenkehalle] Regal-Items: {regal.Count} (Max {MaxRegal}) -> {RegalCatalogPath}; " +
-                      $"Truhen-Items: {truhen.Count} (Max {MaxTruhe}) -> {TruhenCatalogPath}. " +
-                      "Kataloge den ItemAreas (Regale/Truhen) zuweisen, dann das Truhen-Setup ausführen.");
+            Debug.Log($"[Geschenkehalle] {all.Count} Items in EINEM Katalog ({CatalogPath}): " +
+                      $"{regal.Count} Toys (Max {MaxRegal}) + {truhen.Count} Truhen-Geschenke (Max {MaxTruhe}). " +
+                      "Katalog der Geschenkehalle-ItemArea zuweisen, dann das Truhen-Setup ausführen.");
         }
 
         // Stempelt alle Prefabs eines Ordners und liefert die Katalog-Einträge zurück.

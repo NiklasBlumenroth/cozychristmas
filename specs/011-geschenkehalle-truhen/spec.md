@@ -11,6 +11,11 @@ In der Geschenkehalle sortiert der Spieler Geschenke. Zwei Item-Klassen:
   einsortiert – über das neue `GiftChest`-System dieser Feature. 100 je Variante, 20 Truhen
   (eine Sorte je Truhe).
 
+Beide Arten gehören zu **einem** Bereich (eine Geschenkehalle, kein zweiter Raum): sie liegen in
+**einem** gemeinsamen Katalog (`GeschenkehalleCatalog`) und werden über die eine Geschenkehalle-
+`ItemArea` verteilt/gespawnt. Unterschiedlich ist nur die Höchstzahl je Variante (Toys 70,
+Truhen-Geschenke 100, variantenspezifisch im Katalog) und das Sortierziel (Regal vs. Truhe).
+
 ## Truhen-Mechanik
 
 1. **Öffnen/Schließen**: Rechtsklick auf die fokussierte Truhe schaltet den Deckel (`chest_top`)
@@ -32,8 +37,8 @@ In der Geschenkehalle sortiert der Spieler Geschenke. Zwei Item-Klassen:
 | Runtime | `GiftChest` (`.cs` + `.Validate.cs`) | `IInteractable`, Deckel-Slerp, OverlapBox-Inhalt, Annehmen (Destroy)/Auswerfen (zur Röhre), Verriegeln |
 | Runtime | `AreaTracker.ChestGroup` | bindet jede verriegelte Truhe → `BookSort(taskId, +1)`; Auto-Soll-Menge = Anzahl Truhen |
 | Input | `PlayerInputRelay` | diskreter Rechtsklick auf fokussierte `GiftChest` → `Interact()` |
-| Editor | `GeschenkItemSetup` | beide Ordner → Sortierobjekte (Rigidbody/Pickup/Sortable/Collider/PrefabId/SettlingBody) + zwei Kataloge |
-| Editor | `GiftChestSetup` | Truhen-Instanzen → `GiftChest` + Innenvolumen + Deckel/Röhre verdrahten + Sorte aus Katalog (Reihenfolge) |
+| Editor | `GeschenkItemSetup` | beide Ordner → Sortierobjekte (Rigidbody/Pickup/Sortable/Collider/PrefabId/SettlingBody) + EIN gemeinsamer Katalog (Max je Variante) |
+| Editor | `GiftChestSetup` | Truhen-Instanzen → `GiftChest` + Innenvolumen + Deckel/Röhre verdrahten + Sorte aus Katalog (nur Truhen-Ordner-Varianten, Reihenfolge) |
 
 - **Decide/Apply getrennt**: Validierungsregel in Core (testbar), Seiteneffekte (Deckel, Destroy,
   Auswurf) in Runtime.
@@ -58,10 +63,10 @@ Authoring (dokumentierte Nicht-Unit-Ausnahme analog `BookPrefabSetup`/`BakerySwe
 1. Truhen-Geschenke auf 20 Varianten reduzieren (Soll-Menge je 100).
 2. Truhen (20) und Regale platzieren; `RöhrenPosition` existiert bereits.
 3. Setup ausführen:
-   - „CozySanta/Geschenkehalle/Geschenke als Sortierobjekte einrichten (Prefabs + Kataloge)"
+   - „CozySanta/Geschenkehalle/Geschenke als Sortierobjekte einrichten (Prefabs + Katalog)"
    - „CozySanta/Geschenkehalle/Truhen einrichten (GiftChest + Innenvolumen + Sorte)"
 4. Am Geschenkehalle-`AreaTracker` eine Truhen-Gruppe (root = gemeinsamer Eltern der Truhen,
-   taskId) hinzufügen; Kataloge den jeweiligen `ItemArea` zuweisen.
+   taskId) hinzufügen; den gemeinsamen `GeschenkehalleCatalog` der Geschenkehalle-`ItemArea` zuweisen.
 5. Pro Truhe: Innenvolumen-Größe und Deckel-Öffnungswinkel feintunen.
 
 ## Out of Scope (v1)

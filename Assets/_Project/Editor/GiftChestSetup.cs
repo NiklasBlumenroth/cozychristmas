@@ -21,7 +21,7 @@ namespace CozySanta.Editor
     /// </summary>
     public static class GiftChestSetup
     {
-        private const string CatalogPath = "Assets/_Project/Data/TruhengeschenkeCatalog.asset";
+        private const string CatalogPath = GeschenkItemSetup.CatalogPath;
         private const string LidChildName = "chest_top";
         private const string EjectTargetName = "RöhrenPosition";
         private const int DefaultRequired = 100;
@@ -32,12 +32,18 @@ namespace CozySanta.Editor
             var catalog = AssetDatabase.LoadAssetAtPath<ItemCatalog>(CatalogPath);
             if (catalog == null || catalog.Keys.Count == 0)
             {
-                Debug.LogError($"[Truhen] Kein/leerer TruhengeschenkeCatalog ({CatalogPath}). " +
+                Debug.LogError($"[Truhen] Kein/leerer GeschenkehalleCatalog ({CatalogPath}). " +
                                "Zuerst 'Geschenke als Sortierobjekte einrichten' ausführen.");
                 return;
             }
 
+            // Nur die Truhen-Varianten (Prefabs im Truhengeschenke-Ordner) aus dem gemeinsamen Katalog.
             var variants = LoadCatalogFacets(catalog);
+            if (variants.Count == 0)
+            {
+                Debug.LogError($"[Truhen] Keine Truhen-Varianten im Katalog (Ordner {GeschenkItemSetup.TruhenFolder}).");
+                return;
+            }
             var eject = FindByName(EjectTargetName);
             if (eject == null)
                 Debug.LogWarning($"[Truhen] Kein '{EjectTargetName}' in der Szene gefunden – Auswurfpunkt bleibt leer.");
@@ -139,14 +145,21 @@ namespace CozySanta.Editor
             return key != null && map.TryGetValue(key, out var m) && m > 0 ? m : DefaultRequired;
         }
 
-        // Liest aus jeder Katalog-Variante (Prefab) die Sortable-Facetten, in Katalog-Reihenfolge.
+        // Liest aus den TRUHEN-Varianten (Prefabs im Truhengeschenke-Ordner) die Sortable-Facetten,
+        // in Katalog-Reihenfolge. Toys (Regal-Geschenke) werden übersprungen.
         private static List<string[]> LoadCatalogFacets(ItemCatalog catalog)
         {
+            var truhenFolder = GeschenkItemSetup.TruhenFolder + "/";
             var result = new List<string[]>();
             foreach (var key in catalog.Keys)
             {
                 var prefab = catalog.Get(key);
-                var sortable = prefab != null ? prefab.GetComponent<Sortable>() : null;
+                if (prefab == null) continue;
+
+                var path = AssetDatabase.GetAssetPath(prefab).Replace('\\', '/');
+                if (!path.StartsWith(truhenFolder)) continue; // nur Truhen-Geschenke
+
+                var sortable = prefab.GetComponent<Sortable>();
                 if (sortable == null)
                 {
                     Debug.LogWarning($"[Truhen] '{key}': kein Sortable am Prefab – übersprungen.");

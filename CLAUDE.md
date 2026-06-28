@@ -287,13 +287,14 @@ Assets/_Project/
   diskreten Rechtsklick auf eine fokussierte `GiftChest`. `AreaTracker` additiv um `ChestGroup` (Truhen
   unter root → `BookSort` +1 je Verriegelung, Auto-Soll = Anzahl Truhen). Editor: `GeschenkItemSetup`
   („CozySanta/Geschenkehalle/Geschenke als Sortierobjekte einrichten") stattet beide Ordner aus
-  (`Prefabs/Geschenke` → Toys/Regale, `…/Truhengeschenke` → Truhen) mit Rigidbody/Pickup/Sortable
-  (SortKey = Prefab-Name)/BoxCollider/PrefabId/SettlingBody, Schatten aus, und baut zwei Kataloge
-  (`GeschenkeRegalCatalog` Max 70, `TruhengeschenkeCatalog` Max 100). `GiftChestSetup`
-  („CozySanta/Geschenkehalle/Truhen einrichten") erkennt Truhen am Child `chest_top`, hängt `GiftChest` an,
-  legt ein `InsideVolume`-Trigger an, verdrahtet Deckel + `RöhrenPosition` und weist der Reihe nach je eine
-  Sorte aus dem Katalog zu. Regal-Zuweisung der Toys = bestehendes `SortTargetInteractable`-System (separat,
-  wie Dekohalle/Bäckerei). Doku/Diagramm unter `specs/011-geschenkehalle-truhen/`.
+  (`Prefabs/Geschenke` → Toys, `…/Truhengeschenke` → Truhen-Geschenke) mit Rigidbody/Pickup/Sortable
+  (SortKey = Prefab-Name)/BoxCollider/PrefabId/SettlingBody, Schatten aus, und baut EINEN gemeinsamen
+  Katalog `GeschenkehalleCatalog` (eine Geschenkehalle, beide Arten dort verteilt; Max je Variante: Toys 70,
+  Truhen-Geschenke 100). `GiftChestSetup` („CozySanta/Geschenkehalle/Truhen einrichten") erkennt Truhen am
+  Child `chest_top`, hängt `GiftChest` an, legt ein `InsideVolume`-Trigger an, verdrahtet Deckel +
+  `RöhrenPosition` und weist der Reihe nach je eine Truhen-Sorte zu (filtert aus dem gemeinsamen Katalog die
+  Prefabs im `Truhengeschenke`-Ordner). Regal-Zuweisung der Toys = bestehendes `SortTargetInteractable`-System
+  (separat, wie Dekohalle/Bäckerei). Doku/Diagramm unter `specs/011-geschenkehalle-truhen/`.
 
 ## Status / MVP-Fokus
 
