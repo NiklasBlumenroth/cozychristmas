@@ -218,3 +218,4 @@ MonoBehaviour:
   placedEuler: {x: -90, y: 0, z: 0}
   placedScale: 1
   placedOffset: {x: 0, y: -0.15, z: 0}
+  carryEuler: {x: -90, y: 0, z: 0}
