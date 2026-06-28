@@ -309,6 +309,12 @@ Assets/_Project/
   („CozySanta/Geschenkehalle/Geschenke drehbar machen") fügt sie nachträglich an alle Katalog-Items an
   + legt ein `SortPlacementRotationDevTool` in die Szene (Item tragen, im Fach-Ghost justieren). Doku/
   Diagramm unter `specs/011-geschenkehalle-truhen/`.
+  Item-Abbild auf Schildern (Editor): `GeschenkSignSetup` („CozySanta/Geschenkehalle/Item-Abbild auf
+  Schilder setzen") setzt auf jedes `BoardRegal`-Schild (Kind von Truhe/Regal unter `GeschenkehalleInnen`)
+  ein reines Abbild-Mesh des akzeptierten Items (SortKey des `GiftChest`/`SortTargetInteractable` →
+  `GeschenkehalleCatalog`-Prefab). Kein Sortierobjekt: gestrippt auf MeshFilter/MeshRenderer. Ausrichtung =
+  in-Hand (`SortPlacementRotation.CarryEuler`), zentriert auf der Schildfläche, auf 80% der Fläche
+  eingepasst, Tiefe entlang der Schild-Normalen auf 1% abgeflacht (`ItemSchild`-Kind, idempotent).
 
 ## Status / MVP-Fokus
 
