@@ -259,6 +259,12 @@ Assets/_Project/
   `ItemPlacementPositionOffset`, `CombinedScale`). `SortPlacementRotationDevTool` erweitert: `,`/`.` =
   Größe, Bild↑/↓ = Höhe (zusätzlich zu I/K J/L U/O = drehen). `DekohalleSortItemSetup` reduziert auf
   „macht Katalog-Items drehbar" (hängt `SortPlacementRotation` an + ein DevTool in die Szene).
+  Hand-Drehung (additiv): `SortPlacementRotation` trägt zusätzlich `CarryEuler` (unabhängige Drehung,
+  wenn das Item in der HAND gehalten wird, relativ zum Hand-Anker; getrennt von der Fach-Einlage).
+  `PlayerCarry.RelayoutHands` legt sie statt `Quaternion.identity` an beide Hand-Anker an (ohne
+  Komponente = Identität). `SortPlacementRotationDevTool` hat einen Modus-Umschalter (Taste `T`): „Fach"
+  justiert die Einlage wie bisher, „Hand" justiert nur `CarryEuler` live am getragenen Item (I/K J/L U/O;
+  setzt die `localRotation` sofort, da `RelayoutHands` erst bei Stapeländerung neu läuft).
 
 - **Dekohalle-Fächer-Belegung (Editor, Szene)**: `DekohalleSortAssignmentSetup`
   („CozySanta/Dekohalle/Fächer in Regalen belegen") weist den 18 `gabinet`-Regalen unter `DekoInnen`

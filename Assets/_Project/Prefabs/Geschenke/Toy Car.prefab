@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 8035114622319112427}
   - component: {fileID: 6622703837451055908}
   - component: {fileID: 5705454259472387725}
+  - component: {fileID: 1528413377185175996}
   m_Layer: 0
   m_Name: Toy Car
   m_TagString: Untagged
@@ -199,3 +200,18 @@ MonoBehaviour:
   linearThreshold: 0.05
   angularThreshold: 0.2
   settleDuration: 3
+--- !u!114 &1528413377185175996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7695997743222462810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc4e0dd9ec0c5104baf418e3bae7f77f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Sorting.SortPlacementRotation
+  placedEuler: {x: 0, y: 0, z: 0}
+  placedScale: 1
+  placedOffset: {x: 0, y: 0, z: 0}

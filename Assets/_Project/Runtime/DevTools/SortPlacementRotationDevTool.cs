@@ -11,9 +11,14 @@ namespace CozySanta.Runtime.DevTools
     /// selektieren zu müssen. Verstellt Dreh-Offset, Größenfaktor und Höhen-/Positions-Offset; der aktuelle
     /// Stand wird oben eingeblendet, sodass man ihn ablesen und ins Prefab übernehmen kann.
     ///
+    /// Zwei Modi (Taste T schaltet um): „Fach" justiert die Einlage (Dreh/Größe/Höhe, live im Fach-Ghost),
+    /// „Hand" justiert NUR die Hand-Drehung (<see cref="SortPlacementRotation.CarryEuler"/>, live am
+    /// getragenen Item, kein Ghost nötig).
+    ///
     /// Tasten (Schrittweite per Inspector, Shift = Feinschritt):
     ///   I / K = Pitch (X),  J / L = Yaw (Y),  U / O = Roll (Z)
-    ///   , / . = kleiner / größer (Scale),  Bild↑ / Bild↓ = Höhe (Y-Offset),  P = Wert loggen.
+    ///   , / . = kleiner / größer (Scale, nur Fach),  Bild↑ / Bild↓ = Höhe (Y-Offset, nur Fach)
+    ///   T = Modus Fach/Hand,  P = Wert loggen.
     /// </summary>
     public sealed class SortPlacementRotationDevTool : MonoBehaviour
     {
@@ -41,6 +46,7 @@ namespace CozySanta.Runtime.DevTools
         [SerializeField] private int fontSize = 16;
 
         private GUIStyle _style;
+        private bool _handMode;   // false = Fach (Einlage), true = Hand (CarryEuler)
 
         private void Awake()
         {
@@ -54,10 +60,17 @@ namespace CozySanta.Runtime.DevTools
             var keyboard = Keyboard.current;
             if (keyboard == null) return;
 
+            // Modus umschalten (Fach <-> Hand).
+            if (keyboard.tKey.wasPressedThisFrame)
+            {
+                _handMode = !_handMode;
+                LogState(rot);
+            }
+
             var shift = keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
             var changed = false;
 
-            // Rotation: I/K = X, J/L = Y, U/O = Z.
+            // Rotation: I/K = X, J/L = Y, U/O = Z (in beiden Modi).
             var rStep = shift ? fineStepDegrees : stepDegrees;
             var delta = Vector3.zero;
             if (keyboard.iKey.wasPressedThisFrame) delta.x += rStep;
@@ -68,19 +81,29 @@ namespace CozySanta.Runtime.DevTools
             if (keyboard.oKey.wasPressedThisFrame) delta.z -= rStep;
             if (delta != Vector3.zero)
             {
-                rot.PlacedEuler = Wrap(rot.PlacedEuler + delta);
+                if (_handMode) rot.CarryEuler = Wrap(rot.CarryEuler + delta);
+                else           rot.PlacedEuler = Wrap(rot.PlacedEuler + delta);
                 changed = true;
             }
 
-            // Größe: , = kleiner, . = größer.
-            var sStep = shift ? fineScaleStep : scaleStep;
-            if (keyboard.commaKey.wasPressedThisFrame) { rot.PlacedScale -= sStep; changed = true; }
-            if (keyboard.periodKey.wasPressedThisFrame) { rot.PlacedScale += sStep; changed = true; }
+            // Größe + Höhe nur im Fach-Modus (Hand justiert ausschließlich die Drehung).
+            if (!_handMode)
+            {
+                var sStep = shift ? fineScaleStep : scaleStep;
+                if (keyboard.commaKey.wasPressedThisFrame) { rot.PlacedScale -= sStep; changed = true; }
+                if (keyboard.periodKey.wasPressedThisFrame) { rot.PlacedScale += sStep; changed = true; }
 
-            // Höhe (Y-Offset): Bild↑ = hoch, Bild↓ = runter.
-            var oStep = shift ? fineOffsetStep : offsetStep;
-            if (keyboard.pageUpKey.wasPressedThisFrame) { var o = rot.PlacedOffset; o.y += oStep; rot.PlacedOffset = o; changed = true; }
-            if (keyboard.pageDownKey.wasPressedThisFrame) { var o = rot.PlacedOffset; o.y -= oStep; rot.PlacedOffset = o; changed = true; }
+                var oStep = shift ? fineOffsetStep : offsetStep;
+                if (keyboard.pageUpKey.wasPressedThisFrame) { var o = rot.PlacedOffset; o.y += oStep; rot.PlacedOffset = o; changed = true; }
+                if (keyboard.pageDownKey.wasPressedThisFrame) { var o = rot.PlacedOffset; o.y -= oStep; rot.PlacedOffset = o; changed = true; }
+            }
+
+            // Hand-Modus: Drehung sofort am getragenen Item sichtbar machen (RelayoutHands läuft sonst erst
+            // bei der nächsten Stapeländerung). Das oberste Item liegt am Hand-Anker mit localRotation.
+            if (_handMode && changed && carry.TryPeekTopComponent(out var topComp) && topComp != null)
+            {
+                topComp.transform.localRotation = rot.CarryOffset;
+            }
 
             if (changed || keyboard.pKey.wasPressedThisFrame) LogState(rot);
         }
@@ -93,9 +116,14 @@ namespace CozySanta.Runtime.DevTools
             return top.TryGetComponent(out rot);
         }
 
-        private static void LogState(SortPlacementRotation rot)
-            => Debug.Log($"[PlacedAdjust] {rot.gameObject.name}: Euler = {rot.PlacedEuler}, " +
-                         $"Scale = {rot.PlacedScale:0.###}, Offset = {rot.PlacedOffset}");
+        private void LogState(SortPlacementRotation rot)
+        {
+            if (_handMode)
+                Debug.Log($"[CarryAdjust] {rot.gameObject.name}: CarryEuler = {rot.CarryEuler}");
+            else
+                Debug.Log($"[PlacedAdjust] {rot.gameObject.name}: Euler = {rot.PlacedEuler}, " +
+                          $"Scale = {rot.PlacedScale:0.###}, Offset = {rot.PlacedOffset}");
+        }
 
         private void OnGUI()
         {
@@ -112,10 +140,20 @@ namespace CozySanta.Runtime.DevTools
                 _style.normal.textColor = Color.white;
             }
 
-            var e = rot.PlacedEuler;
-            var text = $"Einlage „{rot.gameObject.name}\":  Dreh X {e.x:0} Y {e.y:0} Z {e.z:0}   " +
+            string text;
+            if (_handMode)
+            {
+                var c = rot.CarryEuler;
+                text = $"[HAND] „{rot.gameObject.name}\":  Dreh X {c.x:0} Y {c.y:0} Z {c.z:0}\n" +
+                       "I/K J/L U/O = drehen   T = Modus Fach   (Shift = fein, P = loggen)";
+            }
+            else
+            {
+                var e = rot.PlacedEuler;
+                text = $"[FACH] „{rot.gameObject.name}\":  Dreh X {e.x:0} Y {e.y:0} Z {e.z:0}   " +
                        $"Größe {rot.PlacedScale:0.##}   Höhe {rot.PlacedOffset.y:0.###}\n" +
-                       "I/K J/L U/O = drehen   ,/. = Größe   Bild↑/Bild↓ = Höhe   (Shift = fein, P = loggen)";
+                       "I/K J/L U/O = drehen   ,/. = Größe   Bild↑/Bild↓ = Höhe   T = Modus Hand   (Shift = fein, P = loggen)";
+            }
             GUI.Label(new Rect(0f, 8f, Screen.width, 60f), text, _style);
         }
 

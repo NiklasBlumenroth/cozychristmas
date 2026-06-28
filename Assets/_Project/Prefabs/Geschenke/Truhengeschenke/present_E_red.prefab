@@ -90,6 +90,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fa3a476cc1f48ce43981c0930a32551e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7403515472560814403}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fa3a476cc1f48ce43981c0930a32551e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2607521176044574080}
   m_SourcePrefab: {fileID: 100100000, guid: fa3a476cc1f48ce43981c0930a32551e, type: 3}
 --- !u!1 &611423532313396034 stripped
 GameObject:
@@ -200,3 +203,18 @@ MonoBehaviour:
   linearThreshold: 0.05
   angularThreshold: 0.2
   settleDuration: 3
+--- !u!114 &2607521176044574080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 611423532313396034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc4e0dd9ec0c5104baf418e3bae7f77f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Sorting.SortPlacementRotation
+  placedEuler: {x: 0, y: 0, z: 0}
+  placedScale: 1
+  placedOffset: {x: 0, y: 0, z: 0}

@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 7371843979266707591}
   - component: {fileID: 6787929359549276508}
   - component: {fileID: 5391162279353872178}
+  - component: {fileID: 7682615780778018375}
   m_Layer: 0
   m_Name: GiftBox_Square_TypeA
   m_TagString: Untagged
@@ -234,6 +235,21 @@ MonoBehaviour:
   linearThreshold: 0.05
   angularThreshold: 0.2
   settleDuration: 3
+--- !u!114 &7682615780778018375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 125242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc4e0dd9ec0c5104baf418e3bae7f77f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Sorting.SortPlacementRotation
+  placedEuler: {x: 0, y: 0, z: 0}
+  placedScale: 1
+  placedOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &128768
 GameObject:
   m_ObjectHideFlags: 0

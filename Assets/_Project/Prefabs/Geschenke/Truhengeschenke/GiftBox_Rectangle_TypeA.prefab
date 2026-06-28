@@ -284,6 +284,7 @@ GameObject:
   - component: {fileID: 247312558488517719}
   - component: {fileID: 5618405081089442340}
   - component: {fileID: 2307387346684902658}
+  - component: {fileID: 8477565232647714833}
   m_Layer: 0
   m_Name: GiftBox_Rectangle_TypeA
   m_TagString: Untagged
@@ -412,6 +413,21 @@ MonoBehaviour:
   linearThreshold: 0.05
   angularThreshold: 0.2
   settleDuration: 3
+--- !u!114 &8477565232647714833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 164226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc4e0dd9ec0c5104baf418e3bae7f77f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Sorting.SortPlacementRotation
+  placedEuler: {x: 0, y: 0, z: 0}
+  placedScale: 1
+  placedOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &184806
 GameObject:
   m_ObjectHideFlags: 0
