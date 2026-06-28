@@ -234,6 +234,12 @@ namespace CozySanta.Runtime.Sorting
 
         private void PlaceVisual(Component component, int x, int y, int z)
         {
+            // Natürliche WELT-Skalierung merken (noch in der Hand) – Basis fürs exakte Wiederherstellen beim
+            // Entnehmen. Verhindert den Stauch-Drift: Einlegen (wps:false) verschiebt die Welt-Skalierung um
+            // den Regal-Scale, Aufnehmen (wps:true) backt sie ein – ohne diese Referenz schrumpft das Item
+            // mit jedem Lege-/Entnehm-Zyklus.
+            _originalScale[component.GetInstanceID()] = component.transform.lossyScale;
+
             // Welt-Pose aus der Hand merken = Flug-Start. Umparenten mit worldPositionStays:false (behält die
             // bisherige Scale-Semantik: das Item erbt die Fach-Skalierung) und Welt-Pose direkt zurücksetzen.
             var startPos = component.transform.position;
@@ -265,14 +271,20 @@ namespace CozySanta.Runtime.Sorting
 
         private void RestoreVisual(Component component, int id)
         {
-            if (_originalScale.TryGetValue(id, out var original))
+            if (_originalScale.TryGetValue(id, out var naturalWorld))
             {
-                component.transform.localScale = original;
+                // Exakt auf die natürliche Welt-Skalierung zurücksetzen: parentlos setzen (kein Parent →
+                // localScale == Welt-Skalierung), dann den Wert übernehmen. Das anschließende Aufnehmen
+                // (PlayerCarry, worldPositionStays:true) bewahrt diese Welt-Skalierung → kein Drift.
+                component.transform.SetParent(null, worldPositionStays: true);
+                component.transform.localScale = naturalWorld;
                 _originalScale.Remove(id);
             }
             // Collider/Physik werden von PlayerCarry.TryPickup (carried) wieder gesetzt.
         }
 
+        // Multipliziert die (nach dem Umparenten gültige) lokale Skalierung mit Fach- und item-eigenem Faktor.
+        // Die Restore-Referenz (natürliche Welt-Skalierung) wird in PlaceVisual gesetzt, unabhängig hiervon.
         private void ApplyPlacedScale(Component component, float itemScale)
         {
             var total = (placedScale > 0f ? placedScale : 1f) * (itemScale > 0f ? itemScale : 1f);
@@ -281,13 +293,7 @@ namespace CozySanta.Runtime.Sorting
                 return;
             }
 
-            var id = component.GetInstanceID();
-            if (!_originalScale.ContainsKey(id))
-            {
-                _originalScale[id] = component.transform.localScale;
-            }
-
-            component.transform.localScale = _originalScale[id] * total;
+            component.transform.localScale *= total;
         }
 
         /// <summary>Ghost-Pose für Spalte (x,y): hinterster freier Slot. <paramref name="item"/> ist das
