@@ -259,11 +259,18 @@ Assets/_Project/
   `ItemPlacementPositionOffset`, `CombinedScale`). `SortPlacementRotationDevTool` erweitert: `,`/`.` =
   Größe, Bild↑/↓ = Höhe (zusätzlich zu I/K J/L U/O = drehen). `DekohalleSortItemSetup` reduziert auf
   „macht Katalog-Items drehbar" (hängt `SortPlacementRotation` an + ein DevTool in die Szene).
+  Hand-Drehung (additiv): `SortPlacementRotation` trägt zusätzlich `CarryEuler` (unabhängige Drehung,
+  wenn das Item in der HAND gehalten wird, relativ zum Hand-Anker; getrennt von der Fach-Einlage).
+  `PlayerCarry.RelayoutHands` legt sie statt `Quaternion.identity` an beide Hand-Anker an (ohne
+  Komponente = Identität). `SortPlacementRotationDevTool` hat einen Modus-Umschalter (Taste `T`): „Fach"
+  justiert die Einlage wie bisher, „Hand" justiert nur `CarryEuler` live am getragenen Item (I/K J/L U/O;
+  setzt die `localRotation` sofort, da `RelayoutHands` erst bei Stapeländerung neu läuft).
 
 - **Dekohalle-Fächer-Belegung (Editor, Szene)**: `DekohalleSortAssignmentSetup`
   („CozySanta/Dekohalle/Fächer in Regalen belegen") weist den 18 `gabinet`-Regalen unter `DekoInnen`
   der Reihe nach je eine Deko-Variante aus dem Katalog zu und vereinheitlicht alle Fächer eines Regals
   auf diese SortKey (liest die Facetten aus den Prefabs; nur `acceptedFacets`, Raster/Mengen unberührt).
+  Schild-Abbild analog Geschenkehalle: `DekoSignSetup` (siehe F11/`BoardSignSetup`).
 
 - **Nachthimmel (additiv, Optik)**: prozeduraler Skybox-Shader `CozySanta/NightSky` (Nacht-Verlauf,
   zweilagiger Sternenhimmel mit Funkeln + Glüh-Halo, Vollmond mit Halo/Kratern, dezente Milchstraße —
@@ -275,6 +282,50 @@ Assets/_Project/
   Steh-/Hockhöhe), `CenterY` (Füße bleiben am Boden) und `EyeHeight` (Kamera senkt mit).
   `FirstPersonController` um `SetCrouch(bool)` + `ApplyCrouch` (CharacterController-Höhe/-Mitte + Kamera)
   erweitert, `PlayerInputRelay` liest Shift gehalten. EditMode-Tests CR1–CR5.
+
+- **F11 (Core/Runtime grün, Unity-Compile maßgeblich)**: Geschenkehalle-Truhen — Sortieren durch
+  physisches Einwerfen + Deckel schließen. Core `GiftChestValidation.Decide` (rein, testbar): alles-oder-
+  nichts gegen genau einen `SortKey`, Annahme-Anzahl, Verriegeln bei Soll-Menge; EditMode-Tests GC1–GC6.
+  Runtime `GiftChest` (partial `…cs`/`…Validate.cs`, `IInteractable`): Rechtsklick öffnet/schließt den
+  Deckel (`chest_top`, Slerp, Öffnungswinkel > 90°); beim Schließen sammelt `Physics.OverlapBox` über das
+  Trigger-Innenvolumen alle `Sortable`-Items → alle korrekt = verschwinden (`Unregister` + `Destroy`) +
+  Zählstand; ein falsches = gesamter Inhalt fliegt zur `RöhrenPosition` (`BeginSettling`). Erreicht der
+  Zählstand `required` (100), verriegelt die Truhe dauerhaft (`onLocked`). `PlayerInputRelay` routet den
+  diskreten Rechtsklick auf eine fokussierte `GiftChest`. `AreaTracker` additiv um `ChestGroup` (Truhen
+  unter root → `BookSort` +1 je Verriegelung, Auto-Soll = Anzahl Truhen). Editor: `GeschenkItemSetup`
+  („CozySanta/Geschenkehalle/Geschenke als Sortierobjekte einrichten") stattet beide Ordner aus
+  (`Prefabs/Geschenke` → Toys, `…/Truhengeschenke` → Truhen-Geschenke) mit Rigidbody/Pickup/Sortable
+  (SortKey = Prefab-Name)/BoxCollider/PrefabId/SettlingBody, Schatten aus, und baut EINEN gemeinsamen
+  Katalog `GeschenkehalleCatalog` (eine Geschenkehalle, beide Arten dort verteilt; Max je Variante: Toys 70,
+  Truhen-Geschenke 100). `GiftChestSetup` („CozySanta/Geschenkehalle/Truhen einrichten") erkennt Truhen am
+  Child `chest_top`, hängt `GiftChest` an, legt ein `InsideVolume`-Trigger an, verdrahtet Deckel +
+  `RöhrenPosition` und weist 1:1 (kein Modulo) je eine Truhen-Sorte zu (filtert aus dem gemeinsamen Katalog
+  die Prefabs im `Truhengeschenke`-Ordner). Scopt auf den Szenen-Root `GeschenkehalleInnen` (wie
+  Dekohalle/DekoInnen; Fallback: Hierarchie-Auswahl mit Warnung), damit Deko-Truhen anderer Hallen unberührt
+  bleiben. Regal-Belegung der Toys: `GeschenkehalleSortAssignmentSetup`
+  („CozySanta/Geschenkehalle/Regale belegen") weist den `gabinet`-Regalen unter `GeschenkehalleInnen` der
+  Reihe nach je eine Toy-Sorte zu (nur Nicht-`Truhengeschenke`-Varianten; proportional, Standard 2 benachbarte
+  Regale je Toy; nur `acceptedFacets`, Raster/Mengen unberührt). Fach-Einlage-Justage:
+  `GeschenkItemSetup` hängt den Items zusätzlich `SortPlacementRotation` an; `GeschenkSortItemSetup`
+  („CozySanta/Geschenkehalle/Geschenke drehbar machen") fügt sie nachträglich an alle Katalog-Items an
+  + legt ein `SortPlacementRotationDevTool` in die Szene (Item tragen, im Fach-Ghost justieren). Doku/
+  Diagramm unter `specs/011-geschenkehalle-truhen/`.
+  Item-Abbild auf Schildern (Editor): geteilte Kernlogik `BoardSignSetup` (intern) setzt auf jedes
+  `BoardRegal`-Schild (Kind von Truhe/Regal unter einem Hallen-Root) ein reines Abbild-Mesh des akzeptierten
+  Items. Kein Sortierobjekt: gestrippt auf MeshFilter/MeshRenderer. Ausrichtung = in-Hand
+  (`SortPlacementRotation.CarryEuler`), zentriert auf der Schildfläche, auf 80% der Fläche eingepasst, Tiefe
+  entlang der Schild-Normalen auf 1% abgeflacht (`ItemSchild`-Kind, idempotent). Prefab-Match über die VOLLEN
+  `Sortable`-Facetten (Container-`acceptedFacets` → Katalog-Prefab, dessen `Sortable.facets` identisch sind),
+  mit Fallback auf den Katalog-Schlüssel (Geschenkehalle: SortKey = Prefab-Name). Dünne Wrapper-Befehle:
+  `GeschenkSignSetup` („CozySanta/Geschenkehalle/Item-Abbild auf Schilder setzen", Root `GeschenkehalleInnen`,
+  `GeschenkehalleCatalog`) und `DekoSignSetup` („CozySanta/Dekohalle/Item-Abbild auf Schilder setzen", Root
+  `DekoInnen`, `DekohalleCatalog`; Voraussetzung: Regale via `DekohalleSortAssignmentSetup` belegt).
+  Durchmischen (Editor, Szene): `GeschenkShuffleSetup` mit zwei Befehlen
+  („CozySanta/Geschenkehalle/Regale durchmischen" bzw. „… Truhen durchmischen") tauscht unter
+  `GeschenkehalleInnen` je Container das Bündel aus Sorte (`acceptedFacets` der Fächer bzw. der Truhe, bei
+  Truhen inkl. `required`) UND den `ItemSchild`-Abbildern (Mesh + lokale Position/Rotation/Scale werden
+  mitgenommen). Verteilung = zyklische Zufallspermutation (Sattolo) → jeder Container bekommt garantiert den
+  Inhalt eines anderen; ungleiche Board-Anzahl wird abgefangen (letztes Schild klonen / überzählige entfernen).
 
 ## Status / MVP-Fokus
 

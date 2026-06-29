@@ -24,6 +24,10 @@ namespace CozySanta.Runtime.Sorting
                  "um ein (verkleinertes) Item sauber auf den Fachboden zu setzen.")]
         [SerializeField] private Vector3 placedOffset;
 
+        [Tooltip("UNABHÄNGIGE Drehung (Euler), wenn das Item in der HAND gehalten wird (relativ zum " +
+                 "Hand-Anker). Getrennt von der Fach-Einlage; ohne Wirkung aufs Sortieren.")]
+        [SerializeField] private Vector3 carryEuler;
+
         /// <summary>Der Dreh-Offset als Quaternion (Identität bei 0).</summary>
         public Quaternion Offset => Quaternion.Euler(placedEuler);
 
@@ -46,6 +50,16 @@ namespace CozySanta.Runtime.Sorting
         {
             get => placedOffset;
             set => placedOffset = value;
+        }
+
+        /// <summary>Hand-Drehung als Quaternion (Identität bei 0).</summary>
+        public Quaternion CarryOffset => Quaternion.Euler(carryEuler);
+
+        /// <summary>Euler-Winkel der Hand-Drehung (für DevTool/Setup-Code).</summary>
+        public Vector3 CarryEuler
+        {
+            get => carryEuler;
+            set => carryEuler = value;
         }
 
 #if UNITY_EDITOR

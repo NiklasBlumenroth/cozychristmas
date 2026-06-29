@@ -2,6 +2,7 @@ using CozySanta.Core.Input;
 using CozySanta.Runtime.Carry;
 using CozySanta.Runtime.Interaction;
 using CozySanta.Runtime.Progression;
+using CozySanta.Runtime.Sorting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -56,8 +57,16 @@ namespace CozySanta.Runtime.Player
                 if (_takeRepeat.Tick(mouse.leftButton.isPressed, dt, holdInitialDelay, holdRepeatInterval))
                     interaction.TryTake();
 
-                if (_placeRepeat.Tick(mouse.rightButton.isPressed, dt, holdInitialDelay, holdRepeatInterval))
+                // Truhe: diskreter Rechtsklick öffnet/schließt den Deckel (keine Wiederholung beim Halten).
+                if (mouse.rightButton.wasPressedThisFrame
+                    && interaction.FocusedInteractable is GiftChest chest)
+                {
+                    chest.Interact();
+                }
+                else if (_placeRepeat.Tick(mouse.rightButton.isPressed, dt, holdInitialDelay, holdRepeatInterval))
+                {
                     interaction.TryPlace();
+                }
             }
 
             var keyboard = Keyboard.current;

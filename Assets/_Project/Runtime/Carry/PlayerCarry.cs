@@ -185,16 +185,21 @@ namespace CozySanta.Runtime.Carry
                     continue;
                 }
 
+                // Optionale item-eigene Hand-Drehung (SortPlacementRotation.CarryEuler); ohne Komponente Identität.
+                var carryRot = component.TryGetComponent<CozySanta.Runtime.Sorting.SortPlacementRotation>(out var spr)
+                    ? spr.CarryOffset
+                    : Quaternion.identity;
+
                 var isTop = i == items.Count - 1;
                 if (isTop && leftHandAnchor != null)
                 {
                     CarriedItemFlight.For(component)
-                        .BeginToAnchor(leftHandAnchor, Vector3.zero, Quaternion.identity, flightDuration);
+                        .BeginToAnchor(leftHandAnchor, Vector3.zero, carryRot, flightDuration);
                 }
                 else if (rightHandAnchor != null)
                 {
                     CarriedItemFlight.For(component)
-                        .BeginToAnchor(rightHandAnchor, Vector3.up * (stackSpacing * i), Quaternion.identity, flightDuration);
+                        .BeginToAnchor(rightHandAnchor, Vector3.up * (stackSpacing * i), carryRot, flightDuration);
                 }
             }
         }

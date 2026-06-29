@@ -1,0 +1,138 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54cc246f331e5f94a8c6bbaaf73bf768, type: 3}
+  m_Name: GeschenkehalleCatalog
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Items.ItemCatalog
+  entries:
+  - key: basketball
+    prefab: {fileID: 8387786602419648323, guid: e6509a3a2ffb37a4b925a539dc8df84d, type: 3}
+    maxPerVariant: 70
+  - key: football
+    prefab: {fileID: 3200816337046271972, guid: 9dc51676dc31dbe44a92a955d93ca357, type: 3}
+    maxPerVariant: 70
+  - key: Toy Boat
+    prefab: {fileID: 4240102250285020339, guid: c59bf6aac6d6d88429b49ad55d5efd7a, type: 3}
+    maxPerVariant: 70
+  - key: Toy Car
+    prefab: {fileID: 7695997743222462810, guid: 08c3de70920255e47b510f60d3e18723, type: 3}
+    maxPerVariant: 70
+  - key: Toy Figure 1
+    prefab: {fileID: 7624795855581514100, guid: ca5a7c64160d6874594d65baf35e1a76, type: 3}
+    maxPerVariant: 70
+  - key: Toy Figure 3
+    prefab: {fileID: 328463565389761649, guid: 0091feb2c08e5cc4fab537d11e520344, type: 3}
+    maxPerVariant: 70
+  - key: Toy Figure 4
+    prefab: {fileID: 6582658330439034202, guid: 3faf692be2dc14742ac28ba8c8340101, type: 3}
+    maxPerVariant: 70
+  - key: train_locomotive
+    prefab: {fileID: 4039260244485639944, guid: 698d3797b5e980545b5777ad23c49fc6, type: 3}
+    maxPerVariant: 70
+  - key: train_tender_coal
+    prefab: {fileID: 5415837883906108670, guid: 1ff0dc02215e6604f81b26d8c4986871, type: 3}
+    maxPerVariant: 70
+  - key: train_tender_empty
+    prefab: {fileID: 8914124315825310022, guid: 01c5141d9d1afe842a2599378096a50f, type: 3}
+    maxPerVariant: 70
+  - key: train_tender_presents_A
+    prefab: {fileID: 1209441558564078354, guid: 2982a2b2ba1e338418e1ea2e4f5f7bd8, type: 3}
+    maxPerVariant: 70
+  - key: train_tender_presents_B
+    prefab: {fileID: 3026638504014214544, guid: c93e25cedb335f447bd064d9cb7a2dae, type: 3}
+    maxPerVariant: 70
+  - key: train_wagon
+    prefab: {fileID: 2014198787148062013, guid: 532fe383f1b03064ea0f79697f540cd2, type: 3}
+    maxPerVariant: 70
+  - key: GiftBox_Cylinder_TypeA
+    prefab: {fileID: 162592, guid: b03851801ad4427499ef073e81939289, type: 3}
+    maxPerVariant: 100
+  - key: GiftBox_Rectangle_TypeA
+    prefab: {fileID: 164226, guid: f8e3d2b8280141041b771fdd32cd1f3e, type: 3}
+    maxPerVariant: 100
+  - key: GiftBox_Square_TypeA
+    prefab: {fileID: 125242, guid: 10a9cb4554200574dbe94e4026ff0b59, type: 3}
+    maxPerVariant: 100
+  - key: present_A_blue
+    prefab: {fileID: 9190036811650203751, guid: 58dc7a6e672546c4492d3451ea5ccf47, type: 3}
+    maxPerVariant: 100
+  - key: present_A_green
+    prefab: {fileID: 6448002863512715843, guid: 5136c8c1f6365c54b8f5bcd4fd5de308, type: 3}
+    maxPerVariant: 100
+  - key: present_A_red
+    prefab: {fileID: 1233041343565546007, guid: 01f989b5d41bf284b8368c7248282797, type: 3}
+    maxPerVariant: 100
+  - key: present_A_white
+    prefab: {fileID: 5246985261448893813, guid: 4c60970e452a9734ab64c051730db8b2, type: 3}
+    maxPerVariant: 100
+  - key: present_A_yellow
+    prefab: {fileID: 7518391837615235049, guid: 252b680cbee72af4aa100710dd8fa660, type: 3}
+    maxPerVariant: 100
+  - key: present_B_blue
+    prefab: {fileID: 7730120535047197126, guid: e6eeeb0e70abe1b4abbb2c32a30c3fc9, type: 3}
+    maxPerVariant: 100
+  - key: present_B_green
+    prefab: {fileID: 5702694586225622313, guid: 4ba99bfeb725abe418fb2b15db11a076, type: 3}
+    maxPerVariant: 100
+  - key: present_B_red
+    prefab: {fileID: 7676920692256967486, guid: 9641b9260b6bae041933b8c98e904cb0, type: 3}
+    maxPerVariant: 100
+  - key: present_B_white
+    prefab: {fileID: 4366782130458911012, guid: b10e025fad5ef5d43a8d2e1510736d46, type: 3}
+    maxPerVariant: 100
+  - key: present_B_yellow
+    prefab: {fileID: 4858878302942430921, guid: 168e64a567055054f99a9717b61742e1, type: 3}
+    maxPerVariant: 100
+  - key: present_C_blue
+    prefab: {fileID: 6794298461680576233, guid: 0d74c3f3ec86b0e4d9a5f48b5b07317c, type: 3}
+    maxPerVariant: 100
+  - key: present_C_green
+    prefab: {fileID: 7653099600659167722, guid: 6115cd2b4469d6a4e80d5848add7d4c7, type: 3}
+    maxPerVariant: 100
+  - key: present_C_red
+    prefab: {fileID: 4273473632696324428, guid: d76c8316a0a957848b70dfc659f98abc, type: 3}
+    maxPerVariant: 100
+  - key: present_C_white
+    prefab: {fileID: 3112574672338257541, guid: 78b6b92cc14a8e04bb1ad39438ab9503, type: 3}
+    maxPerVariant: 100
+  - key: present_C_yellow
+    prefab: {fileID: 776975922075108362, guid: 8127fe08a12c01b4dbb0121352c9f203, type: 3}
+    maxPerVariant: 100
+  - key: present_E_blue
+    prefab: {fileID: 7102384558884119159, guid: 50222e3e9741ee748a0ce728a3ac4215, type: 3}
+    maxPerVariant: 100
+  - key: present_E_green
+    prefab: {fileID: 5582876377816712765, guid: a6d6885a1f4e959468f3daf1bc1c0733, type: 3}
+    maxPerVariant: 100
+  - key: present_E_red
+    prefab: {fileID: 611423532313396034, guid: 35e68a00e6c601d4a9fdd482d0f93814, type: 3}
+    maxPerVariant: 100
+  - key: present_E_white
+    prefab: {fileID: 8675389292617931958, guid: 900813ee6acb0de4aa1798cfc9a6c3fb, type: 3}
+    maxPerVariant: 100
+  - key: present_E_yellow
+    prefab: {fileID: 5321037757009943411, guid: cbae985f4cbb12749bf8f09b187819fa, type: 3}
+    maxPerVariant: 100
+  - key: present_sphere_A_blue
+    prefab: {fileID: 4651732659219788382, guid: d756a237d85199b409b205efca47f3ad, type: 3}
+    maxPerVariant: 100
+  - key: present_sphere_A_green
+    prefab: {fileID: 7530871089753274285, guid: 5d42840a10f785a488cf734d4a084c4d, type: 3}
+    maxPerVariant: 100
+  - key: present_sphere_A_red
+    prefab: {fileID: 4975145357235256635, guid: 0181681f970975543a11663285a49d9e, type: 3}
+    maxPerVariant: 100
+  - key: present_sphere_A_white
+    prefab: {fileID: 682088074951785615, guid: 022db01e6318b264fbfe9a572da00aba, type: 3}
+    maxPerVariant: 100
+  - key: present_sphere_A_yellow
+    prefab: {fileID: 7936373375089687658, guid: a629f37edd5fd1c4684ec36a192a6be1, type: 3}
+    maxPerVariant: 100

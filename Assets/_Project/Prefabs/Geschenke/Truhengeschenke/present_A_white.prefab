@@ -1,0 +1,221 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &4904526210061707300
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 187.49484
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.105001464
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 294.58328
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      propertyPath: m_Name
+      value: present_A_white
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5143037263333252677}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4706049185056561465}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7555959194432320242}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1260374917396171400}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5342782964424388824}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9009142639640428573}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5696063605239549182}
+  m_SourcePrefab: {fileID: 100100000, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+--- !u!1 &5246985261448893813 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e67f560aea04123418e8c2863c0a6698, type: 3}
+  m_PrefabInstance: {fileID: 4904526210061707300}
+  m_PrefabAsset: {fileID: 0}
+--- !u!54 &5143037263333252677
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5246985261448893813}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &4706049185056561465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5246985261448893813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6d1dae674f183d45a5d6f62a71908b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Carry.PickupInteractable
+  promptText: Aufnehmen
+  weight: 0.3
+--- !u!114 &7555959194432320242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5246985261448893813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a7c8bae04bfa1d42bdcf1912767b24f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Sorting.Sortable
+  facets:
+  - present_A_white
+--- !u!65 &1260374917396171400
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5246985261448893813}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.005637504, y: 0.005637503, z: 0.0066170907}
+  m_Center: {x: 0.00000001816079, y: 0.0000000062864274, z: 0.0033085453}
+--- !u!114 &5342782964424388824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5246985261448893813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2486b93c9088404ba3be0e06c1b284b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Items.PrefabId
+  key: present_A_white
+--- !u!114 &9009142639640428573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5246985261448893813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dc08ba70a9fa7a4f9669fa8e8e1375c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Items.SettlingBody
+  linearThreshold: 0.05
+  angularThreshold: 0.2
+  settleDuration: 3
+--- !u!114 &5696063605239549182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5246985261448893813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc4e0dd9ec0c5104baf418e3bae7f77f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CozySanta.Runtime::CozySanta.Runtime.Sorting.SortPlacementRotation
+  placedEuler: {x: -90, y: 0, z: 0}
+  placedScale: 1
+  placedOffset: {x: 0, y: -0.15, z: 0}
+  carryEuler: {x: -90, y: 0, z: 0}

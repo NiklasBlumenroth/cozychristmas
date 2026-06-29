@@ -85,5 +85,5 @@ AssetOrigin:
   productId: 85527
   packageName: Modular Medival Lanterns
   packageVersion: 1.0
-  assetPath: Assets/Laterns and candles/Meshes/LampPost_wall.fbx
+  assetPath: Assets/_Project/Prefabs/Lights/LampPost_wall.fbx
   uploadId: 185448
