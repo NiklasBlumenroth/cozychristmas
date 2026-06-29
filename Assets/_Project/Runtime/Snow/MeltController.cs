@@ -75,7 +75,7 @@ namespace CozySanta.Runtime.Snow
         /// <summary>Schmelzstärke (Höhe/s im Zentrum). Andockpunkt für LampPower-Upgrade (F6).</summary>
         public float MeltStrength { get => meltStrength; set => meltStrength = value; }
 
-        /// <summary>Schmelzradius (m). Andockpunkt für LampCone-Upgrade (F6).</summary>
+        /// <summary>Schmelzradius (m). Fester Lichtkegel (PlayerProgression setzt ihn; kein Skill mehr).</summary>
         public float MeltRadius { get => meltRadius; set => meltRadius = value; }
 
         /// <summary>Lädt den Akku von einer externen Quelle auf (Ladestation, F7).</summary>

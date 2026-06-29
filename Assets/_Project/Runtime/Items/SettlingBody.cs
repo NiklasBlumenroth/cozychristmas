@@ -34,6 +34,10 @@ namespace CozySanta.Runtime.Items
 
         private Rigidbody Body => _body != null ? _body : (_body = GetComponent<Rigidbody>());
 
+        /// <summary>True, wenn das Item ruht (eingefroren via <see cref="EnterRest"/>): kinematisch und die
+        /// Auswertung ist abgeschaltet. Genutzt vom Heranholen, um nur liegengebliebene Kopien zu greifen.</summary>
+        public bool IsResting => !enabled && Body.isKinematic;
+
         private void OnEnable() => _timer.Reset();
 
         private void FixedUpdate()

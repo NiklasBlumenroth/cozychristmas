@@ -17,7 +17,7 @@ namespace CozySanta.Runtime.Progression
         private bool _visible;
 
         private static readonly string[] SkillLabels =
-            { "LampPower", "LampCone", "LampBattery", "CarryCapacity", "MoveSpeed", "SortVision", "ObjectPull" };
+            { "LampPower", "LampBattery", "CarryCapacity", "MoveSpeed", "ObjectPull", "AutoSort" };
 
         private void Update()
         {

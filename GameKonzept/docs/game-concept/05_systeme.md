@@ -99,6 +99,28 @@ Designfunktion:
 - Fehler erzeugen sanftes, sichtbares Feedback statt Game Over oder Zeitstrafe.
 - Der Cooldown verhindert hektisches Testen und haelt die Sortierentscheidung relevant.
 
+## Auto-Einsortier-System
+
+Auto-Einsortieren ist eine freischaltbare Faehigkeit, die das Sortieren beschleunigt: Auf Knopfdruck fliegt das aktuell getragene (bzw. anvisierte) Sortierobjekt selbststaendig in sein korrektes Fach und wird dort regulaer eingelegt. Der Spieler muss das Objekt also nicht mehr von Hand zum richtigen Regalfach tragen.
+
+Regeln:
+
+- Die Faehigkeit muss zunaechst ueber einen Skillpunkt freigeschaltet werden.
+- Jede Ausloesung verbraucht eine Ladung und sendet genau ein passendes Objekt in sein Zielfach.
+- Ladungen laden sich ueber einen Cooldown wieder auf und koennen sich stapeln (mehrere vorraetige Ladungen), sodass mehrere Objekte kurz hintereinander eingeflogen werden koennen.
+- Nur korrekt zuordenbare Objekte fliegen; gibt es kein gueltiges Zielfach (z. B. Fach voll/abgeschlossen), passiert nichts und es wird keine Ladung verbraucht.
+
+Skalierung ueber Skillstufen:
+
+- kuerzere Aufladezeit je Ladung (Cooldown),
+- hoehere maximale Anzahl gleichzeitig stapelbarer Ladungen.
+
+Designfunktion:
+
+- Belohnt Fortschritt mit weniger Laufwegen, ohne das Sortieren komplett zu automatisieren (begrenzte Ladungen + Cooldown halten es dosiert).
+- Die stapelbaren Ladungen erzeugen kleine Entscheidungsmomente (jetzt einsetzen oder fuer einen groesseren Schwung sammeln).
+- Ergaenzt die Objektanziehung als zweite „magische" Sortierhilfe (Anziehen zum Spieler vs. Wegschicken ins Fach).
+
 ## Skill-System
 
 Alle Skills nutzen denselben Fortschrittspool. Der Spieler entscheidet bei jedem Levelaufstieg frei, welche verfuegbare Faehigkeit verbessert wird. Es gibt keinen Skilltree mit festen Abhaengigkeiten.
@@ -109,7 +131,7 @@ Designregeln:
 
 - Skillpunkte duerfen frei investiert werden.
 - Upgrades sollen nicht gegenseitig blockieren.
-- Neue Faehigkeiten wie Sortierblick oder Objektanziehung koennen als einzelne Skills freischaltbar sein.
+- Neue Faehigkeiten wie Objektanziehung oder Auto-Einsortieren koennen als einzelne Skills freischaltbar sein.
 - Nach der Freischaltung koennen diese Faehigkeiten frei weiter verbessert werden.
 - Keine Skillwahl darf einen spaeteren Fortschritt unmoeglich machen.
 - Jede Stufe soll spuerbar genug sein, um Belohnung zu erzeugen, aber klein genug, um haeufige Levelaufstiege zu erlauben.
@@ -118,8 +140,8 @@ Skillgruppen:
 
 - Lampe,
 - Tragen,
-- Sortierblick,
 - Objektanziehung,
+- Auto-Einsortieren,
 - Bewegung.
 
 Vorlaeufige Upgrade-Skalierung:
@@ -127,14 +149,13 @@ Vorlaeufige Upgrade-Skalierung:
 | Skilloption | Zielanzahl Stufen | Skalierungsart |
 | --- | ---: | --- |
 | Lampen-Power | ca. 20 | kleine Steigerung der Schmelzgeschwindigkeit pro Stufe |
-| Lichtkegel | ca. 20 | kleine Verbreiterung/Verlaengerung pro Stufe |
 | Akku | ca. 20 | kleine Erhoehung der Nutzungsdauer pro Stufe |
 | Tragkraft | ca. 20 | schrittweise Erhoehung bis maximal 25 kg |
 | Bewegung | ca. 20 | kleine Speed-Steigerung pro Stufe |
-| Sortierblick-Dauer | ca. 20 | laengere Anzeigezeit pro Stufe |
-| Sortierblick-Cooldown | ca. 20 | kuerzerer Cooldown pro Stufe |
 | Objektanziehung-Cooldown | ca. 20 | kuerzerer Cooldown pro Stufe |
 | Objektanziehung-Staerke | ca. 20 | mehr Reichweite oder mehr Objekte pro Stufe |
+| Auto-Einsortieren-Cooldown | ca. 20 | schnellere Aufladung einer Ladung pro Stufe |
+| Auto-Einsortieren-Ladungen | ca. 20 | hoehere maximale Anzahl stapelbarer Ladungen pro Stufe |
 
 ## Gewichtssystem
 
@@ -156,15 +177,9 @@ Diese Werte sind Platzhalter und muessen spaeter gebalanced werden.
 
 ## Cooldown-System
 
-Sortierblick und Objektanziehung haben Cooldowns.
+Objektanziehung und Auto-Einsortieren haben Cooldowns.
 
 Cooldowns dienen dem Rhythmus und Balancing der Faehigkeiten, nicht als Stressmechanik. Sie sollen kurz genug sein, um cozy zu bleiben, aber lang genug, damit Upgrades spuerbar sind.
-
-Sortierblick-Parameter:
-
-- Dauer,
-- Cooldown,
-- Zielanzeige fuer linkes Objekt.
 
 Objektanziehung-Parameter:
 
@@ -173,6 +188,13 @@ Objektanziehung-Parameter:
 - Reichweite,
 - erlaubte Objektarten,
 - Bezug zum linken Objekt.
+
+Auto-Einsortieren-Parameter:
+
+- Cooldown (Aufladezeit je Ladung),
+- maximale Anzahl stapelbarer Ladungen,
+- Bezug zum aktuell getragenen/anvisierten Objekt,
+- Reichweite zum Zielfach.
 
 ## Akku-System
 

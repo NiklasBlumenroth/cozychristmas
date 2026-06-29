@@ -1,0 +1,41 @@
+@startuml gather_flow
+title Fähigkeit B – Heranholen (Activate)
+
+start
+if (freigeschaltet & Ladung vorhanden?) then (nein)
+  stop
+endif
+:oberstes getragenes Objekt lesen;
+if (Hand leer / kein PrefabId?) then (ja)
+  stop
+endif
+:aktuelles Gebäude bestimmen (ItemArea.Contains);
+if (kein Gebäude?) then (ja)
+  stop
+endif
+
+:ruhende Kopien sammeln;
+note right
+  unter ItemArea.ItemParent (Fallback: Bereichs-AABB)
+  gleicher PrefabId.Key, SettlingBody.IsResting,
+  ohne das gehaltene Objekt
+end note
+:Kandidaten mischen (zufällig);
+
+while (nächster Kandidat?) is (ja)
+  if (keine Ladung mehr?) then (ja)
+    break
+  endif
+  if (Traglast erschöpft? CanCarry == false) then (ja)
+    break
+  endif
+  :carry.TryPickup(pickup)\n(Flug an den Hand-Anker);
+  if (aufgenommen?) then (ja)
+    :Charges.TryConsume();
+  endif
+endwhile (keine mehr)
+stop
+note bottom
+  Holt min(Ladungen, freie Traglast) zufällige Kopien.
+end note
+@enduml

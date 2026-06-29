@@ -1,3 +1,4 @@
+using CozySanta.Runtime.Abilities;
 using CozySanta.Runtime.Carry;
 using CozySanta.Runtime.Player;
 using CozySanta.Runtime.Progression;
@@ -11,20 +12,16 @@ using UnityEngine.UI;
 namespace CozySanta.Editor
 {
     /// <summary>
-    /// Einmal-Setup F6: erstellt das editor-authored Skillmenü-Prefab (SkillEntryUI) und die
-    /// vollständige SkillMenuPanel-Hierarchie unter dem vorhandenen Canvas in der SampleScene.
-    /// Laufzeitcode (PlayerProgression) bindet später an die fertige Hierarchie.
-    /// Jeder Aufruf löscht und ersetzt Prefab + Panel vollständig.
+    /// Einmal-Setup F6/F12: erstellt das editor-authored Skillmenü-Prefab (SkillEntryUI) und die
+    /// SkillMenuPanel-Hierarchie unter dem Canvas – Einträge/Gruppen kommen aus der editierbaren
+    /// <see cref="SkillTableConfig"/> (wird angelegt, falls fehlend). Verdrahtet PlayerProgression inkl.
+    /// der magischen Sortierhilfen (MagicSortAbility/MagicGatherAbility) und der Eingabe. Jeder Aufruf
+    /// ersetzt Prefab + Panel vollständig.
     /// </summary>
     public static class ProgressionSetup
     {
         private const string EntryPrefabPath = "Assets/_Project/Prefabs/UI/SkillEntryUI.prefab";
-
-        private static readonly string[] SkillNames =
-            { "Schmelzstärke", "Kegelgröße", "Akku", "Tragkraft", "Laufgeschw.", "Sortierblick", "Objektanz." };
-
-        private static readonly bool[] Unlockable =
-            { false, false, false, false, false, true, true };
+        private const string SkillTablePath  = "Assets/_Project/Data/SkillTable.asset";
 
         [MenuItem("CozySanta/Setup F6 (Skill-Menü erstellen)")]
         public static void Setup()
@@ -32,18 +29,36 @@ namespace CozySanta.Editor
             var canvas = Object.FindFirstObjectByType<Canvas>();
             if (canvas == null) { Debug.LogError("[F6Setup] Kein Canvas in der Szene."); return; }
 
+            var table  = EnsureSkillTable();
             var prefab = CreateEntryPrefab();
-            BuildMenuPanel(canvas.transform, prefab);
-            WireProgression(canvas);
+            BuildMenuPanel(canvas.transform, prefab, table);
+            WireProgression(canvas, table);
 
             AssetDatabase.SaveAssets();
             EditorSceneManager.MarkAllScenesDirty();
-            Debug.Log("[F6Setup] SkillMenuPanel + PlayerProgression verdrahtet. Szene speichern (Strg+S).");
+            Debug.Log("[F6Setup] SkillTable + SkillMenuPanel + PlayerProgression/Abilities verdrahtet. " +
+                      "Szene speichern (Strg+S).");
+        }
+
+        // Lädt die Stufen-Tabelle oder legt sie mit dem Startentwurf an.
+        private static SkillTableConfig EnsureSkillTable()
+        {
+            var table = AssetDatabase.LoadAssetAtPath<SkillTableConfig>(SkillTablePath);
+            if (table != null) return table;
+
+            var dir = System.IO.Path.GetDirectoryName(SkillTablePath);
+            if (!AssetDatabase.IsValidFolder(dir)) AssetDatabase.CreateFolder("Assets/_Project", "Data");
+
+            table = ScriptableObject.CreateInstance<SkillTableConfig>();
+            table.ResetToDefaults();
+            AssetDatabase.CreateAsset(table, SkillTablePath);
+            Debug.Log($"[F6Setup] SkillTable angelegt: {SkillTablePath}");
+            return table;
         }
 
         // ── PlayerProgression verdrahten ─────────────────────────────────────────
 
-        private static void WireProgression(Canvas canvas)
+        private static void WireProgression(Canvas canvas, SkillTableConfig table)
         {
             var relay = Object.FindFirstObjectByType<PlayerInputRelay>();
             if (relay == null) { Debug.LogWarning("[F6Setup] Kein PlayerInputRelay in der Szene."); return; }
@@ -53,11 +68,16 @@ namespace CozySanta.Editor
 
             var prog   = player.GetComponent<PlayerProgression>()  ?? player.AddComponent<PlayerProgression>();
             var dev    = player.GetComponent<SkillMenuDevTool>()   ?? player.AddComponent<SkillMenuDevTool>();
+            var sortAb = player.GetComponent<MagicSortAbility>()   ?? player.AddComponent<MagicSortAbility>();
+            var gathAb = player.GetComponent<MagicGatherAbility>() ?? player.AddComponent<MagicGatherAbility>();
 
             var soP = new SerializedObject(prog);
             ObjProp(soP, "carry",         player.GetComponent<PlayerCarry>());
             ObjProp(soP, "melt",          Object.FindFirstObjectByType<MeltController>());
             ObjProp(soP, "movement",      player.GetComponent<FirstPersonController>());
+            ObjProp(soP, "autoSort",      sortAb);
+            ObjProp(soP, "gather",        gathAb);
+            ObjProp(soP, "skillTable",    table);
             ObjProp(soP, "skillMenuView", view);
             soP.ApplyModifiedPropertiesWithoutUndo();
 
@@ -66,10 +86,12 @@ namespace CozySanta.Editor
             soD.ApplyModifiedPropertiesWithoutUndo();
 
             var soR = new SerializedObject(relay);
-            ObjProp(soR, "skillMenu", view);
+            ObjProp(soR, "skillMenu",       view);
+            ObjProp(soR, "autoSortAbility", sortAb);
+            ObjProp(soR, "gatherAbility",   gathAb);
             soR.ApplyModifiedPropertiesWithoutUndo();
 
-            Debug.Log("[F6Setup] PlayerProgression, SkillMenuDevTool und PlayerInputRelay verdrahtet.");
+            Debug.Log("[F6Setup] PlayerProgression, Abilities, SkillMenuDevTool und PlayerInputRelay verdrahtet.");
         }
 
         // ── SkillEntryUI-Prefab ──────────────────────────────────────────────────
@@ -117,7 +139,7 @@ namespace CozySanta.Editor
 
         // ── SkillMenuPanel ───────────────────────────────────────────────────────
 
-        private static void BuildMenuPanel(Transform canvas, GameObject entryPrefab)
+        private static void BuildMenuPanel(Transform canvas, GameObject entryPrefab, SkillTableConfig table)
         {
             var old = canvas.Find("SkillMenuPanel");
             if (old != null) Object.DestroyImmediate(old.gameObject);
@@ -155,19 +177,21 @@ namespace CozySanta.Editor
             ObjProp(so, "xpText",              xpText);
             ObjProp(so, "availablePointsText", pointsText);
 
-            // Skill-Einträge (Gruppen + Zeilen)
+            // Skill-Einträge aus der Stufen-Tabelle (Gruppen-Header bei Gruppenwechsel; Eintrag-Index = SkillId).
             var arr = so.FindProperty("skillEntries");
-            arr.arraySize = 7;
+            arr.arraySize = System.Enum.GetValues(typeof(CozySanta.Core.Progression.SkillId)).Length;
 
-            GroupHeader(panel.transform, "Lampe");
-            for (var i = 0; i < 3; i++) AddEntry(i, panel.transform, entryPrefab, arr);
-            GroupHeader(panel.transform, "Tragen");
-            AddEntry(3, panel.transform, entryPrefab, arr);
-            GroupHeader(panel.transform, "Bewegung");
-            AddEntry(4, panel.transform, entryPrefab, arr);
-            GroupHeader(panel.transform, "Freischalt-Skills");
-            AddEntry(5, panel.transform, entryPrefab, arr);
-            AddEntry(6, panel.transform, entryPrefab, arr);
+            var lastGroup = string.Empty;
+            foreach (var row in table.Rows)
+            {
+                if (row.group != lastGroup)
+                {
+                    GroupHeader(panel.transform, string.IsNullOrEmpty(row.group) ? "Sonstige" : row.group);
+                    lastGroup = row.group;
+                }
+
+                AddEntry(row, panel.transform, entryPrefab, arr);
+            }
 
             var close = MakeButton("CloseButton", panel.transform, "X", 0, 28);
             ObjProp(so, "closeButton", close);
@@ -175,17 +199,17 @@ namespace CozySanta.Editor
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static void AddEntry(int idx, Transform parent, GameObject prefab, SerializedProperty arr)
+        private static void AddEntry(SkillTableConfig.Row row, Transform parent, GameObject prefab, SerializedProperty arr)
         {
             var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
-            go.name = $"SkillEntry_{SkillNames[idx]}";
+            go.name = $"SkillEntry_{row.displayName}";
             LE(go, height: 32);
 
             var nameT = go.transform.Find("SkillNameText")?.GetComponent<TMP_Text>();
-            if (nameT != null) nameT.text = SkillNames[idx];
-            if (!Unlockable[idx]) go.transform.Find("UnlockBadge")?.gameObject.SetActive(false);
+            if (nameT != null) nameT.text = row.displayName;
+            if (!row.unlockable) go.transform.Find("UnlockBadge")?.gameObject.SetActive(false);
 
-            arr.GetArrayElementAtIndex(idx).objectReferenceValue = go.GetComponent<SkillEntryUI>();
+            arr.GetArrayElementAtIndex((int)row.id).objectReferenceValue = go.GetComponent<SkillEntryUI>();
         }
 
         private static void GroupHeader(Transform parent, string label)

@@ -7,7 +7,7 @@ namespace CozySanta.Runtime.Progression
     /// <summary>
     /// View-Komponente des editor-authored Skillmenü-Panels.
     /// PlayerProgression hält eine Referenz und ruft Set*-Methoden auf; kein UI wird erzeugt.
-    /// skillEntries[i] entspricht SkillId-Enum-Wert i (0=LampPower … 6=ObjectPull).
+    /// skillEntries[i] entspricht SkillId-Enum-Wert i (0=LampPower … 5=AutoSort).
     /// </summary>
     public sealed class SkillMenuView : MonoBehaviour
     {
@@ -20,8 +20,8 @@ namespace CozySanta.Runtime.Progression
         [Header("Schließen")]
         [SerializeField] private Button closeButton;
 
-        [Header("Skill-Einträge (Reihenfolge = SkillId-Enum: LampPower…ObjectPull)")]
-        [SerializeField] private SkillEntryUI[] skillEntries = new SkillEntryUI[7];
+        [Header("Skill-Einträge (Reihenfolge = SkillId-Enum: LampPower…AutoSort)")]
+        [SerializeField] private SkillEntryUI[] skillEntries = new SkillEntryUI[6];
 
         public Button CloseButton => closeButton;
 

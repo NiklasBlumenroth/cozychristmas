@@ -296,6 +296,36 @@ namespace CozySanta.Runtime.Sorting
             component.transform.localScale *= total;
         }
 
+        /// <summary>Sucht für das Auto-Einsortieren eine freie Spalte, in die <paramref name="key"/> als
+        /// KORREKTES Objekt gehört: das Fach muss diesen SortKey akzeptieren (deckungsgleiche Facetten),
+        /// darf nicht geschlossen/gesperrt sein und braucht eine freie Zelle. False sonst.</summary>
+        public bool TryFindFreeColumn(SortKey key, out int x, out int y)
+        {
+            x = -1;
+            y = -1;
+            if (_target == null || _target.IsClosed || _grid == null) return false;
+            if (acceptedFacets == null || acceptedFacets.Length == 0) return false;
+            if (!new SortKey(acceptedFacets).Matches(key)) return false;            // nur das passende Fach
+            if (!SortPlacementRule.IsPlaceable(key, placeableArts)) return false;   // optionale Art-Sperre
+
+            var sx = _grid.GetLength(0);
+            var sy = _grid.GetLength(1);
+            for (var ix = 0; ix < sx; ix++)
+            {
+                for (var iy = 0; iy < sy; iy++)
+                {
+                    if (TryGetFillCell(ix, iy, out _, out _, out _))
+                    {
+                        x = ix;
+                        y = iy;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>Ghost-Pose für Spalte (x,y): hinterster freier Slot. <paramref name="item"/> ist das
         /// getragene Objekt – dessen optionaler <see cref="SortPlacementRotation"/>-Offset fließt in die
         /// Rotation ein, damit der Ghost exakt der späteren Einlage-Pose entspricht. False, wenn die Spalte

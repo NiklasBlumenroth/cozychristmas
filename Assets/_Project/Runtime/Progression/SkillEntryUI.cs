@@ -17,7 +17,7 @@ namespace CozySanta.Runtime.Progression
         [SerializeField] private TMP_Text skillLevelText;
         [SerializeField] private TMP_Text skillValueText;
 
-        [Header("Freischalt-Badge (nur SortVision & ObjectPull)")]
+        [Header("Freischalt-Badge (nur Heranholen & Auto-Einsortieren)")]
         [Tooltip("GameObject mit 'Freigeschaltet'-Label; standardmäßig inaktiv.")]
         [SerializeField] private GameObject unlockBadge;
 

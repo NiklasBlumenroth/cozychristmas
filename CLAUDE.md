@@ -327,6 +327,28 @@ Assets/_Project/
   mitgenommen). Verteilung = zyklische Zufallspermutation (Sattolo) → jeder Container bekommt garantiert den
   Inhalt eines anderen; ungleiche Board-Anzahl wird abgefangen (letztes Schild klonen / überzählige entfernen).
 
+- **F12 (Core/Runtime grün, Unity-Compile maßgeblich)**: Magische Sortierhilfen — zwei freischaltbare
+  Fähigkeiten, beide mit stapelbaren Ladungen + Cooldown (Core `ChargeStack`, EditMode CS1–CS5) und
+  Skillwert-Mathematik `SkillScaling` (linear Start→Ende, steigend/fallend, ganzzahlige Ladungen;
+  EditMode SC1–SC5). Stufen sind datengetrieben: `SkillConfig` umgebaut auf Start/Ende + optionale
+  Ladungs-Kurve; editierbares Asset `SkillTableConfig` (`Assets/_Project/Data/SkillTable.asset`) liefert
+  alle Stufenwerte. **A – Auto-Einsortieren** (Taste `2`, Halten = mehrfach): Runtime `MagicSortAbility`
+  schickt das oberste getragene Objekt vollautomatisch in ein passendes Ziel im aktuellen Gebäude
+  (`ItemArea.Contains`) — Regal-Fach (additive `SortTargetInteractable.TryFindFreeColumn`, nur das
+  korrekte Fach) oder Truhe (additive `GiftChest.EnsureOpen`/`CanAutoInsert`/`TryAutoInsert`: Deckel auf,
+  von oben einwerfen, Voll-Prüfung über Einwurf-Zonen-`OverlapBox`); bei mehreren Zielen jedes Mal
+  zufällig; 1 Ladung = 1 Objekt. **B – Heranholen** (Taste `3`, Halten = mehrfach): `MagicGatherAbility`
+  zieht zufällige ruhende Kopien gleicher `PrefabId` (`SettlingBody.IsResting`) aus dem Gebäude in die
+  Hand — `min(Ladungen, freie Traglast)` Stück. Gemeinsame Basis `MagicAbility` (Ladungen, Configure,
+  Held-/Gebäude-Abfragen). **Skill-Umbau:** `LampCone` + `SortVision` entfernt, `ObjectPull` =
+  Heranholen, neu `AutoSort`; 6 statt 7 Skills; `MeltController.MeltRadius` fester Wert (1.2, Kegel
+  bleibt Mechanik). `PlayerProgression` lädt das Asset und wendet Cooldown/Ladungen auf die Abilities an;
+  Menü (`ProgressionSetup`/Setup F6) baut Einträge/Gruppen aus dem Asset und verdrahtet die Abilities.
+  `DevTeleportPad` von oberen Ziffern auf **Numpad 7/8/9/0/6** verlegt (Tasten 2/3 frei). Doku/Diagramme
+  unter `specs/012-magische-sortierhilfen/`. ProgressionTests auf neues Modell aktualisiert (S6 ergänzt).
+  Setup nach dem Öffnen in Unity: „CozySanta/Setup F6 (Skill-Menü erstellen)" erneut ausführen (legt
+  `SkillTable.asset` an, baut das 6er-Menü, hängt + verdrahtet die zwei Ability-Komponenten am Spieler).
+
 ## Status / MVP-Fokus
 
 Erster Sektor (Eingangsbereich + Poststelle, optional Dekorationsfabrik) als

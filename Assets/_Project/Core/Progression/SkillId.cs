@@ -4,11 +4,10 @@ namespace CozySanta.Core.Progression
     public enum SkillId
     {
         LampPower     = 0,
-        LampCone      = 1,
-        LampBattery   = 2,
-        CarryCapacity = 3,
-        MoveSpeed     = 4,
-        SortVision    = 5,  // Freischalt-Skill (F9)
-        ObjectPull    = 6,  // Freischalt-Skill (F10)
+        LampBattery   = 1,
+        CarryCapacity = 2,
+        MoveSpeed     = 3,
+        ObjectPull    = 4,  // Heranholen – Freischalt-Skill (Cooldown + Ladungen)
+        AutoSort      = 5,  // Auto-Einsortieren – Freischalt-Skill (Cooldown + Ladungen)
     }
 }

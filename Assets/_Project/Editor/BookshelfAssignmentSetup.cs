@@ -12,9 +12,11 @@ namespace CozySanta.Editor
     /// <summary>
     /// Verteilt die Buch-Typen (Facetten <c>[Farbe, Form]</c>) aus <c>Prefabs/Books</c> zufällig und
     /// 1:1 auf die Bookshelf-Fächer (<see cref="SortTargetInteractable"/>) der offenen Szene: je Fach
-    /// genau ein Buchtyp, <c>requiredCount = 1</c>, <c>gridSize = (1,1,1)</c>. Die akzeptierten Facetten
-    /// werden direkt aus den Buch-Prefabs gelesen (garantiert positionsgleich zu deren SortKey).
-    /// Reiner Editor-Schritt; ändert nur die offene Szene (Constitution V konform).
+    /// genau ein Buchtyp. Die Soll-Menge (<c>requiredCount</c>) wird an das vorhandene Raster
+    /// (<c>gridSize</c>, beim Bücherregal 20×1×1) angeglichen, damit ein Fach erst voll ist, wenn ALLE
+    /// Slots korrekt belegt sind – nicht schon nach einem Buch. Das Raster selbst bleibt unangetastet.
+    /// Zweiter Befehl „Fächer-Soll an Raster angleichen" repariert vorhandene Fächer non-destruktiv
+    /// (nur <c>requiredCount</c>, kein Neu-Mischen). Reiner Editor-Schritt (Constitution V konform).
     /// </summary>
     public static class BookshelfAssignmentSetup
     {
@@ -59,8 +61,7 @@ namespace CozySanta.Editor
 
                 var so = new SerializedObject(fach);
                 SetStringArray(so, "acceptedFacets", facets);
-                SetInt(so, "requiredCount", 1);
-                SetVector3Int(so, "gridSize", 1, 1, 1);
+                SetInt(so, "requiredCount", ReadGridCapacity(so)); // Soll = Slotanzahl (Raster bleibt)
                 so.ApplyModifiedProperties();
                 EditorUtility.SetDirty(fach);
 
@@ -70,8 +71,56 @@ namespace CozySanta.Editor
             Undo.CollapseUndoOperations(group);
             EditorSceneManager.MarkSceneDirty(faecher[0].gameObject.scene);
 
-            Debug.Log($"[FachBelegung] {count} Fächer belegt (je 1 Buchtyp, requiredCount=1, gridSize=1x1x1). " +
+            Debug.Log($"[FachBelegung] {count} Fächer belegt (je 1 Buchtyp, Soll = Rastergröße). " +
                       $"Szene speichern (Strg+S).\n{log}");
+        }
+
+        /// <summary>Repariert vorhandene Bookshelf-Fächer: setzt nur <c>requiredCount</c> = Slotanzahl
+        /// (gridSize-Produkt), ohne Buch-Zuordnung/Raster zu ändern. Behebt Fächer, die fälschlich nach
+        /// einem Buch schließen (altes requiredCount=1).</summary>
+        [MenuItem("CozySanta/Bücher/Fächer-Soll an Raster angleichen (Fix requiredCount)")]
+        public static void AlignRequiredCount()
+        {
+            var faecher = CollectShelfFaecher();
+            if (faecher.Count == 0)
+            {
+                Debug.LogError($"[FachFix] Keine Bookshelf-Fächer (unter '{ShelfRootPrefix}…') in der offenen Szene.");
+                return;
+            }
+
+            Undo.IncrementCurrentGroup();
+            var group = Undo.GetCurrentGroup();
+            var changed = 0;
+
+            foreach (var fach in faecher)
+            {
+                var so = new SerializedObject(fach);
+                var capacity = ReadGridCapacity(so);
+                var req = so.FindProperty("requiredCount");
+                if (req == null || req.intValue == capacity) continue;
+
+                Undo.RecordObject(fach, "Fächer-Soll angleichen");
+                req.intValue = capacity;
+                so.ApplyModifiedProperties();
+                EditorUtility.SetDirty(fach);
+                changed++;
+            }
+
+            Undo.CollapseUndoOperations(group);
+            EditorSceneManager.MarkSceneDirty(faecher[0].gameObject.scene);
+            Debug.Log($"[FachFix] {changed} von {faecher.Count} Fächern auf Soll = Rastergröße gesetzt. " +
+                      "Szene speichern (Strg+S).");
+        }
+
+        // Slotanzahl eines Fachs = Produkt der gridSize-Komponenten (mind. 1).
+        private static int ReadGridCapacity(SerializedObject so)
+        {
+            var p = so.FindProperty("gridSize");
+            if (p == null) return 1;
+            var x = Mathf.Max(1, p.FindPropertyRelative("x").intValue);
+            var y = Mathf.Max(1, p.FindPropertyRelative("y").intValue);
+            var z = Mathf.Max(1, p.FindPropertyRelative("z").intValue);
+            return x * y * z;
         }
 
         /// <summary>Liest aus jedem Buch-Prefab im Books-Ordner die Sortable-Facetten ([Farbe, Form]).</summary>
@@ -178,19 +227,6 @@ namespace CozySanta.Editor
             {
                 p.intValue = value;
             }
-        }
-
-        private static void SetVector3Int(SerializedObject so, string prop, int x, int y, int z)
-        {
-            var p = so.FindProperty(prop);
-            if (p == null)
-            {
-                return;
-            }
-
-            p.FindPropertyRelative("x").intValue = x;
-            p.FindPropertyRelative("y").intValue = y;
-            p.FindPropertyRelative("z").intValue = z;
         }
     }
 }

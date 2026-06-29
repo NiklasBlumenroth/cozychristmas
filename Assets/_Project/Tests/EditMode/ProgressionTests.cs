@@ -6,15 +6,15 @@ namespace CozySanta.Tests.EditMode
     /// <summary>EditMode-Tests für XpLedger (X1–X4), SkillSet/Skill (S1–S5) und Skillwerte (V1).</summary>
     public sealed class ProgressionTests
     {
+        // Reihenfolge = SkillId-Enum (Start→Ende, MaxLevel, [unlockable, hasCharges, chargesStart, chargesEnd]).
         private static SkillConfig[] Configs() => new[]
         {
-            new SkillConfig(1.0f, 0.1f, 3.0f,  20),        // LampPower
-            new SkillConfig(0.8f, 0.05f, 1.8f, 20),        // LampCone
-            new SkillConfig(12f,  1.0f,  32f,  20),        // LampBattery
-            new SkillConfig(5f,   1.0f,  25f,  20),        // CarryCapacity
-            new SkillConfig(3f,   0.15f, 6f,   20),        // MoveSpeed
-            new SkillConfig(0f,   1f,    20f,  20, true),  // SortVision (unlockable)
-            new SkillConfig(0f,   1f,    20f,  20, true),  // ObjectPull (unlockable)
+            new SkillConfig(1.2f, 3.0f, 20),                              // LampPower
+            new SkillConfig(12f,  32f,  20),                             // LampBattery
+            new SkillConfig(5f,   25f,  20),                             // CarryCapacity
+            new SkillConfig(3f,   6f,   20),                             // MoveSpeed
+            new SkillConfig(10f,  4f,   20, true, true, 1f, 5f),         // ObjectPull (Heranholen)
+            new SkillConfig(8f,   3f,   20, true, true, 1f, 5f),         // AutoSort (Auto-Einsortieren)
         };
 
         // ── X1: XP unter Schwelle → Level/Punkte unverändert ────────────────────
@@ -101,11 +101,25 @@ namespace CozySanta.Tests.EditMode
         {
             var state = new ProgressionState(Configs());
             state.AwardXp(100);
-            var skill = state.Skills.Get(SkillId.SortVision);
+            var skill = state.Skills.Get(SkillId.AutoSort);
             Assert.IsFalse(skill.IsUnlocked);
-            state.Invest(SkillId.SortVision);
+            state.Invest(SkillId.AutoSort);
             Assert.IsTrue(skill.IsUnlocked);
             Assert.AreEqual(1, skill.Level);
+        }
+
+        // ── S6: Fähigkeit liefert ganzzahlige Ladungen (zweite Kurve) ───────────
+        [Test]
+        public void AbilitySkill_ProvidesIntegerCharges()
+        {
+            var state = new ProgressionState(Configs());
+            state.AwardXp(9999);
+            var skill = state.Skills.Get(SkillId.AutoSort); // charges 1→5, cooldown 8→3
+            Assert.AreEqual(1, skill.Charges, "Stufe 0 = 1 Ladung");
+            while (state.AvailablePoints > 0 && skill.CanRaise) state.Invest(SkillId.AutoSort);
+            Assert.AreEqual(20, skill.Level);
+            Assert.AreEqual(5, skill.Charges, "Max-Stufe = 5 Ladungen");
+            Assert.AreEqual(3f, skill.Value, 0.001f, "Max-Stufe = 3s Cooldown");
         }
 
         // ── S5: AvailablePoints = verdient − ausgegeben (nie negativ) ────────────

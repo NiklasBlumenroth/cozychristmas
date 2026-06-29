@@ -9,9 +9,9 @@ namespace CozySanta.Runtime.DevTools
 {
     /// <summary>
     /// Entwickler-/Debug-Hilfe (kein Gameplay-UI im Sinne der Constitution V): direktes Springen zu
-    /// festen Teleport-Zielen über die Zifferntasten 1–5. Wird dem Helfer-Objekt im Teleporter zugewiesen;
-    /// jeder Slot bekommt ein Ziel-Transform (z. B. Position in Sektor 1, Sektor 2 …). Taste „1" springt
-    /// zum ersten Slot, „2" zum zweiten usw.
+    /// festen Teleport-Zielen über den Ziffernblock (Numpad 7/8/9/0/6 = Slot 1–5). Auf den Numpad verlegt,
+    /// weil die oberen Zifferntasten 2/3 nun die magischen Sortierhilfen auslösen. Wird dem Helfer-Objekt im
+    /// Teleporter zugewiesen; jeder Slot bekommt ein Ziel-Transform (z. B. Position in Sektor 1, Sektor 2 …).
     ///
     /// Versetzt wird – wie im <see cref="Teleport.TeleportRouter"/> – CharacterController-sicher
     /// (kurz deaktivieren) inkl. optionaler Blickrichtung und optionaler Bereichs-Umschaltung
@@ -33,7 +33,7 @@ namespace CozySanta.Runtime.DevTools
             public GameObject activateArea;
         }
 
-        [Tooltip("Ziele für die Tasten 1–5 (Reihenfolge = Tastennummer). Maximal 5 werden gelesen.")]
+        [Tooltip("Ziele für Numpad 7/8/9/0/6 (Reihenfolge = Slot 1–5). Maximal 5 werden gelesen.")]
         [SerializeField] private List<Slot> slots = new List<Slot>(5);
         [Tooltip("Optional: schaltet beim Sprung den Ziel-Bereich aktiv (siehe 'Activate Area' je Slot). " +
                  "Leer = wird beim Start automatisch gesucht.")]
@@ -41,7 +41,7 @@ namespace CozySanta.Runtime.DevTools
         [Tooltip("Der zu versetzende Spieler. Leer = wird beim Start automatisch gesucht.")]
         [SerializeField] private FirstPersonController player;
 
-        // Zifferntasten 1..5 (Index 0 = Taste „1"). Reihenfolge passt zu den Slots.
+        // Numpad 7/8/9/0/6 (Index 0 = Slot 1). Reihenfolge passt zu den Slots.
         private Key[] _keys;
 
         private void Awake()
@@ -49,7 +49,7 @@ namespace CozySanta.Runtime.DevTools
             if (player == null) player = FindAnyObjectByType<FirstPersonController>();
             if (areaActivator == null) areaActivator = FindAnyObjectByType<AreaActivator>();
 
-            _keys = new[] { Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5 };
+            _keys = new[] { Key.Numpad7, Key.Numpad8, Key.Numpad9, Key.Numpad0, Key.Numpad6 };
         }
 
         private void Update()

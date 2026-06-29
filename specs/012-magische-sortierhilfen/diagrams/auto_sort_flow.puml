@@ -1,0 +1,41 @@
+@startuml auto_sort_flow
+title Fähigkeit A – Auto-Einsortieren (Activate)
+
+start
+if (freigeschaltet & Ladung vorhanden?) then (nein)
+  stop
+endif
+:oberstes getragenes Objekt + SortKey lesen;
+if (Hand leer / kein SortKey?) then (ja)
+  stop
+endif
+:aktuelles Gebäude bestimmen (ItemArea.Contains);
+if (kein Gebäude?) then (ja)
+  stop
+endif
+
+:Ziele im Gebäude sammeln;
+note right
+  Fächer: TryFindFreeColumn(key) == true
+  (Facette passt, nicht geschlossen, freie Zelle)
+  Truhen: CanAutoInsert(key) == true
+  (passende Sorte, nicht verriegelt, Einwurf-Zone frei)
+end note
+if (keine Ziele?) then (ja)
+  stop
+endif
+
+:zufällig EIN Ziel wählen;
+if (Ziel = Fach?) then (Fach)
+  :PlaceInColumn(x, y, carry)\n(Flug aus der Hand in den Slot);
+  if (Objekt hat die Hand verlassen?) then (ja)
+    :Charges.TryConsume();
+  endif
+else (Truhe)
+  :EnsureOpen() + Item oben einwerfen\n(fällt per Physik in den Stapel);
+  if (TryAutoInsert == true?) then (ja)
+    :Charges.TryConsume();
+  endif
+endif
+stop
+@enduml

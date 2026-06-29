@@ -1,4 +1,5 @@
 using CozySanta.Core.Input;
+using CozySanta.Runtime.Abilities;
 using CozySanta.Runtime.Carry;
 using CozySanta.Runtime.Interaction;
 using CozySanta.Runtime.Progression;
@@ -23,9 +24,17 @@ namespace CozySanta.Runtime.Player
 
         [Header("Skill-Menü (optional)")]
         [SerializeField] private SkillMenuView skillMenu;
+        [Tooltip("Dev/Test: Taste B = ein Level-Up (1 Skillpunkt). Leer = wird am Spieler gesucht.")]
+        [SerializeField] private PlayerProgression progression;
 
         [Header("Area-HUD (optional)")]
         [SerializeField] private AreaHudView areaHud;
+
+        [Header("Magische Sortierhilfen (optional)")]
+        [Tooltip("Fähigkeit A – Auto-Einsortieren (Taste 2, Halten = mehrfach).")]
+        [SerializeField] private MagicSortAbility autoSortAbility;
+        [Tooltip("Fähigkeit B – Heranholen (Taste 3, Halten = mehrfach).")]
+        [SerializeField] private MagicGatherAbility gatherAbility;
 
         [Header("Gedrückt-Halten = Aktion wiederholen")]
         [Tooltip("Wartezeit nach dem ersten Auslösen, bevor die Auto-Wiederholung startet (Sekunden).")]
@@ -36,12 +45,17 @@ namespace CozySanta.Runtime.Player
         private HoldRepeatTimer _takeRepeat;
         private HoldRepeatTimer _placeRepeat;
         private HoldRepeatTimer _dropRepeat;
+        private HoldRepeatTimer _autoSortRepeat;
+        private HoldRepeatTimer _gatherRepeat;
 
         private void Awake()
         {
             if (controller == null) controller = GetComponent<FirstPersonController>();
             if (interaction == null) interaction = GetComponent<PlayerInteractionController>();
             if (carry == null) carry = GetComponent<PlayerCarry>();
+            if (autoSortAbility == null) autoSortAbility = GetComponent<MagicSortAbility>();
+            if (gatherAbility == null) gatherAbility = GetComponent<MagicGatherAbility>();
+            if (progression == null) progression = GetComponent<PlayerProgression>();
         }
 
         private void Update()
@@ -88,6 +102,20 @@ namespace CozySanta.Runtime.Player
 
                 if (keyboard.xKey.wasPressedThisFrame && skillMenu != null)
                     ToggleSkillMenu();
+
+                // Dev/Test: Taste B = ein Level-Up (gibt einen Skillpunkt).
+                if (keyboard.bKey.wasPressedThisFrame && progression != null)
+                    progression.LevelUp();
+
+                // Magische Sortierhilfen: Taste 2 = Auto-Einsortieren (A), Taste 3 = Heranholen (B).
+                // Beide lösen sofort aus und wiederholen sich beim Halten.
+                if (autoSortAbility != null
+                    && _autoSortRepeat.Tick(keyboard.digit2Key.isPressed, dt, holdInitialDelay, holdRepeatInterval))
+                    autoSortAbility.Activate();
+
+                if (gatherAbility != null
+                    && _gatherRepeat.Tick(keyboard.digit3Key.isPressed, dt, holdInitialDelay, holdRepeatInterval))
+                    gatherAbility.Activate();
             }
 
             HandleCharging();

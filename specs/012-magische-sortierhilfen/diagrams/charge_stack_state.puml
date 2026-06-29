@@ -1,0 +1,30 @@
+@startuml charge_stack_state
+title ChargeStack – Ladungen & Cooldown (Core, testbar)
+
+[*] --> Voll : new(maxCharges)\nCurrent = MaxCharges
+
+state Voll {
+}
+state Aufladend {
+}
+state Leer {
+}
+
+Voll --> Aufladend : TryConsume()\nCurrent--  (Current < Max)
+Aufladend --> Aufladend : Step(dt)\n_timer += dt  (< Recharge)
+Aufladend --> Aufladend : Step(dt) erreicht Recharge\nCurrent++  (Current < Max)
+Aufladend --> Voll : Current == MaxCharges\n_timer = 0
+Aufladend --> Leer : TryConsume() bis Current == 0
+Leer --> Aufladend : Step(dt) lädt nach
+Leer --> Leer : TryConsume() == false
+
+note right of Voll
+  Fraction == 1
+  HasCharge == (Current > 0)
+end note
+
+note bottom of Leer
+  Configure(max, recharge): Current auf Max geklemmt
+  Refill(): Current = MaxCharges (beim Freischalten)
+end note
+@enduml
