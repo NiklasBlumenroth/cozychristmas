@@ -270,6 +270,7 @@ Assets/_Project/
   („CozySanta/Dekohalle/Fächer in Regalen belegen") weist den 18 `gabinet`-Regalen unter `DekoInnen`
   der Reihe nach je eine Deko-Variante aus dem Katalog zu und vereinheitlicht alle Fächer eines Regals
   auf diese SortKey (liest die Facetten aus den Prefabs; nur `acceptedFacets`, Raster/Mengen unberührt).
+  Schild-Abbild analog Geschenkehalle: `DekoSignSetup` (siehe F11/`BoardSignSetup`).
 
 - **Nachthimmel (additiv, Optik)**: prozeduraler Skybox-Shader `CozySanta/NightSky` (Nacht-Verlauf,
   zweilagiger Sternenhimmel mit Funkeln + Glüh-Halo, Vollmond mit Halo/Kratern, dezente Milchstraße —
@@ -309,12 +310,22 @@ Assets/_Project/
   („CozySanta/Geschenkehalle/Geschenke drehbar machen") fügt sie nachträglich an alle Katalog-Items an
   + legt ein `SortPlacementRotationDevTool` in die Szene (Item tragen, im Fach-Ghost justieren). Doku/
   Diagramm unter `specs/011-geschenkehalle-truhen/`.
-  Item-Abbild auf Schildern (Editor): `GeschenkSignSetup` („CozySanta/Geschenkehalle/Item-Abbild auf
-  Schilder setzen") setzt auf jedes `BoardRegal`-Schild (Kind von Truhe/Regal unter `GeschenkehalleInnen`)
-  ein reines Abbild-Mesh des akzeptierten Items (SortKey des `GiftChest`/`SortTargetInteractable` →
-  `GeschenkehalleCatalog`-Prefab). Kein Sortierobjekt: gestrippt auf MeshFilter/MeshRenderer. Ausrichtung =
-  in-Hand (`SortPlacementRotation.CarryEuler`), zentriert auf der Schildfläche, auf 80% der Fläche
-  eingepasst, Tiefe entlang der Schild-Normalen auf 1% abgeflacht (`ItemSchild`-Kind, idempotent).
+  Item-Abbild auf Schildern (Editor): geteilte Kernlogik `BoardSignSetup` (intern) setzt auf jedes
+  `BoardRegal`-Schild (Kind von Truhe/Regal unter einem Hallen-Root) ein reines Abbild-Mesh des akzeptierten
+  Items. Kein Sortierobjekt: gestrippt auf MeshFilter/MeshRenderer. Ausrichtung = in-Hand
+  (`SortPlacementRotation.CarryEuler`), zentriert auf der Schildfläche, auf 80% der Fläche eingepasst, Tiefe
+  entlang der Schild-Normalen auf 1% abgeflacht (`ItemSchild`-Kind, idempotent). Prefab-Match über die VOLLEN
+  `Sortable`-Facetten (Container-`acceptedFacets` → Katalog-Prefab, dessen `Sortable.facets` identisch sind),
+  mit Fallback auf den Katalog-Schlüssel (Geschenkehalle: SortKey = Prefab-Name). Dünne Wrapper-Befehle:
+  `GeschenkSignSetup` („CozySanta/Geschenkehalle/Item-Abbild auf Schilder setzen", Root `GeschenkehalleInnen`,
+  `GeschenkehalleCatalog`) und `DekoSignSetup` („CozySanta/Dekohalle/Item-Abbild auf Schilder setzen", Root
+  `DekoInnen`, `DekohalleCatalog`; Voraussetzung: Regale via `DekohalleSortAssignmentSetup` belegt).
+  Durchmischen (Editor, Szene): `GeschenkShuffleSetup` mit zwei Befehlen
+  („CozySanta/Geschenkehalle/Regale durchmischen" bzw. „… Truhen durchmischen") tauscht unter
+  `GeschenkehalleInnen` je Container das Bündel aus Sorte (`acceptedFacets` der Fächer bzw. der Truhe, bei
+  Truhen inkl. `required`) UND den `ItemSchild`-Abbildern (Mesh + lokale Position/Rotation/Scale werden
+  mitgenommen). Verteilung = zyklische Zufallspermutation (Sattolo) → jeder Container bekommt garantiert den
+  Inhalt eines anderen; ungleiche Board-Anzahl wird abgefangen (letztes Schild klonen / überzählige entfernen).
 
 ## Status / MVP-Fokus
 
